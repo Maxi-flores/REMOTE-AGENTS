@@ -7,6 +7,15 @@ logs/
 .venv/
 .python-version
 
+# Node / Vite
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+.vite/
+**/.vite/
+*.tsbuildinfo
+
 # Test artifacts
 QUORUM_DISSENT_TEST.txt
 FORENSIC_REPLAY_TEST.txt

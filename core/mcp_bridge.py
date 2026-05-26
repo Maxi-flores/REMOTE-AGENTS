@@ -113,7 +113,7 @@ async def _read_ws_frame(reader: asyncio.StreamReader) -> tuple[int, bytes]:
     return opcode, payload
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, eq=False)
 class _WSConn:
     reader: asyncio.StreamReader
     writer: asyncio.StreamWriter

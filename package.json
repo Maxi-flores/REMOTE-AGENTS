@@ -1,0 +1,13 @@
+{
+  "name": "remote-agents-monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:dashboard-3d": "npm --workspace packages/dashboard-3d run dev",
+    "build:dashboard-3d": "npm --workspace packages/dashboard-3d run build",
+    "lint:dashboard-3d": "npm --workspace packages/dashboard-3d run lint"
+  }
+}
+

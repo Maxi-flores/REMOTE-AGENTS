@@ -13,6 +13,7 @@ import asyncio
 import hashlib
 import json
 import os
+import shutil
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -77,6 +78,13 @@ class WorkspaceCacheEngine:
         self._objects_dir = self._cache_root / "objects"
         self._index_path = self._cache_root / "index.json"
         self._lock = RLock()
+
+    def evict_objects(self) -> None:
+        """Delete all cached objects under `.workspace_cache/objects/`."""
+
+        with self._lock:
+            shutil.rmtree(self._objects_dir, ignore_errors=True)
+            self._objects_dir.mkdir(parents=True, exist_ok=True)
 
     def _object_path(self, fingerprint: ManifestFingerprint) -> Path:
         return self._objects_dir / f"{fingerprint}.json"
@@ -295,4 +303,3 @@ class WorkspaceCacheEngine:
                 latency_ms=wall_ms,
             )
         return result_obj, decision
-

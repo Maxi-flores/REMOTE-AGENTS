@@ -362,6 +362,14 @@ class WorkspaceRollupEngine:
     def batch_size(self) -> int:
         return self._batch_size
 
+    def set_batch_size(self, batch_size: int) -> None:
+        """Update the batch ceiling for future rollup flushes."""
+
+        if not isinstance(batch_size, int) or isinstance(batch_size, bool) or batch_size <= 0:
+            raise ValueError("batch_size must be a positive integer")
+        with self._mu:
+            self._batch_size = int(batch_size)
+
     def ingest_cache_decision(
         self,
         *,

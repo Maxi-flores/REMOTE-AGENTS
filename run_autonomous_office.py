@@ -10,13 +10,13 @@ from pathlib import Path
 
 from agents.registry import AgentRegistry
 from core.handshake import HandshakePipeline
-from core.logconf import configure_logging, component_logger
-from core.matrix_verifier import MatrixVerifier, load_governance_policy
-from core.telemetry import TelemetryTracker, estimate_payload_bytes
 from core.governance import GovernanceLogger
 from core.handshake import handshake_schemas
+from core.logconf import component_logger, configure_logging
+from core.matrix_verifier import MatrixVerifier, load_governance_policy
 from core.orchestrator import run_sync
 from core.recovery import CheckpointFormatError, CheckpointManager
+from core.telemetry import TelemetryTracker, estimate_payload_bytes
 
 
 def _read_business_case(args: argparse.Namespace) -> str:

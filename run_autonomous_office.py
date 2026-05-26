@@ -13,6 +13,7 @@ from core.governance import GovernanceLogger
 from core.handshake import HandshakePipeline, handshake_schemas
 from core.logconf import component_logger, configure_logging
 from core.orchestrator import run_sync
+from core.proof_ledger import ProofLedgerManager
 from core.recovery import CheckpointFormatError, CheckpointManager
 from core.transaction_manager import cleanup_workspace_staging
 
@@ -96,8 +97,9 @@ def main(argv: list[str] | None = None) -> int:
     log_dir = Path(args.log_dir).resolve()
     business_case = _read_business_case(args)
 
-    governance = GovernanceLogger(root=log_dir)
     checkpoint = CheckpointManager(logs_dir=log_dir, business_case=business_case)
+    proof_ledger = ProofLedgerManager(logs_dir=log_dir, execution_token=checkpoint.token)
+    governance = GovernanceLogger(root=log_dir, proof_ledger=proof_ledger)
     resume = None
     try:
         resume = checkpoint.load()

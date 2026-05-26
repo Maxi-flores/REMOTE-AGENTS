@@ -16,7 +16,7 @@ import hashlib
 import json
 import os
 import threading
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterator, Mapping, MutableMapping, TypedDict, cast
@@ -58,13 +58,15 @@ class ProofLedgerManager:
 
     logs_dir: Path
     execution_token: str
+    _path: Path = field(init=False)
+    _mu: threading.Lock = field(init=False)
+    _next_index: int = field(init=False, default=0)
+    _prev_hash: str = field(init=False, default="0" * 64)
 
     def __post_init__(self) -> None:
         self.logs_dir.mkdir(parents=True, exist_ok=True)
         self._path = self.logs_dir / "PROOFS_LEDGER.jsonl"
         self._mu = threading.Lock()
-        self._next_index = 0
-        self._prev_hash = "0" * 64
         self._hydrate_tail()
 
     @property
@@ -178,4 +180,3 @@ def verify_ledger_blocks(blocks: Iterator[ProofLedgerBlock]) -> list[ProofLedger
         expected_index += 1
         verified.append(block)
     return verified
-

@@ -242,13 +242,14 @@ async def run_three_stage_pipeline(
 ) -> JSONObject:
     ensure_workspace_io_hooks_installed()
     engine = HandshakeEngine(governance=governance, schemas=handshake_schemas())
+    ledger = governance.proof_ledger
 
     repo_root_raw = workspace_snapshot.get("repo_root")
     repo_root = Path(repo_root_raw).resolve() if isinstance(repo_root_raw, str) else Path.cwd().resolve()
     token = checkpoint.token if checkpoint is not None else execution_token(business_case=business_case)
     cleanup_workspace_staging(repo_root=repo_root, token=token, active_stage=resume.active_stage if resume else None)
 
-    quorum_mgr = quorum or ValidationQuorumManager(logs_dir=governance.root)
+    quorum_mgr = quorum or ValidationQuorumManager(logs_dir=governance.root, proof_ledger=ledger)
 
     stage_to_next_role: dict[str, str] = {
         "intake_to_architecture": "software_architect",
@@ -263,6 +264,41 @@ async def run_three_stage_pipeline(
     q1: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] = asyncio.Queue(maxsize=1)
     q2: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] = asyncio.Queue(maxsize=1)
     q3: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] = asyncio.Queue(maxsize=1)
+
+    def _env_meta(item: PacketEnvelope[JSONObject] | _Stop) -> JSONObject:
+        if item is STOP:
+            return {"stop": True}
+        return {
+            "sequence": item.sequence,
+            "schema_id": item.schema_id,
+            "signature": item.signature,
+            "source_role": item.source_role,
+            "correlation_id": item.correlation_id,
+        }
+
+    async def _q_put(
+        name: str,
+        q: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop],
+        item: PacketEnvelope[JSONObject] | _Stop,
+    ) -> None:
+        if ledger is not None:
+            try:
+                ledger.append_block({"kind": "QUEUE_PUT", "queue": name, "item": _env_meta(item)})
+            except Exception:
+                pass
+        await q.put(item)
+
+    async def _q_get(
+        name: str,
+        q: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop],
+    ) -> PacketEnvelope[JSONObject] | _Stop:
+        item = await q.get()
+        if ledger is not None:
+            try:
+                ledger.append_block({"kind": "QUEUE_GET", "queue": name, "item": _env_meta(item)})
+            except Exception:
+                pass
+        return item
 
     seed_stop: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] | None = None
     if resume is not None:
@@ -310,19 +346,25 @@ async def run_three_stage_pipeline(
             created_at=resume.created_at,
         )
         if env.sequence == "intake_to_architecture":
-            await q1.put(env)
+            await _q_put("q1", q1, env)
             seed_stop = q1
         elif env.sequence == "architecture_to_risk":
-            await q2.put(env)
+            await _q_put("q2", q2, env)
             seed_stop = q2
         elif env.sequence == "risk_to_build_execution":
-            await q3.put(env)
+            await _q_put("q3", q3, env)
         else:
             raise CriticalMisalignmentError(f"Unsupported resume stage: {env.sequence}")
 
     async def intake_task() -> None:
         exclude = [governance.root]
-        async with WorkspaceTransaction(repo_roots=[repo_root], token=token, stage="intake_to_architecture", exclude_roots=exclude) as tx:
+        async with WorkspaceTransaction(
+            repo_roots=[repo_root],
+            token=token,
+            stage="intake_to_architecture",
+            exclude_roots=exclude,
+            proof_ledger=ledger,
+        ) as tx:
             payload = await intake_agent.build_intake_payload(
                 business_case=business_case, workspace_snapshot=workspace_snapshot
             )
@@ -380,19 +422,25 @@ async def run_three_stage_pipeline(
                     )
             if checkpoint_ok:
                 tx.commit()
-        await q1.put(env)
-        await q1.put(STOP)
+        await _q_put("q1", q1, env)
+        await _q_put("q1", q1, STOP)
 
     async def architect_task() -> None:
         while True:
-            item = await q1.get()
+            item = await _q_get("q1", q1)
             if item is STOP:
-                await q2.put(STOP)
+                await _q_put("q2", q2, STOP)
                 return
             env1 = item
             engine.validate_envelope(env1, expected_sequence="intake_to_architecture")
             exclude = [governance.root]
-            async with WorkspaceTransaction(repo_roots=[repo_root], token=token, stage="architecture_to_risk", exclude_roots=exclude) as tx:
+            async with WorkspaceTransaction(
+                repo_roots=[repo_root],
+                token=token,
+                stage="architecture_to_risk",
+                exclude_roots=exclude,
+                proof_ledger=ledger,
+            ) as tx:
                 payload = await architect_agent.build_architecture_payload(intake_envelope=env1)
                 env2 = engine.create_envelope(
                     sequence="architecture_to_risk",
@@ -449,18 +497,24 @@ async def run_three_stage_pipeline(
                         )
                 if checkpoint_ok:
                     tx.commit()
-                await q2.put(env2)
+                await _q_put("q2", q2, env2)
 
     async def risk_task() -> None:
         while True:
-            item = await q2.get()
+            item = await _q_get("q2", q2)
             if item is STOP:
-                await q3.put(STOP)
+                await _q_put("q3", q3, STOP)
                 return
             env2 = item
             engine.validate_envelope(env2, expected_sequence="architecture_to_risk")
             exclude = [governance.root]
-            async with WorkspaceTransaction(repo_roots=[repo_root], token=token, stage="risk_to_build_execution", exclude_roots=exclude) as tx:
+            async with WorkspaceTransaction(
+                repo_roots=[repo_root],
+                token=token,
+                stage="risk_to_build_execution",
+                exclude_roots=exclude,
+                proof_ledger=ledger,
+            ) as tx:
                 payload = await risk_agent.build_risk_payload(architecture_envelope=env2)
                 env3 = engine.create_envelope(
                     sequence="risk_to_build_execution",
@@ -517,11 +571,11 @@ async def run_three_stage_pipeline(
                         )
                 if checkpoint_ok:
                     tx.commit()
-                await q3.put(env3)
+                await _q_put("q3", q3, env3)
 
     async def build_task() -> JSONObject:
         while True:
-            item = await q3.get()
+            item = await _q_get("q3", q3)
             if item is STOP:
                 raise CriticalMisalignmentError("Pipeline terminated before build execution.")
             env3 = item
@@ -534,7 +588,14 @@ async def run_three_stage_pipeline(
     async def seed_stop_task() -> None:
         if seed_stop is None:
             return
-        await seed_stop.put(STOP)
+        if seed_stop is q1:
+            await _q_put("q1", q1, STOP)
+        elif seed_stop is q2:
+            await _q_put("q2", q2, STOP)
+        elif seed_stop is q3:
+            await _q_put("q3", q3, STOP)
+        else:
+            await seed_stop.put(STOP)
 
     async with asyncio.TaskGroup() as tg:
         if resume is None:

@@ -17,6 +17,7 @@ from typing import Any, Awaitable, Callable, Iterable, Mapping, MutableMapping, 
 from core.exceptions import QuorumDissentException
 from core.fault import dump_quorum_dissent_snapshot
 from core.hashutil import fnv1a_32
+from core.proof_ledger import ProofLedgerManager
 from core.schema import Schema, SchemaValidationError, canonical_json, validate_against_schema
 from core.types import JSONObject, JSONValue
 
@@ -289,6 +290,7 @@ class ValidationQuorumManager:
     logs_dir: Path
     policy: QuorumPolicy = QuorumPolicy()
     validators_by_stage: Mapping[str, Sequence[tuple[str, Validator]]] | None = None
+    proof_ledger: ProofLedgerManager | None = None
 
     async def validate(
         self,
@@ -345,6 +347,25 @@ class ValidationQuorumManager:
             for validator_id, validator in validators:
                 tg.create_task(_run_one(validator_id, validator))
 
+        ledger = self.proof_ledger
+        if ledger is not None:
+            try:
+                ordered = {k: ballots[k] for k in sorted(ballots)}
+                ledger.append_block(
+                    {
+                        "kind": "QUORUM_BALLOTS_COLLECTED",
+                        "stage": stage,
+                        "schema_id": schema.schema_id,
+                        "correlation_id": correlation_id,
+                        "handshake_hash": handshake_hash,
+                        "envelope_signature": envelope_signature,
+                        "policy": {"mode": self.policy.mode, "halt_on_any_dissent": self.policy.halt_on_any_dissent},
+                        "ballots": ordered,
+                    }
+                )
+            except Exception:
+                pass
+
         try:
             self._enforce_quorum(stage=stage, ballots=dict(ballots))
         except QuorumDissentException as exc:
@@ -357,6 +378,23 @@ class ValidationQuorumManager:
                 proposer_payload=payload,
                 ballots=ballots,
             )
+            if ledger is not None:
+                try:
+                    ordered = {k: ballots[k] for k in sorted(ballots)}
+                    ledger.append_block(
+                        {
+                            "kind": "QUORUM_DISSENT",
+                            "stage": stage,
+                            "schema_id": schema.schema_id,
+                            "correlation_id": correlation_id,
+                            "handshake_hash": handshake_hash,
+                            "envelope_signature": envelope_signature,
+                            "error": str(exc),
+                            "ballots": ordered,
+                        }
+                    )
+                except Exception:
+                    pass
             raise QuorumDissentException(
                 str(exc),
                 stage=stage,
@@ -366,6 +404,24 @@ class ValidationQuorumManager:
                 ballots=dict(ballots),
                 payload=payload,
             ) from exc
+        if ledger is not None:
+            try:
+                total = len(ballots)
+                required = self.policy.required_passes(total)
+                passed = sum(1 for b in ballots.values() if bool(b.get("passed")))
+                ledger.append_block(
+                    {
+                        "kind": "QUORUM_PASSED",
+                        "stage": stage,
+                        "schema_id": schema.schema_id,
+                        "correlation_id": correlation_id,
+                        "passed": passed,
+                        "total": total,
+                        "required": required,
+                    }
+                )
+            except Exception:
+                pass
         return dict(ballots)
 
     def _validators_for_stage(self, stage: str) -> Sequence[tuple[str, Validator]]:

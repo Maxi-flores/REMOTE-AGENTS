@@ -3,6 +3,7 @@ __pycache__/
 logs/
 .remote_agents_logs/
 .workspace_staging/
+.workspace_cache/
 .venv/
 .python-version
 

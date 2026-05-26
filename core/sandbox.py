@@ -235,6 +235,7 @@ class AgentSandboxExecutor:
         stage: PipelineStage | None = None,
         event: str = "SANDBOX_RUN",
         telemetry_metadata: Mapping[str, Any] | None = None,
+        metrics_hook: Callable[[SandboxMetrics], None] | None = None,
     ) -> T:
         if self._closed:
             raise RuntimeError("AgentSandboxExecutor is closed")
@@ -387,6 +388,13 @@ class AgentSandboxExecutor:
             raise PipelineHaltException(f"{label} sandbox timeout (mode={chosen}, timeout_s={timeout_s})") from exc
 
         self._director.record(label, metrics.wall_ms)
+
+        if metrics_hook is not None:
+            try:
+                metrics_hook(metrics)
+            except Exception:
+                # Cache/telemetry observers must never break sandbox execution.
+                pass
 
         if tracer is not None and correlation_id is not None and stage is not None:
             meta: dict[str, Any] = dict(telemetry_metadata or {})

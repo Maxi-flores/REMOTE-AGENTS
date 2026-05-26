@@ -14,6 +14,7 @@ from core.handshake import HandshakePipeline, handshake_schemas
 from core.logconf import component_logger, configure_logging
 from core.orchestrator import run_sync
 from core.recovery import CheckpointFormatError, CheckpointManager
+from core.transaction_manager import cleanup_workspace_staging
 
 
 def _read_business_case(args: argparse.Namespace) -> str:
@@ -104,6 +105,13 @@ def main(argv: list[str] | None = None) -> int:
         governance.emit_event({"event": "CHECKPOINT_INVALID", "error": str(exc)})
         resume = None
 
+    # Always clear or finalize any orphaned workspace staging for this execution token.
+    cleanup_workspace_staging(
+        repo_root=repo_root,
+        token=checkpoint.token,
+        active_stage=resume.active_stage if resume is not None else None,
+    )
+
     if resume is not None and checkpoint.requires_manual_intervention():
         governance.emit_event({"event": "INTERVENTION_REQUIRED", "active_stage": resume.active_stage})
         if not args.resolve_intervention:
@@ -111,6 +119,7 @@ def main(argv: list[str] | None = None) -> int:
         repaired = checkpoint.resolve_intervention(schemas=handshake_schemas())
         if repaired is not None:
             resume = repaired
+        cleanup_workspace_staging(repo_root=repo_root, token=checkpoint.token, active_stage=resume.active_stage)
         governance.set_state("Running")
 
     return run_sync(

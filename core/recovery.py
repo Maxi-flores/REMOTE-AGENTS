@@ -222,7 +222,7 @@ class CheckpointManager:
         created_at: float,
         next_role: str,
         governance_state: GovernanceState = "Running",
-    ) -> None:
+    ) -> bool:
         """Atomically persist a checkpoint after a successful stage handoff."""
         try:
             validate_against_schema(payload, schema.definition)
@@ -251,9 +251,10 @@ class CheckpointManager:
                 updated_at=now,
             )
             _atomic_write_json(self.checkpoint_path, snap.to_json())
+            return True
         except Exception:
             # Recovery must never cause a new halt; containment is required.
-            return
+            return False
 
     def clear(self) -> None:
         try:
@@ -330,4 +331,3 @@ class CheckpointManager:
             if obj.get("event") == "STATE" and obj.get("state") == "Pending Intervention":
                 saw_pending = True
         return saw_pending and saw_misalignment
-

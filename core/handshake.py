@@ -21,8 +21,9 @@ from .exceptions import CriticalMisalignmentError, PipelineHaltException
 from .fault import dump_critical_misalignment
 from .governance import GovernanceLogger
 from .hashutil import fnv1a_32
-from .recovery import CheckpointManager, CheckpointSnapshot
+from .recovery import CheckpointManager, CheckpointSnapshot, execution_token
 from .schema import Schema, SchemaValidationError, signature_for, validate_against_schema
+from .transaction_manager import WorkspaceTransaction, cleanup_workspace_staging, ensure_workspace_io_hooks_installed
 from .types import JSONObject
 from .validator import SchemaValidator
 
@@ -237,7 +238,13 @@ async def run_three_stage_pipeline(
     checkpoint: CheckpointManager | None = None,
     resume: CheckpointSnapshot | None = None,
 ) -> JSONObject:
+    ensure_workspace_io_hooks_installed()
     engine = HandshakeEngine(governance=governance, schemas=handshake_schemas())
+
+    repo_root_raw = workspace_snapshot.get("repo_root")
+    repo_root = Path(repo_root_raw).resolve() if isinstance(repo_root_raw, str) else Path.cwd().resolve()
+    token = checkpoint.token if checkpoint is not None else execution_token(business_case=business_case)
+    cleanup_workspace_staging(repo_root=repo_root, token=token, active_stage=resume.active_stage if resume else None)
 
     q1: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] = asyncio.Queue(maxsize=1)
     q2: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] = asyncio.Queue(maxsize=1)
@@ -266,29 +273,34 @@ async def run_three_stage_pipeline(
             raise CriticalMisalignmentError(f"Unsupported resume stage: {env.sequence}")
 
     async def intake_task() -> None:
-        payload = await intake_agent.build_intake_payload(
-            business_case=business_case, workspace_snapshot=workspace_snapshot
-        )
-        env = engine.create_envelope(
-            sequence="intake_to_architecture",
-            schema_id="intake_to_architecture.v1",
-            payload=payload,
-            source_role="intake_specialist",
-        )
-        if checkpoint is not None:
-            schema = engine.schemas.get(env.schema_id)
-            if schema is not None:
-                checkpoint.record_stage(
-                    stage=env.sequence,
-                    schema=schema,
-                    payload=env.payload,
-                    envelope_signature=env.signature,
-                    source_role=env.source_role,
-                    correlation_id=env.correlation_id,
-                    created_at=env.created_at,
-                    next_role="software_architect",
-                    governance_state=governance.state,
-                )
+        exclude = [governance.root]
+        async with WorkspaceTransaction(repo_roots=[repo_root], token=token, stage="intake_to_architecture", exclude_roots=exclude) as tx:
+            payload = await intake_agent.build_intake_payload(
+                business_case=business_case, workspace_snapshot=workspace_snapshot
+            )
+            env = engine.create_envelope(
+                sequence="intake_to_architecture",
+                schema_id="intake_to_architecture.v1",
+                payload=payload,
+                source_role="intake_specialist",
+            )
+            checkpoint_ok = True
+            if checkpoint is not None:
+                schema = engine.schemas.get(env.schema_id)
+                if schema is not None:
+                    checkpoint_ok = checkpoint.record_stage(
+                        stage=env.sequence,
+                        schema=schema,
+                        payload=env.payload,
+                        envelope_signature=env.signature,
+                        source_role=env.source_role,
+                        correlation_id=env.correlation_id,
+                        created_at=env.created_at,
+                        next_role="software_architect",
+                        governance_state=governance.state,
+                    )
+            if checkpoint_ok:
+                tx.commit()
         await q1.put(env)
         await q1.put(STOP)
 
@@ -300,29 +312,34 @@ async def run_three_stage_pipeline(
                 return
             env1 = item
             engine.validate_envelope(env1, expected_sequence="intake_to_architecture")
-            payload = await architect_agent.build_architecture_payload(intake_envelope=env1)
-            env2 = engine.create_envelope(
-                sequence="architecture_to_risk",
-                schema_id="architecture_to_risk.v1",
-                payload=payload,
-                source_role="software_architect",
-                correlation_id=env1.correlation_id,
-            )
-            if checkpoint is not None:
-                schema = engine.schemas.get(env2.schema_id)
-                if schema is not None:
-                    checkpoint.record_stage(
-                        stage=env2.sequence,
-                        schema=schema,
-                        payload=env2.payload,
-                        envelope_signature=env2.signature,
-                        source_role=env2.source_role,
-                        correlation_id=env2.correlation_id,
-                        created_at=env2.created_at,
-                        next_role="risk_compliance",
-                        governance_state=governance.state,
-                    )
-            await q2.put(env2)
+            exclude = [governance.root]
+            async with WorkspaceTransaction(repo_roots=[repo_root], token=token, stage="architecture_to_risk", exclude_roots=exclude) as tx:
+                payload = await architect_agent.build_architecture_payload(intake_envelope=env1)
+                env2 = engine.create_envelope(
+                    sequence="architecture_to_risk",
+                    schema_id="architecture_to_risk.v1",
+                    payload=payload,
+                    source_role="software_architect",
+                    correlation_id=env1.correlation_id,
+                )
+                checkpoint_ok = True
+                if checkpoint is not None:
+                    schema = engine.schemas.get(env2.schema_id)
+                    if schema is not None:
+                        checkpoint_ok = checkpoint.record_stage(
+                            stage=env2.sequence,
+                            schema=schema,
+                            payload=env2.payload,
+                            envelope_signature=env2.signature,
+                            source_role=env2.source_role,
+                            correlation_id=env2.correlation_id,
+                            created_at=env2.created_at,
+                            next_role="risk_compliance",
+                            governance_state=governance.state,
+                        )
+                if checkpoint_ok:
+                    tx.commit()
+                await q2.put(env2)
 
     async def risk_task() -> None:
         while True:
@@ -332,29 +349,34 @@ async def run_three_stage_pipeline(
                 return
             env2 = item
             engine.validate_envelope(env2, expected_sequence="architecture_to_risk")
-            payload = await risk_agent.build_risk_payload(architecture_envelope=env2)
-            env3 = engine.create_envelope(
-                sequence="risk_to_build_execution",
-                schema_id="risk_to_build_execution.v1",
-                payload=payload,
-                source_role="risk_compliance",
-                correlation_id=env2.correlation_id,
-            )
-            if checkpoint is not None:
-                schema = engine.schemas.get(env3.schema_id)
-                if schema is not None:
-                    checkpoint.record_stage(
-                        stage=env3.sequence,
-                        schema=schema,
-                        payload=env3.payload,
-                        envelope_signature=env3.signature,
-                        source_role=env3.source_role,
-                        correlation_id=env3.correlation_id,
-                        created_at=env3.created_at,
-                        next_role="build_orchestrator",
-                        governance_state=governance.state,
-                    )
-            await q3.put(env3)
+            exclude = [governance.root]
+            async with WorkspaceTransaction(repo_roots=[repo_root], token=token, stage="risk_to_build_execution", exclude_roots=exclude) as tx:
+                payload = await risk_agent.build_risk_payload(architecture_envelope=env2)
+                env3 = engine.create_envelope(
+                    sequence="risk_to_build_execution",
+                    schema_id="risk_to_build_execution.v1",
+                    payload=payload,
+                    source_role="risk_compliance",
+                    correlation_id=env2.correlation_id,
+                )
+                checkpoint_ok = True
+                if checkpoint is not None:
+                    schema = engine.schemas.get(env3.schema_id)
+                    if schema is not None:
+                        checkpoint_ok = checkpoint.record_stage(
+                            stage=env3.sequence,
+                            schema=schema,
+                            payload=env3.payload,
+                            envelope_signature=env3.signature,
+                            source_role=env3.source_role,
+                            correlation_id=env3.correlation_id,
+                            created_at=env3.created_at,
+                            next_role="build_orchestrator",
+                            governance_state=governance.state,
+                        )
+                if checkpoint_ok:
+                    tx.commit()
+                await q3.put(env3)
 
     async def build_task() -> JSONObject:
         while True:

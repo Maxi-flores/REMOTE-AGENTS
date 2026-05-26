@@ -12,6 +12,7 @@ from typing import Any
 from core.exceptions import CriticalMisalignmentError
 from core.governance import GovernanceLogger
 from core.handshake import run_three_stage_pipeline
+from core.recovery import CheckpointManager, CheckpointSnapshot
 from core.parsers import (
     DesignatedAgentsConfig,
     RepoGuide,
@@ -81,7 +82,13 @@ class Orchestrator:
         )
         return cls(workspace=workspace, governance=governance)
 
-    async def run(self, *, business_case: str) -> int:
+    async def run(
+        self,
+        *,
+        business_case: str,
+        checkpoint: CheckpointManager | None = None,
+        resume: CheckpointSnapshot | None = None,
+    ) -> int:
         self.governance.emit_event(
             {
                 "event": "ORCHESTRATOR_START",
@@ -91,10 +98,32 @@ class Orchestrator:
         )
 
         try:
-            intake_agent = self._load_agent("intake_specialist")
-            architect_agent = self._load_agent("software_architect")
-            risk_agent = self._load_agent("risk_compliance")
-            build_agent = self._load_agent("build_orchestrator")
+            needed_roles = {"intake_specialist", "software_architect", "risk_compliance", "build_orchestrator"}
+            if resume is not None:
+                if resume.active_stage == "intake_to_architecture":
+                    needed_roles.discard("intake_specialist")
+                elif resume.active_stage == "architecture_to_risk":
+                    needed_roles.discard("intake_specialist")
+                    needed_roles.discard("software_architect")
+                elif resume.active_stage == "risk_to_build_execution":
+                    needed_roles.discard("intake_specialist")
+                    needed_roles.discard("software_architect")
+                    needed_roles.discard("risk_compliance")
+                else:
+                    raise CriticalMisalignmentError(f"Unknown resume stage: {resume.active_stage}")
+                self.governance.emit_event(
+                    {
+                        "event": "ORCHESTRATOR_RESUME",
+                        "active_stage": resume.active_stage,
+                        "schema_id": resume.schema_id,
+                        "correlation_id": resume.correlation_id,
+                    }
+                )
+
+            intake_agent = self._load_agent("intake_specialist") if "intake_specialist" in needed_roles else None
+            architect_agent = self._load_agent("software_architect") if "software_architect" in needed_roles else None
+            risk_agent = self._load_agent("risk_compliance") if "risk_compliance" in needed_roles else None
+            build_agent = self._load_agent("build_orchestrator") if "build_orchestrator" in needed_roles else None
 
             result = await run_three_stage_pipeline(
                 governance=self.governance,
@@ -104,6 +133,8 @@ class Orchestrator:
                 build_agent=build_agent,
                 business_case=business_case,
                 workspace_snapshot=self.workspace.snapshot(),
+                checkpoint=checkpoint,
+                resume=resume,
             )
             self.governance.emit_event({"event": "ORCHESTRATOR_RESULT", "result": result})
             self.governance.set_state("Completed")
@@ -140,7 +171,13 @@ class Orchestrator:
             return cls()
 
 
-def run_sync(*, business_case: str, repo_root: Path, governance: GovernanceLogger) -> int:
+def run_sync(
+    *,
+    business_case: str,
+    repo_root: Path,
+    governance: GovernanceLogger,
+    checkpoint: CheckpointManager | None = None,
+    resume: CheckpointSnapshot | None = None,
+) -> int:
     orchestrator = Orchestrator.load_from_repo_root(repo_root, governance=governance)
-    return asyncio.run(orchestrator.run(business_case=business_case))
-
+    return asyncio.run(orchestrator.run(business_case=business_case, checkpoint=checkpoint, resume=resume))

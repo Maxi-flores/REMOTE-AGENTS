@@ -21,6 +21,7 @@ from .exceptions import CriticalMisalignmentError, PipelineHaltException
 from .fault import dump_critical_misalignment
 from .governance import GovernanceLogger
 from .hashutil import fnv1a_32
+from .recovery import CheckpointManager, CheckpointSnapshot
 from .schema import Schema, SchemaValidationError, signature_for, validate_against_schema
 from .types import JSONObject
 from .validator import SchemaValidator
@@ -233,12 +234,36 @@ async def run_three_stage_pipeline(
     build_agent: Any,
     business_case: str,
     workspace_snapshot: JSONObject,
+    checkpoint: CheckpointManager | None = None,
+    resume: CheckpointSnapshot | None = None,
 ) -> JSONObject:
     engine = HandshakeEngine(governance=governance, schemas=handshake_schemas())
 
     q1: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] = asyncio.Queue(maxsize=1)
     q2: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] = asyncio.Queue(maxsize=1)
     q3: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] = asyncio.Queue(maxsize=1)
+
+    seed_stop: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] | None = None
+    if resume is not None:
+        env = PacketEnvelope(
+            sequence=resume.active_stage,
+            schema_id=resume.schema_id,
+            payload=resume.payload,
+            signature=resume.envelope_signature,
+            source_role=resume.source_role,
+            correlation_id=resume.correlation_id,
+            created_at=resume.created_at,
+        )
+        if env.sequence == "intake_to_architecture":
+            await q1.put(env)
+            seed_stop = q1
+        elif env.sequence == "architecture_to_risk":
+            await q2.put(env)
+            seed_stop = q2
+        elif env.sequence == "risk_to_build_execution":
+            await q3.put(env)
+        else:
+            raise CriticalMisalignmentError(f"Unsupported resume stage: {env.sequence}")
 
     async def intake_task() -> None:
         payload = await intake_agent.build_intake_payload(
@@ -250,6 +275,20 @@ async def run_three_stage_pipeline(
             payload=payload,
             source_role="intake_specialist",
         )
+        if checkpoint is not None:
+            schema = engine.schemas.get(env.schema_id)
+            if schema is not None:
+                checkpoint.record_stage(
+                    stage=env.sequence,
+                    schema=schema,
+                    payload=env.payload,
+                    envelope_signature=env.signature,
+                    source_role=env.source_role,
+                    correlation_id=env.correlation_id,
+                    created_at=env.created_at,
+                    next_role="software_architect",
+                    governance_state=governance.state,
+                )
         await q1.put(env)
         await q1.put(STOP)
 
@@ -269,6 +308,20 @@ async def run_three_stage_pipeline(
                 source_role="software_architect",
                 correlation_id=env1.correlation_id,
             )
+            if checkpoint is not None:
+                schema = engine.schemas.get(env2.schema_id)
+                if schema is not None:
+                    checkpoint.record_stage(
+                        stage=env2.sequence,
+                        schema=schema,
+                        payload=env2.payload,
+                        envelope_signature=env2.signature,
+                        source_role=env2.source_role,
+                        correlation_id=env2.correlation_id,
+                        created_at=env2.created_at,
+                        next_role="risk_compliance",
+                        governance_state=governance.state,
+                    )
             await q2.put(env2)
 
     async def risk_task() -> None:
@@ -287,6 +340,20 @@ async def run_three_stage_pipeline(
                 source_role="risk_compliance",
                 correlation_id=env2.correlation_id,
             )
+            if checkpoint is not None:
+                schema = engine.schemas.get(env3.schema_id)
+                if schema is not None:
+                    checkpoint.record_stage(
+                        stage=env3.sequence,
+                        schema=schema,
+                        payload=env3.payload,
+                        envelope_signature=env3.signature,
+                        source_role=env3.source_role,
+                        correlation_id=env3.correlation_id,
+                        created_at=env3.created_at,
+                        next_role="build_orchestrator",
+                        governance_state=governance.state,
+                    )
             await q3.put(env3)
 
     async def build_task() -> JSONObject:
@@ -296,12 +363,32 @@ async def run_three_stage_pipeline(
                 raise CriticalMisalignmentError("Pipeline terminated before build execution.")
             env3 = item
             engine.validate_envelope(env3, expected_sequence="risk_to_build_execution")
-            return await build_agent.execute_build(envelope=env3)
+            result = await build_agent.execute_build(envelope=env3)
+            if checkpoint is not None:
+                checkpoint.clear()
+            return result
+
+    async def seed_stop_task() -> None:
+        if seed_stop is None:
+            return
+        await seed_stop.put(STOP)
 
     async with asyncio.TaskGroup() as tg:
-        tg.create_task(intake_task())
-        tg.create_task(architect_task())
-        tg.create_task(risk_task())
+        if resume is None:
+            tg.create_task(intake_task())
+            tg.create_task(architect_task())
+            tg.create_task(risk_task())
+        else:
+            if resume.active_stage == "intake_to_architecture":
+                tg.create_task(architect_task())
+                tg.create_task(risk_task())
+            elif resume.active_stage == "architecture_to_risk":
+                tg.create_task(risk_task())
+            elif resume.active_stage == "risk_to_build_execution":
+                pass
+            else:
+                raise CriticalMisalignmentError(f"Unsupported resume stage: {resume.active_stage}")
+            tg.create_task(seed_stop_task())
         build = tg.create_task(build_task())
 
     return build.result()
@@ -437,6 +524,13 @@ class HandshakePipeline:
             await asyncio.gather(*tasks)
             return await artifact_task
         except Exception as exc:
+            for task in tasks:
+                task.cancel()
+            try:
+                artifact_task.cancel()
+            except Exception:
+                pass
+            await asyncio.gather(*tasks, artifact_task, return_exceptions=True)
             state["pipeline_state"] = "DEAD_HALT"
             dump_critical_misalignment(self._logs_dir, state, exc)
             raise

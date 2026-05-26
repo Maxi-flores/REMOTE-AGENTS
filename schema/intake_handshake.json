@@ -6,6 +6,10 @@
   "additionalProperties": false,
   "required": ["origin_agent", "target_agent", "protocol", "payload"],
   "properties": {
+    "handshake_hash": {
+      "type": "string",
+      "description": "Optional precomputed FNV-1a token for tamper detection."
+    },
     "origin_agent": {
       "type": "string",
       "enum": ["ISA"]
@@ -52,4 +56,3 @@
     }
   }
 }
-

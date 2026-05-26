@@ -13,6 +13,8 @@ from core.governance import GovernanceLogger
 from core.handshake import HandshakePipeline, handshake_schemas
 from core.logconf import component_logger, configure_logging
 from core.orchestrator import run_sync
+from core.proof_ledger import ProofLedgerManager
+from core.replay import PipelineReplayController, ReadOnlyWorkspaceGuard
 from core.recovery import CheckpointFormatError, CheckpointManager
 from core.transaction_manager import cleanup_workspace_staging
 
@@ -87,6 +89,10 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Re-validate a human-fixed checkpoint payload and resume execution.",
     )
+    parser.add_argument(
+        "--replay-from-ledger",
+        help="Deterministically replay from logs/PROOFS_LEDGER.jsonl (start index) or a ledger/snapshot file path.",
+    )
     args = parser.parse_args(argv)
 
     if args.legacy_intake:
@@ -94,10 +100,21 @@ def main(argv: list[str] | None = None) -> int:
 
     repo_root = Path(args.repo_root).resolve()
     log_dir = Path(args.log_dir).resolve()
+
+    if args.replay_from_ledger:
+        controller = PipelineReplayController(repo_root=repo_root, log_dir=log_dir)
+        try:
+            with ReadOnlyWorkspaceGuard(repo_root):
+                asyncio.run(controller.replay_step_loop(source=str(args.replay_from_ledger)))
+            return 0
+        finally:
+            controller.close()
+
     business_case = _read_business_case(args)
 
-    governance = GovernanceLogger(root=log_dir)
     checkpoint = CheckpointManager(logs_dir=log_dir, business_case=business_case)
+    proof_ledger = ProofLedgerManager(logs_dir=log_dir, execution_token=checkpoint.token)
+    governance = GovernanceLogger(root=log_dir, proof_ledger=proof_ledger)
     resume = None
     try:
         resume = checkpoint.load()

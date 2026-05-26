@@ -13,6 +13,7 @@ cross-process interference.
 from __future__ import annotations
 
 import builtins
+import base64
 import contextvars
 import hashlib
 import json
@@ -24,6 +25,8 @@ import uuid
 from dataclasses import dataclass
 from pathlib import Path
 from typing import IO, Any, Iterable, Literal, Mapping, MutableMapping, Sequence
+
+from core.proof_ledger import ProofLedgerManager
 
 try:  # pragma: no cover - platform-dependent
     import fcntl  # type: ignore[import-not-found]
@@ -176,6 +179,7 @@ class WorkspaceTransaction:
         token: str,
         stage: str,
         exclude_roots: Sequence[Path] | None = None,
+        proof_ledger: ProofLedgerManager | None = None,
     ) -> None:
         if not repo_roots:
             raise ValueError("repo_roots must be non-empty")
@@ -183,6 +187,7 @@ class WorkspaceTransaction:
         self._exclude_roots = [p.resolve() for p in (exclude_roots or [])]
         self._token = token
         self._stage = stage
+        self._proof_ledger = proof_ledger
         self._txn_id = uuid.uuid4().hex
         self._touched: MutableMapping[tuple[str, int, str], _TouchedEntry] = {}
         self._lock_fds: dict[str, int] = {}
@@ -208,6 +213,21 @@ class WorkspaceTransaction:
         self._staging_base.mkdir(parents=True, exist_ok=True)
         self._locks_dir.mkdir(parents=True, exist_ok=True)
         self._write_manifest(state="staging")
+        ledger = self._proof_ledger
+        if ledger is not None:
+            try:
+                ledger.append_block(
+                    {
+                        "kind": "TX_BEGIN",
+                        "token": self._token,
+                        "stage": self._stage,
+                        "txn_id": self._txn_id,
+                        "staging_base": str(self._staging_base),
+                        "repo_roots": [str(p) for p in self._repo_roots],
+                    }
+                )
+            except Exception:
+                pass
         return self
 
     def __exit__(self, exc_type, exc, tb) -> bool:  # type: ignore[no-untyped-def]
@@ -368,6 +388,8 @@ class WorkspaceTransaction:
     def commit(self) -> None:
         if self._finalized:
             return
+        ledger = self._proof_ledger
+        snapshot = self._collect_staged_snapshot()
         self._write_manifest(state="committing")
         for entry in list(self._touched.values()):
             root = self._repo_roots[entry.root_index]
@@ -392,14 +414,68 @@ class WorkspaceTransaction:
                 raise WorkspaceTransactionError(f"Commit failed for {live}: {exc}") from exc
         self._write_manifest(state="committed")
         self._finalized = True
+        if ledger is not None:
+            try:
+                ledger.append_block(
+                    {
+                        "kind": "TX_COMMIT",
+                        "token": self._token,
+                        "stage": self._stage,
+                        "txn_id": self._txn_id,
+                        "touched": snapshot.get("touched", []),
+                        "staged_files": snapshot.get("staged_files", {}),
+                    }
+                )
+            except Exception:
+                pass
         self._cleanup_staging()
 
     def rollback(self) -> None:
         if self._finalized:
             return
+        ledger = self._proof_ledger
+        snapshot = self._collect_staged_snapshot()
         self._write_manifest(state="rolled_back")
         self._finalized = True
+        if ledger is not None:
+            try:
+                ledger.append_block(
+                    {
+                        "kind": "TX_ROLLBACK",
+                        "token": self._token,
+                        "stage": self._stage,
+                        "txn_id": self._txn_id,
+                        "touched": snapshot.get("touched", []),
+                        "staged_files": snapshot.get("staged_files", {}),
+                    }
+                )
+            except Exception:
+                pass
         self._cleanup_staging()
+
+    def _collect_staged_snapshot(self) -> Mapping[str, Any]:
+        """Collect a bounded snapshot of staged file content for forensic replay."""
+        touched = [
+            {"op": e.op, "root_index": e.root_index, "relpath": e.relpath}
+            for e in sorted(self._touched.values(), key=lambda x: (x.op, x.root_index, x.relpath))
+        ]
+        staged_files: dict[str, Any] = {}
+        for entry in sorted(self._touched.values(), key=lambda x: (x.root_index, x.relpath, x.op)):
+            if entry.op != "write":
+                continue
+            staged = self._stage_path(root_index=entry.root_index, relpath=entry.relpath)
+            if not staged.exists() or not staged.is_file():
+                continue
+            try:
+                data = staged.read_bytes()
+            except OSError:
+                continue
+            sha = hashlib.sha256(data).hexdigest()
+            item: dict[str, Any] = {"sha256": sha, "bytes": len(data)}
+            if len(data) <= 65536:
+                item["content_b64"] = base64.b64encode(data).decode("ascii")
+            staged_files[f"{entry.root_index}:{entry.relpath}"] = item
+        return {"touched": touched, "staged_files": staged_files}
 
     def _cleanup_staging(self) -> None:
         try:

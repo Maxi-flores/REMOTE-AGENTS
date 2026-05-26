@@ -1,0 +1,7 @@
+{
+  "role": "software_architect",
+  "module": "agents.software_architect",
+  "class": "SoftwareArchitect",
+  "description": "Transforms intake requirements into an architecture plan and impact assessment."
+}
+

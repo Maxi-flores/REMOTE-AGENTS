@@ -1,0 +1,7 @@
+{
+  "role": "risk_compliance",
+  "module": "agents.risk_compliance",
+  "class": "RiskCompliance",
+  "description": "Runs threat simulation and governance rule validation before build execution."
+}
+

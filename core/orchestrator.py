@@ -1,0 +1,146 @@
+"""Deterministic workspace engine for the autonomous office runtime."""
+
+from __future__ import annotations
+
+import asyncio
+import importlib
+import os
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
+
+from core.exceptions import CriticalMisalignmentError
+from core.governance import GovernanceLogger
+from core.handshake import run_three_stage_pipeline
+from core.parsers import (
+    DesignatedAgentsConfig,
+    RepoGuide,
+    load_text,
+    parse_agent_guide_list,
+    parse_designated_agents_list,
+)
+from core.types import JSONObject
+
+
+@dataclass(frozen=True, slots=True)
+class WorkspaceState:
+    repo_root: Path
+    agent_guide_path: Path
+    designated_agents_path: Path
+    repo_guides: dict[str, RepoGuide]
+    designated: DesignatedAgentsConfig
+
+    def snapshot(self) -> JSONObject:
+        def _mtime(p: Path) -> float | None:
+            try:
+                return p.stat().st_mtime
+            except OSError:
+                return None
+
+        return {
+            "repo_root": str(self.repo_root),
+            "agent_guide_path": str(self.agent_guide_path),
+            "designated_agents_path": str(self.designated_agents_path),
+            "agent_guide_mtime": _mtime(self.agent_guide_path),
+            "designated_agents_mtime": _mtime(self.designated_agents_path),
+            "repo_count": len(self.repo_guides),
+            "roles": sorted(self.designated.agents.keys()),
+            "default_pipeline": list(self.designated.default_pipeline),
+        }
+
+
+class Orchestrator:
+    """Coordinates agent discovery, validation, and pipeline execution."""
+
+    def __init__(self, workspace: WorkspaceState, governance: GovernanceLogger) -> None:
+        self.workspace = workspace
+        self.governance = governance
+
+    @classmethod
+    def load_from_repo_root(cls, repo_root: Path, *, governance: GovernanceLogger) -> "Orchestrator":
+        agent_guide_path = repo_root / "AGENT_GUIDE_LIST.md"
+        designated_path = repo_root / "DESIGNATED_AGENTS_LIST.md"
+
+        if not agent_guide_path.exists():
+            raise FileNotFoundError(str(agent_guide_path))
+        if not designated_path.exists():
+            raise FileNotFoundError(str(designated_path))
+
+        guides_text = load_text(agent_guide_path)
+        designated_text = load_text(designated_path)
+
+        repo_guides = parse_agent_guide_list(guides_text)
+        designated = parse_designated_agents_list(designated_text)
+
+        workspace = WorkspaceState(
+            repo_root=repo_root,
+            agent_guide_path=agent_guide_path,
+            designated_agents_path=designated_path,
+            repo_guides=repo_guides,
+            designated=designated,
+        )
+        return cls(workspace=workspace, governance=governance)
+
+    async def run(self, *, business_case: str) -> int:
+        self.governance.emit_event(
+            {
+                "event": "ORCHESTRATOR_START",
+                "cwd": os.getcwd(),
+                "workspace": self.workspace.snapshot(),
+            }
+        )
+
+        try:
+            intake_agent = self._load_agent("intake_specialist")
+            architect_agent = self._load_agent("software_architect")
+            risk_agent = self._load_agent("risk_compliance")
+            build_agent = self._load_agent("build_orchestrator")
+
+            result = await run_three_stage_pipeline(
+                governance=self.governance,
+                intake_agent=intake_agent,
+                architect_agent=architect_agent,
+                risk_agent=risk_agent,
+                build_agent=build_agent,
+                business_case=business_case,
+                workspace_snapshot=self.workspace.snapshot(),
+            )
+            self.governance.emit_event({"event": "ORCHESTRATOR_RESULT", "result": result})
+            self.governance.set_state("Completed")
+            return 0
+        except CriticalMisalignmentError as e:
+            self.governance.emit_event(
+                {
+                    "event": "CRITICAL_MISALIGNMENT",
+                    "code": CriticalMisalignmentError.code,
+                    "error": str(e),
+                }
+            )
+            self.governance.set_state("Pending Intervention")
+            return 2
+        except Exception as e:
+            self.governance.emit_event({"event": "ORCHESTRATOR_ERROR", "error": repr(e)})
+            self.governance.set_state("Pending Intervention")
+            return 1
+
+    def _load_agent(self, role: str) -> Any:
+        spec = self.workspace.designated.agents.get(role)
+        if spec is None:
+            raise CriticalMisalignmentError(f"Role missing from designated list: {role}")
+
+        module = importlib.import_module(spec.module)
+        cls = getattr(module, spec.class_name, None)
+        if cls is None:
+            raise CriticalMisalignmentError(f"Agent class not found: {spec.module}.{spec.class_name}")
+
+        # Instantiate with shared workspace/governance context when supported.
+        try:
+            return cls(workspace=self.workspace, governance=self.governance)
+        except TypeError:
+            return cls()
+
+
+def run_sync(*, business_case: str, repo_root: Path, governance: GovernanceLogger) -> int:
+    orchestrator = Orchestrator.load_from_repo_root(repo_root, governance=governance)
+    return asyncio.run(orchestrator.run(business_case=business_case))
+

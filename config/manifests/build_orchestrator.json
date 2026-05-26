@@ -1,0 +1,7 @@
+{
+  "role": "build_orchestrator",
+  "module": "agents.build_orchestrator",
+  "class": "BuildOrchestrator",
+  "description": "Executes build triggers and produces a deterministic execution report."
+}
+

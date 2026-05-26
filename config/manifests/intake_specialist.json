@@ -1,0 +1,7 @@
+{
+  "role": "intake_specialist",
+  "module": "agents.intake_specialist",
+  "class": "IntakeSpecialist",
+  "description": "Extracts structured requirements and targets from a freeform business case."
+}
+

@@ -27,6 +27,7 @@ from .schema import Schema, SchemaValidationError, signature_for, validate_again
 from .transaction_manager import WorkspaceTransaction, cleanup_workspace_staging, ensure_workspace_io_hooks_installed
 from .types import JSONObject
 from .validator import SchemaValidator
+from .sandbox import AgentSandboxExecutor
 
 T = TypeVar("T", bound=JSONObject)
 
@@ -356,6 +357,8 @@ async def run_three_stage_pipeline(
         else:
             raise CriticalMisalignmentError(f"Unsupported resume stage: {env.sequence}")
 
+    stage_timeout_s = 10.0
+
     async def intake_task() -> None:
         exclude = [governance.root]
         async with WorkspaceTransaction(
@@ -365,8 +368,12 @@ async def run_three_stage_pipeline(
             exclude_roots=exclude,
             proof_ledger=ledger,
         ) as tx:
-            payload = await intake_agent.build_intake_payload(
-                business_case=business_case, workspace_snapshot=workspace_snapshot
+            payload = await sandbox.run(
+                "intake_specialist.build_intake_payload",
+                intake_agent.build_intake_payload,
+                fn_kwargs={"business_case": business_case, "workspace_snapshot": workspace_snapshot},
+                timeout_s=stage_timeout_s,
+                mode="thread",
             )
             env = engine.create_envelope(
                 sequence="intake_to_architecture",
@@ -441,7 +448,13 @@ async def run_three_stage_pipeline(
                 exclude_roots=exclude,
                 proof_ledger=ledger,
             ) as tx:
-                payload = await architect_agent.build_architecture_payload(intake_envelope=env1)
+                payload = await sandbox.run(
+                    "software_architect.build_architecture_payload",
+                    architect_agent.build_architecture_payload,
+                    fn_kwargs={"intake_envelope": env1},
+                    timeout_s=stage_timeout_s,
+                    mode="thread",
+                )
                 env2 = engine.create_envelope(
                     sequence="architecture_to_risk",
                     schema_id="architecture_to_risk.v1",
@@ -515,7 +528,13 @@ async def run_three_stage_pipeline(
                 exclude_roots=exclude,
                 proof_ledger=ledger,
             ) as tx:
-                payload = await risk_agent.build_risk_payload(architecture_envelope=env2)
+                payload = await sandbox.run(
+                    "risk_compliance.build_risk_payload",
+                    risk_agent.build_risk_payload,
+                    fn_kwargs={"architecture_envelope": env2},
+                    timeout_s=stage_timeout_s,
+                    mode="thread",
+                )
                 env3 = engine.create_envelope(
                     sequence="risk_to_build_execution",
                     schema_id="risk_to_build_execution.v1",
@@ -580,7 +599,13 @@ async def run_three_stage_pipeline(
                 raise CriticalMisalignmentError("Pipeline terminated before build execution.")
             env3 = item
             engine.validate_envelope(env3, expected_sequence="risk_to_build_execution")
-            result = await build_agent.execute_build(envelope=env3)
+            result = await sandbox.run(
+                "build_orchestrator.execute_build",
+                build_agent.execute_build,
+                fn_kwargs={"envelope": env3},
+                timeout_s=stage_timeout_s,
+                mode="thread",
+            )
             if checkpoint is not None:
                 checkpoint.clear()
             return result
@@ -597,25 +622,26 @@ async def run_three_stage_pipeline(
         else:
             await seed_stop.put(STOP)
 
-    async with asyncio.TaskGroup() as tg:
-        if resume is None:
-            tg.create_task(intake_task())
-            tg.create_task(architect_task())
-            tg.create_task(risk_task())
-        else:
-            if resume.active_stage == "intake_to_architecture":
+    async with AgentSandboxExecutor() as sandbox:
+        async with asyncio.TaskGroup() as tg:
+            if resume is None:
+                tg.create_task(intake_task())
                 tg.create_task(architect_task())
                 tg.create_task(risk_task())
-            elif resume.active_stage == "architecture_to_risk":
-                tg.create_task(risk_task())
-            elif resume.active_stage == "risk_to_build_execution":
-                pass
             else:
-                raise CriticalMisalignmentError(f"Unsupported resume stage: {resume.active_stage}")
-            tg.create_task(seed_stop_task())
-        build = tg.create_task(build_task())
+                if resume.active_stage == "intake_to_architecture":
+                    tg.create_task(architect_task())
+                    tg.create_task(risk_task())
+                elif resume.active_stage == "architecture_to_risk":
+                    tg.create_task(risk_task())
+                elif resume.active_stage == "risk_to_build_execution":
+                    pass
+                else:
+                    raise CriticalMisalignmentError(f"Unsupported resume stage: {resume.active_stage}")
+                tg.create_task(seed_stop_task())
+            build = tg.create_task(build_task())
 
-    return build.result()
+        return build.result()
 
 
 class TwinAuditor:
@@ -658,6 +684,9 @@ class HandshakePipeline:
 
     async def run(self, isa, sas, crs, boa, source_text: str, repository_name: str | None = None) -> dict:
         state: dict = {"pipeline_state": "RUNNING", "telemetry": []}
+        stage_timeout_s = 5.0
+        tasks: list[asyncio.Task[Any]] = []
+        artifact_task: asyncio.Task[Any] | None = None
 
         q_isa_out: asyncio.Queue = asyncio.Queue()
         q_sas_in: asyncio.Queue = asyncio.Queue()
@@ -671,7 +700,13 @@ class HandshakePipeline:
         rta = TwinAuditor("RTA", self._validator, self._logs_dir)
 
         async def _isa_task() -> None:
-            packet = isa.ingest(source_text=source_text, repository_name=repository_name)
+            packet = await sandbox.run(
+                "ISA.ingest",
+                isa.ingest,
+                fn_kwargs={"source_text": source_text, "repository_name": repository_name},
+                timeout_s=stage_timeout_s,
+                mode="auto",
+            )
             state["isa_packet"] = packet
             await q_isa_out.put(packet)
             await q_isa_out.put(None)
@@ -711,7 +746,13 @@ class HandshakePipeline:
                 if pkt is None:
                     await q_sas_out.put(None)
                     return
-                blueprint = sas.process(pkt)
+                blueprint = await sandbox.run(
+                    "SAS.process",
+                    sas.process,
+                    pkt,
+                    timeout_s=stage_timeout_s,
+                    mode="auto",
+                )
                 state["sas_packet"] = blueprint
                 await q_sas_out.put(blueprint)
 
@@ -721,7 +762,13 @@ class HandshakePipeline:
                 if pkt is None:
                     await q_crs_out.put(None)
                     return
-                clearance = crs.assess(pkt)
+                clearance = await sandbox.run(
+                    "CRS.assess",
+                    crs.assess,
+                    pkt,
+                    timeout_s=stage_timeout_s,
+                    mode="auto",
+                )
                 state["crs_packet"] = clearance
                 await q_crs_out.put(clearance)
 
@@ -730,31 +777,42 @@ class HandshakePipeline:
                 pkt = await q_boa_in.get()
                 if pkt is None:
                     raise PipelineHaltException("BOA received no clearance packet")
-                artifact = boa.build(pkt, telemetry=state.get("telemetry", []))
+                artifact = await sandbox.run(
+                    "BOA.build",
+                    boa.build,
+                    pkt,
+                    fn_kwargs={"telemetry": state.get("telemetry", [])},
+                    timeout_s=stage_timeout_s,
+                    mode="auto",
+                )
                 state["pipeline_state"] = "COMPLETED"
                 state["artifact"] = artifact
                 return artifact
 
         try:
-            tasks = [
-                asyncio.create_task(_isa_task()),
-                asyncio.create_task(_auditor_task(ita, "intake_handshake.json", "ISA", "SAS", q_isa_out, q_sas_in)),
-                asyncio.create_task(_sas_task()),
-                asyncio.create_task(_auditor_task(ata, "architecture_blueprint.json", "SAS", "CRS", q_sas_out, q_crs_in)),
-                asyncio.create_task(_crs_task()),
-                asyncio.create_task(_auditor_task(rta, "risk_clearance.json", "CRS", "BOA", q_crs_out, q_boa_in)),
-            ]
-            artifact_task = asyncio.create_task(_boa_task())
-            await asyncio.gather(*tasks)
-            return await artifact_task
+            async with AgentSandboxExecutor() as sandbox:
+                tasks = [
+                    asyncio.create_task(_isa_task()),
+                    asyncio.create_task(_auditor_task(ita, "intake_handshake.json", "ISA", "SAS", q_isa_out, q_sas_in)),
+                    asyncio.create_task(_sas_task()),
+                    asyncio.create_task(
+                        _auditor_task(ata, "architecture_blueprint.json", "SAS", "CRS", q_sas_out, q_crs_in)
+                    ),
+                    asyncio.create_task(_crs_task()),
+                    asyncio.create_task(_auditor_task(rta, "risk_clearance.json", "CRS", "BOA", q_crs_out, q_boa_in)),
+                ]
+                artifact_task = asyncio.create_task(_boa_task())
+                await asyncio.gather(*tasks)
+                return await artifact_task
         except Exception as exc:
             for task in tasks:
                 task.cancel()
             try:
-                artifact_task.cancel()
+                if artifact_task is not None:
+                    artifact_task.cancel()
             except Exception:
                 pass
-            await asyncio.gather(*tasks, artifact_task, return_exceptions=True)
+            await asyncio.gather(*tasks, *( [artifact_task] if artifact_task is not None else [] ), return_exceptions=True)
             state["pipeline_state"] = "DEAD_HALT"
             dump_critical_misalignment(self._logs_dir, state, exc)
             raise

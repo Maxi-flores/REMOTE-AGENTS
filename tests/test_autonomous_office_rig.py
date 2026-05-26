@@ -81,6 +81,7 @@ class TestAutonomousOfficeRig(unittest.IsolatedAsyncioTestCase):
             self.repo_root / "AGENT_GUIDE_LIST.md",
             self.logs_dir / "BUILD_ARTIFACT.json",
             self.logs_dir / "CRITICAL_MISALIGNMENT.json",
+            self.logs_dir / "TELEMETRY_TRACE.json",
         ):
             self._restore_text[path] = path.read_text(encoding="utf-8") if path.exists() else None
 
@@ -249,4 +250,3 @@ class TestAutonomousOfficeRig(unittest.IsolatedAsyncioTestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
-

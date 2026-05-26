@@ -40,3 +40,14 @@ class QuorumDissentException(RuntimeError):
         self.envelope_signature = envelope_signature
         self.ballots = ballots
         self.payload = payload
+
+
+class ByzantineNodeException(RuntimeError):
+    """Raised when a peer violates consensus safety rules (bad index/prev-hash/signature)."""
+
+    code = "BYZANTINE_NODE"
+
+    def __init__(self, message: str, *, peer_id: str | None = None, details: object | None = None) -> None:
+        super().__init__(message)
+        self.peer_id = peer_id
+        self.details = details

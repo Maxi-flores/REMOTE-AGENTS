@@ -11,7 +11,7 @@ from typing import Any, Literal
 
 from core.types import JSONObject
 
-GovernanceState = Literal["Running", "Pending Intervention", "Completed"]
+GovernanceState = Literal["Running", "Pending Intervention", "QUORUM_LOCKED_INTERVENTION", "Completed"]
 
 
 @dataclass(slots=True)

@@ -17,10 +17,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Generic, Literal, TypeVar
 
-from .exceptions import CriticalMisalignmentError, PipelineHaltException
+from .exceptions import CriticalMisalignmentError, PipelineHaltException, QuorumDissentException
 from .fault import dump_critical_misalignment
 from .governance import GovernanceLogger
 from .hashutil import fnv1a_32
+from .quorum import ValidationQuorumManager
 from .recovery import CheckpointManager, CheckpointSnapshot, execution_token
 from .schema import Schema, SchemaValidationError, signature_for, validate_against_schema
 from .transaction_manager import WorkspaceTransaction, cleanup_workspace_staging, ensure_workspace_io_hooks_installed
@@ -237,6 +238,7 @@ async def run_three_stage_pipeline(
     workspace_snapshot: JSONObject,
     checkpoint: CheckpointManager | None = None,
     resume: CheckpointSnapshot | None = None,
+    quorum: ValidationQuorumManager | None = None,
 ) -> JSONObject:
     ensure_workspace_io_hooks_installed()
     engine = HandshakeEngine(governance=governance, schemas=handshake_schemas())
@@ -246,12 +248,58 @@ async def run_three_stage_pipeline(
     token = checkpoint.token if checkpoint is not None else execution_token(business_case=business_case)
     cleanup_workspace_staging(repo_root=repo_root, token=token, active_stage=resume.active_stage if resume else None)
 
+    quorum_mgr = quorum or ValidationQuorumManager(logs_dir=governance.root)
+
+    stage_to_next_role: dict[str, str] = {
+        "intake_to_architecture": "software_architect",
+        "architecture_to_risk": "risk_compliance",
+        "risk_to_build_execution": "build_orchestrator",
+    }
+
+    def _handshake_hash(*, from_role: str, to_role: str, schema_id: str, payload: JSONObject) -> str:
+        canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+        return fnv1a_32(f"{from_role}->{to_role}:{schema_id}:{canonical}")
+
     q1: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] = asyncio.Queue(maxsize=1)
     q2: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] = asyncio.Queue(maxsize=1)
     q3: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] = asyncio.Queue(maxsize=1)
 
     seed_stop: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] | None = None
     if resume is not None:
+        next_role = stage_to_next_role.get(resume.active_stage, "unknown")
+        schema = engine.schemas.get(resume.schema_id)
+        if schema is None:
+            raise CriticalMisalignmentError(f"Unknown schema_id in resume snapshot: {resume.schema_id}")
+        hh = _handshake_hash(
+            from_role=resume.source_role,
+            to_role=next_role,
+            schema_id=schema.schema_id,
+            payload=resume.payload,
+        )
+        ballots = await quorum_mgr.validate(
+            stage=resume.active_stage,
+            schema=schema,
+            payload=resume.payload,
+            envelope_signature=resume.envelope_signature,
+            handshake_hash=hh,
+            source_role=resume.source_role,
+            next_role=next_role,
+            correlation_id=resume.correlation_id,
+            repo_root=repo_root,
+        )
+        if checkpoint is not None:
+            checkpoint.record_stage(
+                stage=resume.active_stage,
+                schema=schema,
+                payload=resume.payload,
+                envelope_signature=resume.envelope_signature,
+                source_role=resume.source_role,
+                correlation_id=resume.correlation_id,
+                created_at=resume.created_at,
+                next_role=next_role,
+                governance_state=governance.state,
+                envelope_ballots=ballots,
+            )
         env = PacketEnvelope(
             sequence=resume.active_stage,
             schema_id=resume.schema_id,
@@ -284,6 +332,36 @@ async def run_three_stage_pipeline(
                 payload=payload,
                 source_role="intake_specialist",
             )
+            next_role = stage_to_next_role["intake_to_architecture"]
+            hh = _handshake_hash(from_role=env.source_role, to_role=next_role, schema_id=env.schema_id, payload=env.payload)
+            try:
+                ballots = await quorum_mgr.validate(
+                    stage=env.sequence,
+                    schema=engine.schemas[env.schema_id],
+                    payload=env.payload,
+                    envelope_signature=env.signature,
+                    handshake_hash=hh,
+                    source_role=env.source_role,
+                    next_role=next_role,
+                    correlation_id=env.correlation_id,
+                    repo_root=repo_root,
+                )
+            except QuorumDissentException as exc:
+                if checkpoint is not None:
+                    schema = engine.schemas.get(env.schema_id)
+                    if schema is not None:
+                        checkpoint.record_quorum_halt(
+                            stage=env.sequence,
+                            schema=schema,
+                            payload=env.payload,
+                            envelope_signature=env.signature,
+                            source_role=env.source_role,
+                            correlation_id=env.correlation_id,
+                            created_at=env.created_at,
+                            next_role=next_role,
+                            envelope_ballots=(exc.ballots if isinstance(exc.ballots, dict) else {}),
+                        )
+                raise
             checkpoint_ok = True
             if checkpoint is not None:
                 schema = engine.schemas.get(env.schema_id)
@@ -296,8 +374,9 @@ async def run_three_stage_pipeline(
                         source_role=env.source_role,
                         correlation_id=env.correlation_id,
                         created_at=env.created_at,
-                        next_role="software_architect",
+                        next_role=next_role,
                         governance_state=governance.state,
+                        envelope_ballots=ballots,
                     )
             if checkpoint_ok:
                 tx.commit()
@@ -322,6 +401,36 @@ async def run_three_stage_pipeline(
                     source_role="software_architect",
                     correlation_id=env1.correlation_id,
                 )
+                next_role = stage_to_next_role["architecture_to_risk"]
+                hh = _handshake_hash(from_role=env2.source_role, to_role=next_role, schema_id=env2.schema_id, payload=env2.payload)
+                try:
+                    ballots = await quorum_mgr.validate(
+                        stage=env2.sequence,
+                        schema=engine.schemas[env2.schema_id],
+                        payload=env2.payload,
+                        envelope_signature=env2.signature,
+                        handshake_hash=hh,
+                        source_role=env2.source_role,
+                        next_role=next_role,
+                        correlation_id=env2.correlation_id,
+                        repo_root=repo_root,
+                    )
+                except QuorumDissentException as exc:
+                    if checkpoint is not None:
+                        schema = engine.schemas.get(env2.schema_id)
+                        if schema is not None:
+                            checkpoint.record_quorum_halt(
+                                stage=env2.sequence,
+                                schema=schema,
+                                payload=env2.payload,
+                                envelope_signature=env2.signature,
+                                source_role=env2.source_role,
+                                correlation_id=env2.correlation_id,
+                                created_at=env2.created_at,
+                                next_role=next_role,
+                                envelope_ballots=(exc.ballots if isinstance(exc.ballots, dict) else {}),
+                            )
+                    raise
                 checkpoint_ok = True
                 if checkpoint is not None:
                     schema = engine.schemas.get(env2.schema_id)
@@ -334,8 +443,9 @@ async def run_three_stage_pipeline(
                             source_role=env2.source_role,
                             correlation_id=env2.correlation_id,
                             created_at=env2.created_at,
-                            next_role="risk_compliance",
+                            next_role=next_role,
                             governance_state=governance.state,
+                            envelope_ballots=ballots,
                         )
                 if checkpoint_ok:
                     tx.commit()
@@ -359,6 +469,36 @@ async def run_three_stage_pipeline(
                     source_role="risk_compliance",
                     correlation_id=env2.correlation_id,
                 )
+                next_role = stage_to_next_role["risk_to_build_execution"]
+                hh = _handshake_hash(from_role=env3.source_role, to_role=next_role, schema_id=env3.schema_id, payload=env3.payload)
+                try:
+                    ballots = await quorum_mgr.validate(
+                        stage=env3.sequence,
+                        schema=engine.schemas[env3.schema_id],
+                        payload=env3.payload,
+                        envelope_signature=env3.signature,
+                        handshake_hash=hh,
+                        source_role=env3.source_role,
+                        next_role=next_role,
+                        correlation_id=env3.correlation_id,
+                        repo_root=repo_root,
+                    )
+                except QuorumDissentException as exc:
+                    if checkpoint is not None:
+                        schema = engine.schemas.get(env3.schema_id)
+                        if schema is not None:
+                            checkpoint.record_quorum_halt(
+                                stage=env3.sequence,
+                                schema=schema,
+                                payload=env3.payload,
+                                envelope_signature=env3.signature,
+                                source_role=env3.source_role,
+                                correlation_id=env3.correlation_id,
+                                created_at=env3.created_at,
+                                next_role=next_role,
+                                envelope_ballots=(exc.ballots if isinstance(exc.ballots, dict) else {}),
+                            )
+                    raise
                 checkpoint_ok = True
                 if checkpoint is not None:
                     schema = engine.schemas.get(env3.schema_id)
@@ -371,8 +511,9 @@ async def run_three_stage_pipeline(
                             source_role=env3.source_role,
                             correlation_id=env3.correlation_id,
                             created_at=env3.created_at,
-                            next_role="build_orchestrator",
+                            next_role=next_role,
                             governance_state=governance.state,
+                            envelope_ballots=ballots,
                         )
                 if checkpoint_ok:
                     tx.commit()

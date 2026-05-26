@@ -22,7 +22,7 @@ from core.schema import Schema, SchemaValidationError, canonical_json, signature
 from core.types import JSONObject, JSONValue
 
 CheckpointStage = Literal["intake_to_architecture", "architecture_to_risk", "risk_to_build_execution"]
-GovernanceState = Literal["Running", "Pending Intervention", "Completed"]
+GovernanceState = Literal["Running", "Pending Intervention", "QUORUM_LOCKED_INTERVENTION", "Completed"]
 
 
 class CheckpointFormatError(ValueError):
@@ -46,6 +46,7 @@ class _CheckpointJSON(TypedDict, total=False):
     correlation_id: str
     created_at: float
     updated_at: float
+    envelope_ballots: object
 
 
 @dataclass(frozen=True, slots=True)
@@ -62,6 +63,7 @@ class CheckpointSnapshot:
     correlation_id: str
     created_at: float
     updated_at: float
+    envelope_ballots: dict[str, object]
 
     def to_json(self) -> _CheckpointJSON:
         return {
@@ -77,6 +79,7 @@ class CheckpointSnapshot:
             "correlation_id": self.correlation_id,
             "created_at": self.created_at,
             "updated_at": self.updated_at,
+            "envelope_ballots": self.envelope_ballots,
         }
 
 
@@ -139,6 +142,18 @@ def _as_payload(value: object) -> JSONObject:
     return cast(JSONObject, value)
 
 
+def _as_ballots(value: object) -> dict[str, object]:
+    if value is None:
+        return {}
+    if not isinstance(value, dict):
+        raise CheckpointFormatError("Invalid envelope_ballots.")
+    # Ballots are opaque telemetry to recovery; enforce JSON-object shape.
+    for k, v in value.items():
+        if not isinstance(k, str) or not isinstance(v, dict):
+            raise CheckpointFormatError("Invalid envelope_ballots.")
+    return cast(dict[str, object], value)
+
+
 class CheckpointManager:
     """Write/restore transactional checkpoints for the orchestrator pipeline."""
 
@@ -178,7 +193,7 @@ class CheckpointManager:
             raise CheckpointFormatError("Invalid active_stage.")
 
         governance_state = _as_str(obj.get("governance_state"), field="governance_state")
-        if governance_state not in ("Running", "Pending Intervention", "Completed"):
+        if governance_state not in ("Running", "Pending Intervention", "QUORUM_LOCKED_INTERVENTION", "Completed"):
             raise CheckpointFormatError("Invalid governance_state.")
 
         schema_id = _as_str(obj.get("schema_id"), field="schema_id")
@@ -189,6 +204,7 @@ class CheckpointManager:
         correlation_id = _as_str(obj.get("correlation_id"), field="correlation_id")
         created_at = _as_float(obj.get("created_at"), field="created_at")
         updated_at = _as_float(obj.get("updated_at"), field="updated_at")
+        envelope_ballots = _as_ballots(obj.get("envelope_ballots"))
 
         return CheckpointSnapshot(
             version=self._VERSION,
@@ -203,6 +219,7 @@ class CheckpointManager:
             correlation_id=correlation_id,
             created_at=created_at,
             updated_at=updated_at,
+            envelope_ballots=envelope_ballots,
         )
 
     def record_stage(
@@ -217,7 +234,8 @@ class CheckpointManager:
         created_at: float,
         next_role: str,
         governance_state: GovernanceState = "Running",
-    ) -> None:
+        envelope_ballots: Mapping[str, object] | None = None,
+    ) -> bool:
         """Atomically persist a checkpoint after a successful stage handoff."""
         try:
             validate_against_schema(payload, schema.definition)
@@ -244,11 +262,40 @@ class CheckpointManager:
                 correlation_id=correlation_id,
                 created_at=created_at,
                 updated_at=now,
+                envelope_ballots=dict(envelope_ballots or {}),
             )
             _atomic_write_json(self.checkpoint_path, snap.to_json())
+            return True
         except Exception:
             # Recovery must never cause a new halt; containment is required.
-            return
+            return False
+
+    def record_quorum_halt(
+        self,
+        *,
+        stage: CheckpointStage,
+        schema: Schema,
+        payload: JSONObject,
+        envelope_signature: str,
+        source_role: str,
+        correlation_id: str,
+        created_at: float,
+        next_role: str,
+        envelope_ballots: Mapping[str, object],
+    ) -> bool:
+        """Best-effort checkpoint for a quorum dissent halt (intervention required)."""
+        return self.record_stage(
+            stage=stage,
+            schema=schema,
+            payload=payload,
+            envelope_signature=envelope_signature,
+            source_role=source_role,
+            correlation_id=correlation_id,
+            created_at=created_at,
+            next_role=next_role,
+            governance_state="QUORUM_LOCKED_INTERVENTION",
+            envelope_ballots=envelope_ballots,
+        )
 
     def clear(self) -> None:
         try:
@@ -297,12 +344,13 @@ class CheckpointManager:
             correlation_id=snap.correlation_id,
             created_at=snap.created_at,
             updated_at=time.time(),
+            envelope_ballots={},
         )
         _atomic_write_json(self.checkpoint_path, repaired.to_json())
         return repaired
 
     def requires_manual_intervention(self) -> bool:
-        """Return True when governance.jsonl indicates a CRITICAL_MISALIGNMENT halt."""
+        """Return True when governance.jsonl indicates a locked intervention state."""
         path = self._logs_dir / "governance.jsonl"
         if not path.exists():
             return False
@@ -312,7 +360,9 @@ class CheckpointManager:
             return False
 
         saw_pending = False
+        saw_quorum_locked = False
         saw_misalignment = False
+        saw_quorum_dissent = False
         for ln in lines[-500:]:
             try:
                 obj = json.loads(ln)
@@ -322,6 +372,10 @@ class CheckpointManager:
                 continue
             if obj.get("event") == "CRITICAL_MISALIGNMENT":
                 saw_misalignment = True
+            if obj.get("event") == "QUORUM_DISSENT":
+                saw_quorum_dissent = True
             if obj.get("event") == "STATE" and obj.get("state") == "Pending Intervention":
                 saw_pending = True
-        return saw_pending and saw_misalignment
+            if obj.get("event") == "STATE" and obj.get("state") == "QUORUM_LOCKED_INTERVENTION":
+                saw_quorum_locked = True
+        return (saw_pending and saw_misalignment) or (saw_quorum_locked and saw_quorum_dissent)

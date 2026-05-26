@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from core.exceptions import CriticalMisalignmentError
+from core.exceptions import CriticalMisalignmentError, QuorumDissentException
 from core.governance import GovernanceLogger
 from core.handshake import run_three_stage_pipeline
 from core.recovery import CheckpointManager, CheckpointSnapshot
@@ -139,6 +139,60 @@ class Orchestrator:
             self.governance.emit_event({"event": "ORCHESTRATOR_RESULT", "result": result})
             self.governance.set_state("Completed")
             return 0
+        except ExceptionGroup as eg:  # pragma: no cover - Python groups TaskGroup errors
+            flat: list[BaseException] = []
+
+            def _walk(exc: BaseException) -> None:
+                if isinstance(exc, ExceptionGroup):
+                    for inner in exc.exceptions:
+                        _walk(inner)
+                else:
+                    flat.append(exc)
+
+            _walk(eg)
+
+            for exc in flat:
+                if isinstance(exc, QuorumDissentException):
+                    self.governance.emit_event(
+                        {
+                            "event": "QUORUM_DISSENT",
+                            "code": QuorumDissentException.code,
+                            "error": str(exc),
+                            "stage": getattr(exc, "stage", None),
+                            "correlation_id": getattr(exc, "correlation_id", None),
+                            "handshake_hash": getattr(exc, "handshake_hash", None),
+                            "envelope_signature": getattr(exc, "envelope_signature", None),
+                        }
+                    )
+                    self.governance.set_state("QUORUM_LOCKED_INTERVENTION")
+                    return 2
+                if isinstance(exc, CriticalMisalignmentError):
+                    self.governance.emit_event(
+                        {
+                            "event": "CRITICAL_MISALIGNMENT",
+                            "code": CriticalMisalignmentError.code,
+                            "error": str(exc),
+                        }
+                    )
+                    self.governance.set_state("Pending Intervention")
+                    return 2
+            self.governance.emit_event({"event": "ORCHESTRATOR_ERROR", "error": repr(eg)})
+            self.governance.set_state("Pending Intervention")
+            return 1
+        except QuorumDissentException as e:
+            self.governance.emit_event(
+                {
+                    "event": "QUORUM_DISSENT",
+                    "code": QuorumDissentException.code,
+                    "error": str(e),
+                    "stage": getattr(e, "stage", None),
+                    "correlation_id": getattr(e, "correlation_id", None),
+                    "handshake_hash": getattr(e, "handshake_hash", None),
+                    "envelope_signature": getattr(e, "envelope_signature", None),
+                }
+            )
+            self.governance.set_state("QUORUM_LOCKED_INTERVENTION")
+            return 2
         except CriticalMisalignmentError as e:
             self.governance.emit_event(
                 {

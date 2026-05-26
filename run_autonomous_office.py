@@ -15,8 +15,12 @@ from core.handshake import handshake_schemas
 from core.logconf import component_logger, configure_logging
 from core.matrix_verifier import MatrixVerifier, load_governance_policy
 from core.orchestrator import run_sync
+from core.fork_resolver import LedgerForkAuditor
+from core.proof_ledger import ProofLedgerManager
+from core.replay import PipelineReplayController, ReadOnlyWorkspaceGuard
 from core.recovery import CheckpointFormatError, CheckpointManager
 from core.telemetry import TelemetryTracker, estimate_payload_bytes
+from core.transaction_manager import cleanup_workspace_staging
 
 
 def _read_business_case(args: argparse.Namespace) -> str:
@@ -110,6 +114,10 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Re-validate a human-fixed checkpoint payload and resume execution.",
     )
+    parser.add_argument(
+        "--replay-from-ledger",
+        help="Deterministically replay from logs/PROOFS_LEDGER.jsonl (start index) or a ledger/snapshot file path.",
+    )
     args = parser.parse_args(argv)
 
     if args.legacy_intake:
@@ -117,16 +125,55 @@ def main(argv: list[str] | None = None) -> int:
 
     repo_root = Path(args.repo_root).resolve()
     log_dir = Path(args.log_dir).resolve()
+
+    if args.replay_from_ledger:
+        controller = PipelineReplayController(repo_root=repo_root, log_dir=log_dir)
+        try:
+            with ReadOnlyWorkspaceGuard(repo_root):
+                asyncio.run(controller.replay_step_loop(source=str(args.replay_from_ledger)))
+            return 0
+        finally:
+            controller.close()
+
     business_case = _read_business_case(args)
 
-    governance = GovernanceLogger(root=log_dir)
     checkpoint = CheckpointManager(logs_dir=log_dir, business_case=business_case)
+    governance = GovernanceLogger(root=log_dir, proof_ledger=None)
     resume = None
     try:
         resume = checkpoint.load()
     except CheckpointFormatError as exc:
         governance.emit_event({"event": "CHECKPOINT_INVALID", "error": str(exc)})
         resume = None
+
+    # Self-heal any forked proof ledger before attaching a live writer.
+    try:
+        auditor = LedgerForkAuditor(repo_root=repo_root, log_dir=log_dir)
+        result = auditor.recover_loop(token=checkpoint.token, active_stage=resume.active_stage if resume else None)
+        if result is not None:
+            governance.emit_event(
+                {
+                    "event": "CONSENSUS_RECONCILIATION_COMPLETE",
+                    "ledger_path": str(result.ledger_path),
+                    "orphaned_path": str(result.orphaned_path),
+                    "chosen_tip_hash": result.chosen_tip_hash,
+                    "chosen_blocks": result.chosen_blocks,
+                    "pruned_lines": result.pruned_lines,
+                    "fork_point_index": result.fork_point_index,
+                }
+            )
+    except Exception as exc:
+        governance.emit_event({"event": "CONSENSUS_RECONCILIATION_ERROR", "error": repr(exc)})
+
+    proof_ledger = ProofLedgerManager(logs_dir=log_dir, execution_token=checkpoint.token)
+    governance.proof_ledger = proof_ledger
+
+    # Always clear or finalize any orphaned workspace staging for this execution token.
+    cleanup_workspace_staging(
+        repo_root=repo_root,
+        token=checkpoint.token,
+        active_stage=resume.active_stage if resume is not None else None,
+    )
 
     if resume is not None and checkpoint.requires_manual_intervention():
         governance.emit_event({"event": "INTERVENTION_REQUIRED", "active_stage": resume.active_stage})
@@ -135,6 +182,7 @@ def main(argv: list[str] | None = None) -> int:
         repaired = checkpoint.resolve_intervention(schemas=handshake_schemas())
         if repaired is not None:
             resume = repaired
+        cleanup_workspace_staging(repo_root=repo_root, token=checkpoint.token, active_stage=resume.active_stage)
         governance.set_state("Running")
 
     return run_sync(

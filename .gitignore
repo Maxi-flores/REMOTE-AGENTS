@@ -2,5 +2,10 @@ __pycache__/
 *.pyc
 logs/
 .remote_agents_logs/
+.workspace_staging/
 .venv/
 .python-version
+
+# Test artifacts
+QUORUM_DISSENT_TEST.txt
+FORENSIC_REPLAY_TEST.txt

@@ -1,38 +1,34 @@
-"""
-Asynchronous, zero-dependency telemetry collection for the REMOTE-AGENTS runtime.
+"""Telemetry utilities for the REMOTE-AGENTS runtime.
 
-This module provides a lightweight in-memory trace buffer designed for runtime
-inspection without altering payload schemas or queue behavior.
-
-Design goals:
-  - stdlib-only (Python 3.10+)
-  - deterministic, flat micro-log events
-  - bounded memory via a ring buffer
-  - safe to call from asyncio pipelines with minimal overhead
+This module keeps both telemetry paths that exist in the codebase:
+- TelemetryTracker: async-safe micro-log ring buffer used by the ISA/SAS/CRS/BOA
+  pipeline for per-event tracing and queue latency measurement.
+- TelemetryTracer: synchronous, high-throughput tracer used by stress rigs and
+  governance streams for compact JSON snapshots.
 """
 
 from __future__ import annotations
 
 import asyncio
 import json
+import os
 import time
 from collections import deque
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Callable, Deque, Iterable, Mapping, MutableMapping
+from threading import Lock
+from typing import Any, Callable, Deque, Iterable, Literal, Mapping, MutableMapping, Sequence
 
+from .hashutil import fnv1a_32
+
+PipelineStage = Literal["ISA", "SAS", "CRS", "BOA"]
 
 MicroLogEvent = dict[str, object]
 TelemetryHook = Callable[[MicroLogEvent], object]
 
 
 def _utc_iso_seconds() -> str:
-    """
-    Return a stable, second-resolution UTC timestamp.
-
-    The rest of the system formatter uses second-resolution UTC timestamps; we
-    match that resolution to keep trace output consistent and compact.
-    """
+    """Return a stable, second-resolution UTC timestamp."""
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
 
@@ -44,14 +40,7 @@ def _latency_ms(start_monotonic: float, end_monotonic: float) -> float:
 
 
 def estimate_payload_bytes(payload: object) -> int:
-    """
-    Estimate payload size in bytes without mutating it.
-
-    - dict/list/str/int/float/bool/None are converted through JSON for a stable
-      estimate (sorted keys, compact separators).
-    - bytes/bytearray sizes are measured directly.
-    - unknown objects fall back to repr().
-    """
+    """Estimate payload size in bytes without mutating it."""
     if payload is None:
         return 0
     if isinstance(payload, (bytes, bytearray)):
@@ -65,9 +54,7 @@ def estimate_payload_bytes(payload: object) -> int:
 
 @dataclass(frozen=True)
 class QueueMark:
-    """
-    Internal record linking a queued object identity to its enqueue timestamp.
-    """
+    """Internal record linking a queued object identity to its enqueue timestamp."""
 
     queue_name: str
     enqueued_at: float
@@ -76,24 +63,7 @@ class QueueMark:
 
 
 class TelemetryTracker:
-    """
-    Async telemetry tracker using an in-memory ring buffer.
-
-    Each stored event is a strictly flat dictionary. The following keys are
-    always present:
-      - component: str
-      - twin_hash: str
-      - event_type: str
-      - latency_ms: float
-
-    Additional fields (flat) may be present (timestamp, src/dst agent, queue,
-    payload_bytes, error, etc.).
-
-    Hooks:
-      - Call `add_hook()` with a callable that accepts an event dict.
-      - If the hook returns an awaitable, it is scheduled via create_task().
-      - Hook failures are swallowed to avoid impacting pipeline correctness.
-    """
+    """Async telemetry tracker using an in-memory ring buffer."""
 
     def __init__(self, *, max_events: int = 1024) -> None:
         if max_events <= 0:
@@ -120,9 +90,7 @@ class TelemetryTracker:
         payload_bytes: int | None = None,
         extra: Mapping[str, object] | None = None,
     ) -> MicroLogEvent:
-        """
-        Append a micro-log event to the ring buffer and dispatch hooks.
-        """
+        """Append a micro-log event to the ring buffer and dispatch hooks."""
         event: MicroLogEvent = {
             "component": component,
             "twin_hash": twin_hash,
@@ -157,23 +125,20 @@ class TelemetryTracker:
         src_agent: str | None = None,
         dst_agent: str | None = None,
     ) -> None:
-        """
-        Mark the enqueue time for an item within a named queue.
-
-        The mark is keyed by (queue_name, id(item)) and is bounded to avoid
-        memory growth if unexpected queue usage occurs.
-        """
+        """Mark the enqueue time for an item within a named queue."""
         key = (queue_name, id(item))
         async with self._lock:
             if len(self._queue_marks) >= self._max_queue_marks:
-                # Drop an arbitrary mark to protect memory boundaries.
                 self._queue_marks.pop(next(iter(self._queue_marks)), None)
-            self._queue_marks[key] = QueueMark(queue_name=queue_name, enqueued_at=time.monotonic(), src_agent=src_agent, dst_agent=dst_agent)
+            self._queue_marks[key] = QueueMark(
+                queue_name=queue_name,
+                enqueued_at=time.monotonic(),
+                src_agent=src_agent,
+                dst_agent=dst_agent,
+            )
 
     async def pop_enqueue_latency_ms(self, *, queue_name: str, item: object) -> tuple[float | None, QueueMark | None]:
-        """
-        Return queue wait latency for an item and remove its mark if present.
-        """
+        """Return queue wait latency for an item and remove its mark if present."""
         key = (queue_name, id(item))
         async with self._lock:
             mark = self._queue_marks.pop(key, None)
@@ -182,16 +147,12 @@ class TelemetryTracker:
         return _latency_ms(mark.enqueued_at, time.monotonic()), mark
 
     async def snapshot(self) -> list[MicroLogEvent]:
-        """
-        Return a stable list copy of the current buffer contents.
-        """
+        """Return a stable list copy of the current buffer contents."""
         async with self._lock:
             return list(self._buffer)
 
     async def flush_json(self, path: Path, *, events: Iterable[MicroLogEvent] | None = None) -> Path:
-        """
-        Write telemetry events to JSON on disk.
-        """
+        """Write telemetry events to JSON on disk."""
         path.parent.mkdir(parents=True, exist_ok=True)
         payload = list(events) if events is not None else await self.snapshot()
         path.write_text(json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
@@ -203,15 +164,144 @@ class TelemetryTracker:
         try:
             loop = asyncio.get_running_loop()
         except RuntimeError:
-            # Not in an event loop; run hooks synchronously.
             loop = None
 
         for hook in list(self._hooks):
             try:
                 result = hook(event)
                 if loop is not None and asyncio.iscoroutine(result):
-                    loop.create_task(result)  # fire-and-forget
+                    loop.create_task(result)
             except Exception:
-                # Telemetry must never break pipeline semantics.
                 continue
 
+
+@dataclass(frozen=True, slots=True)
+class TelemetryRecord:
+    """Single telemetry trace record captured by the tracer."""
+
+    ts: float
+    correlation_id: str
+    stage: PipelineStage
+    event: str
+    payload_bytes: int
+    latency_ms: float
+    signature: str
+    sequence: int
+
+
+class _RingBufferJSONStream:
+    """File-like sink for JSONL governance events that keeps a bounded tail."""
+
+    def __init__(self, *, tracer: "TelemetryTracer") -> None:
+        self._tracer = tracer
+
+    def write(self, text: str) -> int:
+        line = text.strip()
+        if not line:
+            return len(text)
+        try:
+            payload = json.loads(line)
+        except Exception:
+            return len(text)
+        try:
+            correlation_id = str(payload.get("correlation_id") or payload.get("handshake_hash") or "unknown")
+        except Exception:
+            correlation_id = "unknown"
+        stage = str(payload.get("source_role") or payload.get("sequence") or "ISA")
+        stage_norm: PipelineStage
+        if stage in ("ISA", "SAS", "CRS", "BOA"):
+            stage_norm = stage  # type: ignore[assignment]
+        else:
+            stage_norm = "ISA"
+        event = str(payload.get("event") or "GOVERNANCE")
+        payload_bytes = len(line.encode("utf-8", errors="replace"))
+        self._tracer.record(
+            correlation_id=correlation_id,
+            stage=stage_norm,
+            event=event,
+            payload_bytes=payload_bytes,
+            latency_ms=0.0,
+        )
+        return len(text)
+
+    def flush(self) -> None:  # pragma: no cover - used by GovernanceLogger
+        return
+
+
+class TelemetryTracer:
+    """High-throughput tracer with bounded in-memory storage."""
+
+    def __init__(self, *, logs_dir: Path, capacity: int = 4096) -> None:
+        if capacity <= 0:
+            raise ValueError("capacity must be > 0")
+        self._logs_dir = logs_dir
+        self._capacity = capacity
+        self._lock = Lock()
+        self._seq = 0
+        self._records: Deque[TelemetryRecord] = deque(maxlen=capacity)
+
+    @property
+    def capacity(self) -> int:
+        return self._capacity
+
+    def stream(self) -> Any:
+        """Return a file-like stream that can be used as a GovernanceLogger sink."""
+        return _RingBufferJSONStream(tracer=self)
+
+    def record(
+        self,
+        *,
+        correlation_id: str,
+        stage: PipelineStage,
+        event: str,
+        payload_bytes: int,
+        latency_ms: float,
+        metadata: Mapping[str, Any] | None = None,
+    ) -> TelemetryRecord:
+        """Append a telemetry record, evicting the oldest when full."""
+        meta = dict(metadata) if metadata else {}
+        now = time.time()
+        sig_input = json.dumps(
+            {
+                "correlation_id": correlation_id,
+                "stage": stage,
+                "event": event,
+                "payload_bytes": int(payload_bytes),
+                "latency_ms": float(latency_ms),
+                "metadata": meta,
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        )
+        signature = fnv1a_32(sig_input)
+        with self._lock:
+            self._seq += 1
+            rec = TelemetryRecord(
+                ts=now,
+                correlation_id=str(correlation_id),
+                stage=stage,
+                event=str(event),
+                payload_bytes=int(payload_bytes),
+                latency_ms=float(latency_ms),
+                signature=signature,
+                sequence=self._seq,
+            )
+            self._records.append(rec)
+        return rec
+
+    def snapshot(self) -> list[dict[str, Any]]:
+        """Return a JSON-serializable snapshot of current records."""
+        with self._lock:
+            records: Sequence[TelemetryRecord] = tuple(self._records)
+        return [asdict(r) for r in records]
+
+    def flush_trace(self) -> Path:
+        """Write an atomic JSON snapshot to ``logs/TELEMETRY_TRACE.json``."""
+        payload = self.snapshot()
+        self._logs_dir.mkdir(parents=True, exist_ok=True)
+        target = self._logs_dir / "TELEMETRY_TRACE.json"
+        tmp = self._logs_dir / f".TELEMETRY_TRACE.json.tmp.{os.getpid()}"
+        tmp.write_text(json.dumps(payload, indent=2, sort_keys=True, ensure_ascii=False) + "\n", encoding="utf-8")
+        tmp.replace(target)
+        return target

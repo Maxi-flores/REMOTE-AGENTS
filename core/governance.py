@@ -10,8 +10,9 @@ from pathlib import Path
 from typing import Any, Literal
 
 from core.types import JSONObject
+from core.proof_ledger import ProofLedgerManager
 
-GovernanceState = Literal["Running", "Pending Intervention", "Completed"]
+GovernanceState = Literal["Running", "Pending Intervention", "QUORUM_LOCKED_INTERVENTION", "Completed"]
 
 
 @dataclass(slots=True)
@@ -19,6 +20,7 @@ class GovernanceLogger:
     root: Path
     stream: Any = sys.stdout
     state: GovernanceState = "Running"
+    proof_ledger: ProofLedgerManager | None = None
 
     def __post_init__(self) -> None:
         self.root.mkdir(parents=True, exist_ok=True)
@@ -52,3 +54,10 @@ class GovernanceLogger:
                 f.write(line + "\n")
         except Exception:
             pass
+        ledger = self.proof_ledger
+        if ledger is not None:
+            try:
+                ledger.append_block({"kind": "GOV_EVENT", "event": enriched})
+            except Exception:
+                # Governance logging must never fail closed.
+                pass

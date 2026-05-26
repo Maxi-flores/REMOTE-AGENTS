@@ -17,16 +17,19 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Generic, Literal, TypeVar
 
-from .exceptions import CriticalMisalignmentError, PipelineHaltException
+from .exceptions import CriticalMisalignmentError, PipelineHaltException, QuorumDissentException
 from .fault import dump_critical_misalignment
 from .governance import GovernanceLogger
 from .hashutil import fnv1a_32
 from .matrix_verifier import MatrixVerifier
 from .telemetry import TelemetryTracker, estimate_payload_bytes
-from .recovery import CheckpointManager, CheckpointSnapshot
+from .quorum import ValidationQuorumManager
+from .recovery import CheckpointManager, CheckpointSnapshot, execution_token
 from .schema import Schema, SchemaValidationError, signature_for, validate_against_schema
+from .transaction_manager import WorkspaceTransaction, cleanup_workspace_staging, ensure_workspace_io_hooks_installed
 from .types import JSONObject
 from .validator import SchemaValidator
+from .sandbox import AgentSandboxExecutor
 
 T = TypeVar("T", bound=JSONObject)
 
@@ -238,15 +241,104 @@ async def run_three_stage_pipeline(
     workspace_snapshot: JSONObject,
     checkpoint: CheckpointManager | None = None,
     resume: CheckpointSnapshot | None = None,
+    quorum: ValidationQuorumManager | None = None,
 ) -> JSONObject:
+    ensure_workspace_io_hooks_installed()
     engine = HandshakeEngine(governance=governance, schemas=handshake_schemas())
+    ledger = governance.proof_ledger
+
+    repo_root_raw = workspace_snapshot.get("repo_root")
+    repo_root = Path(repo_root_raw).resolve() if isinstance(repo_root_raw, str) else Path.cwd().resolve()
+    token = checkpoint.token if checkpoint is not None else execution_token(business_case=business_case)
+    cleanup_workspace_staging(repo_root=repo_root, token=token, active_stage=resume.active_stage if resume else None)
+
+    quorum_mgr = quorum or ValidationQuorumManager(logs_dir=governance.root, proof_ledger=ledger)
+
+    stage_to_next_role: dict[str, str] = {
+        "intake_to_architecture": "software_architect",
+        "architecture_to_risk": "risk_compliance",
+        "risk_to_build_execution": "build_orchestrator",
+    }
+
+    def _handshake_hash(*, from_role: str, to_role: str, schema_id: str, payload: JSONObject) -> str:
+        canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+        return fnv1a_32(f"{from_role}->{to_role}:{schema_id}:{canonical}")
 
     q1: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] = asyncio.Queue(maxsize=1)
     q2: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] = asyncio.Queue(maxsize=1)
     q3: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] = asyncio.Queue(maxsize=1)
 
+    def _env_meta(item: PacketEnvelope[JSONObject] | _Stop) -> JSONObject:
+        if item is STOP:
+            return {"stop": True}
+        return {
+            "sequence": item.sequence,
+            "schema_id": item.schema_id,
+            "signature": item.signature,
+            "source_role": item.source_role,
+            "correlation_id": item.correlation_id,
+        }
+
+    async def _q_put(
+        name: str,
+        q: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop],
+        item: PacketEnvelope[JSONObject] | _Stop,
+    ) -> None:
+        if ledger is not None:
+            try:
+                ledger.append_block({"kind": "QUEUE_PUT", "queue": name, "item": _env_meta(item)})
+            except Exception:
+                pass
+        await q.put(item)
+
+    async def _q_get(
+        name: str,
+        q: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop],
+    ) -> PacketEnvelope[JSONObject] | _Stop:
+        item = await q.get()
+        if ledger is not None:
+            try:
+                ledger.append_block({"kind": "QUEUE_GET", "queue": name, "item": _env_meta(item)})
+            except Exception:
+                pass
+        return item
+
     seed_stop: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] | None = None
     if resume is not None:
+        next_role = stage_to_next_role.get(resume.active_stage, "unknown")
+        schema = engine.schemas.get(resume.schema_id)
+        if schema is None:
+            raise CriticalMisalignmentError(f"Unknown schema_id in resume snapshot: {resume.schema_id}")
+        hh = _handshake_hash(
+            from_role=resume.source_role,
+            to_role=next_role,
+            schema_id=schema.schema_id,
+            payload=resume.payload,
+        )
+        ballots = await quorum_mgr.validate(
+            stage=resume.active_stage,
+            schema=schema,
+            payload=resume.payload,
+            envelope_signature=resume.envelope_signature,
+            handshake_hash=hh,
+            source_role=resume.source_role,
+            next_role=next_role,
+            correlation_id=resume.correlation_id,
+            repo_root=repo_root,
+        )
+        if checkpoint is not None:
+            checkpoint.record_stage(
+                stage=resume.active_stage,
+                schema=schema,
+                payload=resume.payload,
+                envelope_signature=resume.envelope_signature,
+                source_role=resume.source_role,
+                correlation_id=resume.correlation_id,
+                created_at=resume.created_at,
+                next_role=next_role,
+                governance_state=governance.state,
+                envelope_ballots=ballots,
+            )
         env = PacketEnvelope(
             sequence=resume.active_stage,
             schema_id=resume.schema_id,
@@ -257,115 +349,265 @@ async def run_three_stage_pipeline(
             created_at=resume.created_at,
         )
         if env.sequence == "intake_to_architecture":
-            await q1.put(env)
+            await _q_put("q1", q1, env)
             seed_stop = q1
         elif env.sequence == "architecture_to_risk":
-            await q2.put(env)
+            await _q_put("q2", q2, env)
             seed_stop = q2
         elif env.sequence == "risk_to_build_execution":
-            await q3.put(env)
+            await _q_put("q3", q3, env)
         else:
             raise CriticalMisalignmentError(f"Unsupported resume stage: {env.sequence}")
 
+    stage_timeout_s = 10.0
+
     async def intake_task() -> None:
-        payload = await intake_agent.build_intake_payload(
-            business_case=business_case, workspace_snapshot=workspace_snapshot
-        )
-        env = engine.create_envelope(
-            sequence="intake_to_architecture",
-            schema_id="intake_to_architecture.v1",
-            payload=payload,
-            source_role="intake_specialist",
-        )
-        if checkpoint is not None:
-            schema = engine.schemas.get(env.schema_id)
-            if schema is not None:
-                checkpoint.record_stage(
+        exclude = [governance.root]
+        async with WorkspaceTransaction(
+            repo_roots=[repo_root],
+            token=token,
+            stage="intake_to_architecture",
+            exclude_roots=exclude,
+            proof_ledger=ledger,
+        ) as tx:
+            payload = await sandbox.run(
+                "intake_specialist.build_intake_payload",
+                intake_agent.build_intake_payload,
+                fn_kwargs={"business_case": business_case, "workspace_snapshot": workspace_snapshot},
+                timeout_s=stage_timeout_s,
+                mode="thread",
+            )
+            env = engine.create_envelope(
+                sequence="intake_to_architecture",
+                schema_id="intake_to_architecture.v1",
+                payload=payload,
+                source_role="intake_specialist",
+            )
+            next_role = stage_to_next_role["intake_to_architecture"]
+            hh = _handshake_hash(from_role=env.source_role, to_role=next_role, schema_id=env.schema_id, payload=env.payload)
+            try:
+                ballots = await quorum_mgr.validate(
                     stage=env.sequence,
-                    schema=schema,
+                    schema=engine.schemas[env.schema_id],
                     payload=env.payload,
                     envelope_signature=env.signature,
+                    handshake_hash=hh,
                     source_role=env.source_role,
+                    next_role=next_role,
                     correlation_id=env.correlation_id,
-                    created_at=env.created_at,
-                    next_role="software_architect",
-                    governance_state=governance.state,
+                    repo_root=repo_root,
                 )
-        await q1.put(env)
-        await q1.put(STOP)
+            except QuorumDissentException as exc:
+                if checkpoint is not None:
+                    schema = engine.schemas.get(env.schema_id)
+                    if schema is not None:
+                        checkpoint.record_quorum_halt(
+                            stage=env.sequence,
+                            schema=schema,
+                            payload=env.payload,
+                            envelope_signature=env.signature,
+                            source_role=env.source_role,
+                            correlation_id=env.correlation_id,
+                            created_at=env.created_at,
+                            next_role=next_role,
+                            envelope_ballots=(exc.ballots if isinstance(exc.ballots, dict) else {}),
+                        )
+                raise
+            checkpoint_ok = True
+            if checkpoint is not None:
+                schema = engine.schemas.get(env.schema_id)
+                if schema is not None:
+                    checkpoint_ok = checkpoint.record_stage(
+                        stage=env.sequence,
+                        schema=schema,
+                        payload=env.payload,
+                        envelope_signature=env.signature,
+                        source_role=env.source_role,
+                        correlation_id=env.correlation_id,
+                        created_at=env.created_at,
+                        next_role=next_role,
+                        governance_state=governance.state,
+                        envelope_ballots=ballots,
+                    )
+            if checkpoint_ok:
+                tx.commit()
+        await _q_put("q1", q1, env)
+        await _q_put("q1", q1, STOP)
 
     async def architect_task() -> None:
         while True:
-            item = await q1.get()
+            item = await _q_get("q1", q1)
             if item is STOP:
-                await q2.put(STOP)
+                await _q_put("q2", q2, STOP)
                 return
             env1 = item
             engine.validate_envelope(env1, expected_sequence="intake_to_architecture")
-            payload = await architect_agent.build_architecture_payload(intake_envelope=env1)
-            env2 = engine.create_envelope(
-                sequence="architecture_to_risk",
-                schema_id="architecture_to_risk.v1",
-                payload=payload,
-                source_role="software_architect",
-                correlation_id=env1.correlation_id,
-            )
-            if checkpoint is not None:
-                schema = engine.schemas.get(env2.schema_id)
-                if schema is not None:
-                    checkpoint.record_stage(
+            exclude = [governance.root]
+            async with WorkspaceTransaction(
+                repo_roots=[repo_root],
+                token=token,
+                stage="architecture_to_risk",
+                exclude_roots=exclude,
+                proof_ledger=ledger,
+            ) as tx:
+                payload = await sandbox.run(
+                    "software_architect.build_architecture_payload",
+                    architect_agent.build_architecture_payload,
+                    fn_kwargs={"intake_envelope": env1},
+                    timeout_s=stage_timeout_s,
+                    mode="thread",
+                )
+                env2 = engine.create_envelope(
+                    sequence="architecture_to_risk",
+                    schema_id="architecture_to_risk.v1",
+                    payload=payload,
+                    source_role="software_architect",
+                    correlation_id=env1.correlation_id,
+                )
+                next_role = stage_to_next_role["architecture_to_risk"]
+                hh = _handshake_hash(from_role=env2.source_role, to_role=next_role, schema_id=env2.schema_id, payload=env2.payload)
+                try:
+                    ballots = await quorum_mgr.validate(
                         stage=env2.sequence,
-                        schema=schema,
+                        schema=engine.schemas[env2.schema_id],
                         payload=env2.payload,
                         envelope_signature=env2.signature,
+                        handshake_hash=hh,
                         source_role=env2.source_role,
+                        next_role=next_role,
                         correlation_id=env2.correlation_id,
-                        created_at=env2.created_at,
-                        next_role="risk_compliance",
-                        governance_state=governance.state,
+                        repo_root=repo_root,
                     )
-            await q2.put(env2)
+                except QuorumDissentException as exc:
+                    if checkpoint is not None:
+                        schema = engine.schemas.get(env2.schema_id)
+                        if schema is not None:
+                            checkpoint.record_quorum_halt(
+                                stage=env2.sequence,
+                                schema=schema,
+                                payload=env2.payload,
+                                envelope_signature=env2.signature,
+                                source_role=env2.source_role,
+                                correlation_id=env2.correlation_id,
+                                created_at=env2.created_at,
+                                next_role=next_role,
+                                envelope_ballots=(exc.ballots if isinstance(exc.ballots, dict) else {}),
+                            )
+                    raise
+                checkpoint_ok = True
+                if checkpoint is not None:
+                    schema = engine.schemas.get(env2.schema_id)
+                    if schema is not None:
+                        checkpoint_ok = checkpoint.record_stage(
+                            stage=env2.sequence,
+                            schema=schema,
+                            payload=env2.payload,
+                            envelope_signature=env2.signature,
+                            source_role=env2.source_role,
+                            correlation_id=env2.correlation_id,
+                            created_at=env2.created_at,
+                            next_role=next_role,
+                            governance_state=governance.state,
+                            envelope_ballots=ballots,
+                        )
+                if checkpoint_ok:
+                    tx.commit()
+                await _q_put("q2", q2, env2)
 
     async def risk_task() -> None:
         while True:
-            item = await q2.get()
+            item = await _q_get("q2", q2)
             if item is STOP:
-                await q3.put(STOP)
+                await _q_put("q3", q3, STOP)
                 return
             env2 = item
             engine.validate_envelope(env2, expected_sequence="architecture_to_risk")
-            payload = await risk_agent.build_risk_payload(architecture_envelope=env2)
-            env3 = engine.create_envelope(
-                sequence="risk_to_build_execution",
-                schema_id="risk_to_build_execution.v1",
-                payload=payload,
-                source_role="risk_compliance",
-                correlation_id=env2.correlation_id,
-            )
-            if checkpoint is not None:
-                schema = engine.schemas.get(env3.schema_id)
-                if schema is not None:
-                    checkpoint.record_stage(
+            exclude = [governance.root]
+            async with WorkspaceTransaction(
+                repo_roots=[repo_root],
+                token=token,
+                stage="risk_to_build_execution",
+                exclude_roots=exclude,
+                proof_ledger=ledger,
+            ) as tx:
+                payload = await sandbox.run(
+                    "risk_compliance.build_risk_payload",
+                    risk_agent.build_risk_payload,
+                    fn_kwargs={"architecture_envelope": env2},
+                    timeout_s=stage_timeout_s,
+                    mode="thread",
+                )
+                env3 = engine.create_envelope(
+                    sequence="risk_to_build_execution",
+                    schema_id="risk_to_build_execution.v1",
+                    payload=payload,
+                    source_role="risk_compliance",
+                    correlation_id=env2.correlation_id,
+                )
+                next_role = stage_to_next_role["risk_to_build_execution"]
+                hh = _handshake_hash(from_role=env3.source_role, to_role=next_role, schema_id=env3.schema_id, payload=env3.payload)
+                try:
+                    ballots = await quorum_mgr.validate(
                         stage=env3.sequence,
-                        schema=schema,
+                        schema=engine.schemas[env3.schema_id],
                         payload=env3.payload,
                         envelope_signature=env3.signature,
+                        handshake_hash=hh,
                         source_role=env3.source_role,
+                        next_role=next_role,
                         correlation_id=env3.correlation_id,
-                        created_at=env3.created_at,
-                        next_role="build_orchestrator",
-                        governance_state=governance.state,
+                        repo_root=repo_root,
                     )
-            await q3.put(env3)
+                except QuorumDissentException as exc:
+                    if checkpoint is not None:
+                        schema = engine.schemas.get(env3.schema_id)
+                        if schema is not None:
+                            checkpoint.record_quorum_halt(
+                                stage=env3.sequence,
+                                schema=schema,
+                                payload=env3.payload,
+                                envelope_signature=env3.signature,
+                                source_role=env3.source_role,
+                                correlation_id=env3.correlation_id,
+                                created_at=env3.created_at,
+                                next_role=next_role,
+                                envelope_ballots=(exc.ballots if isinstance(exc.ballots, dict) else {}),
+                            )
+                    raise
+                checkpoint_ok = True
+                if checkpoint is not None:
+                    schema = engine.schemas.get(env3.schema_id)
+                    if schema is not None:
+                        checkpoint_ok = checkpoint.record_stage(
+                            stage=env3.sequence,
+                            schema=schema,
+                            payload=env3.payload,
+                            envelope_signature=env3.signature,
+                            source_role=env3.source_role,
+                            correlation_id=env3.correlation_id,
+                            created_at=env3.created_at,
+                            next_role=next_role,
+                            governance_state=governance.state,
+                            envelope_ballots=ballots,
+                        )
+                if checkpoint_ok:
+                    tx.commit()
+                await _q_put("q3", q3, env3)
 
     async def build_task() -> JSONObject:
         while True:
-            item = await q3.get()
+            item = await _q_get("q3", q3)
             if item is STOP:
                 raise CriticalMisalignmentError("Pipeline terminated before build execution.")
             env3 = item
             engine.validate_envelope(env3, expected_sequence="risk_to_build_execution")
-            result = await build_agent.execute_build(envelope=env3)
+            result = await sandbox.run(
+                "build_orchestrator.execute_build",
+                build_agent.execute_build,
+                fn_kwargs={"envelope": env3},
+                timeout_s=stage_timeout_s,
+                mode="thread",
+            )
             if checkpoint is not None:
                 checkpoint.clear()
             return result
@@ -373,27 +615,35 @@ async def run_three_stage_pipeline(
     async def seed_stop_task() -> None:
         if seed_stop is None:
             return
-        await seed_stop.put(STOP)
-
-    async with asyncio.TaskGroup() as tg:
-        if resume is None:
-            tg.create_task(intake_task())
-            tg.create_task(architect_task())
-            tg.create_task(risk_task())
+        if seed_stop is q1:
+            await _q_put("q1", q1, STOP)
+        elif seed_stop is q2:
+            await _q_put("q2", q2, STOP)
+        elif seed_stop is q3:
+            await _q_put("q3", q3, STOP)
         else:
-            if resume.active_stage == "intake_to_architecture":
+            await seed_stop.put(STOP)
+
+    async with AgentSandboxExecutor() as sandbox:
+        async with asyncio.TaskGroup() as tg:
+            if resume is None:
+                tg.create_task(intake_task())
                 tg.create_task(architect_task())
                 tg.create_task(risk_task())
-            elif resume.active_stage == "architecture_to_risk":
-                tg.create_task(risk_task())
-            elif resume.active_stage == "risk_to_build_execution":
-                pass
             else:
-                raise CriticalMisalignmentError(f"Unsupported resume stage: {resume.active_stage}")
-            tg.create_task(seed_stop_task())
-        build = tg.create_task(build_task())
+                if resume.active_stage == "intake_to_architecture":
+                    tg.create_task(architect_task())
+                    tg.create_task(risk_task())
+                elif resume.active_stage == "architecture_to_risk":
+                    tg.create_task(risk_task())
+                elif resume.active_stage == "risk_to_build_execution":
+                    pass
+                else:
+                    raise CriticalMisalignmentError(f"Unsupported resume stage: {resume.active_stage}")
+                tg.create_task(seed_stop_task())
+            build = tg.create_task(build_task())
 
-    return build.result()
+        return build.result()
 
 
 class TwinAuditor:
@@ -447,6 +697,9 @@ class HandshakePipeline:
         verifier: MatrixVerifier | None = None,
     ) -> dict:
         state: dict = {"pipeline_state": "RUNNING", "telemetry": []}
+        stage_timeout_s = 5.0
+        tasks: list[asyncio.Task[Any]] = []
+        artifact_task: asyncio.Task[Any] | None = None
 
         tasks: list[asyncio.Task] = []
         artifact_task: asyncio.Task | None = None
@@ -464,7 +717,13 @@ class HandshakePipeline:
         verifier_lock = asyncio.Lock()
 
         async def _isa_task() -> None:
-            packet = isa.ingest(source_text=source_text, repository_name=repository_name)
+            packet = await sandbox.run(
+                "ISA.ingest",
+                isa.ingest,
+                fn_kwargs={"source_text": source_text, "repository_name": repository_name},
+                timeout_s=stage_timeout_s,
+                mode="auto",
+            )
             state["isa_packet"] = packet
             if telemetry_tracker is not None:
                 await telemetry_tracker.record(
@@ -560,7 +819,13 @@ class HandshakePipeline:
                             extra={"queue_name": "q_sas_in"},
                         )
                 start = time.monotonic()
-                blueprint = sas.process(pkt)
+                blueprint = await sandbox.run(
+                    "SAS.process",
+                    sas.process,
+                    pkt,
+                    timeout_s=stage_timeout_s,
+                    mode="auto",
+                )
                 end = time.monotonic()
                 state["sas_packet"] = blueprint
                 if telemetry_tracker is not None:
@@ -596,7 +861,13 @@ class HandshakePipeline:
                             extra={"queue_name": "q_crs_in"},
                         )
                 start = time.monotonic()
-                clearance = crs.assess(pkt)
+                clearance = await sandbox.run(
+                    "CRS.assess",
+                    crs.assess,
+                    pkt,
+                    timeout_s=stage_timeout_s,
+                    mode="auto",
+                )
                 end = time.monotonic()
                 state["crs_packet"] = clearance
                 if telemetry_tracker is not None:
@@ -631,7 +902,14 @@ class HandshakePipeline:
                             extra={"queue_name": "q_boa_in"},
                         )
                 start = time.monotonic()
-                artifact = boa.build(pkt, telemetry=state.get("telemetry", []))
+                artifact = await sandbox.run(
+                    "BOA.build",
+                    boa.build,
+                    pkt,
+                    fn_kwargs={"telemetry": state.get("telemetry", [])},
+                    timeout_s=stage_timeout_s,
+                    mode="auto",
+                )
                 end = time.monotonic()
                 state["pipeline_state"] = "COMPLETED"
                 state["artifact"] = artifact
@@ -649,19 +927,58 @@ class HandshakePipeline:
                 return artifact
 
         try:
-            tasks = [
-                asyncio.create_task(_isa_task()),
-                asyncio.create_task(_auditor_task(ita, "intake_handshake.json", "ISA", "SAS", "q_isa_out", "q_sas_in", q_isa_out, q_sas_in)),
-                asyncio.create_task(_sas_task()),
-                asyncio.create_task(_auditor_task(ata, "architecture_blueprint.json", "SAS", "CRS", "q_sas_out", "q_crs_in", q_sas_out, q_crs_in)),
-                asyncio.create_task(_crs_task()),
-                asyncio.create_task(_auditor_task(rta, "risk_clearance.json", "CRS", "BOA", "q_crs_out", "q_boa_in", q_crs_out, q_boa_in)),
-            ]
-            artifact_task = asyncio.create_task(_boa_task())
-            await asyncio.gather(*tasks)
-            artifact = await artifact_task
+            async with AgentSandboxExecutor() as sandbox:
+                tasks = [
+                    asyncio.create_task(_isa_task()),
+                    asyncio.create_task(
+                        _auditor_task(
+                            ita,
+                            "intake_handshake.json",
+                            "ISA",
+                            "SAS",
+                            "q_isa_out",
+                            "q_sas_in",
+                            q_isa_out,
+                            q_sas_in,
+                        )
+                    ),
+                    asyncio.create_task(_sas_task()),
+                    asyncio.create_task(
+                        _auditor_task(
+                            ata,
+                            "architecture_blueprint.json",
+                            "SAS",
+                            "CRS",
+                            "q_sas_out",
+                            "q_crs_in",
+                            q_sas_out,
+                            q_crs_in,
+                        )
+                    ),
+                    asyncio.create_task(_crs_task()),
+                    asyncio.create_task(
+                        _auditor_task(
+                            rta,
+                            "risk_clearance.json",
+                            "CRS",
+                            "BOA",
+                            "q_crs_out",
+                            "q_boa_in",
+                            q_crs_out,
+                            q_boa_in,
+                        )
+                    ),
+                ]
+                artifact_task = asyncio.create_task(_boa_task())
+                await asyncio.gather(*tasks)
+                artifact = await artifact_task
             if telemetry_tracker is not None:
-                await telemetry_tracker.record(component="HandshakePipeline", event_type="pipeline_completed", twin_hash="-", latency_ms=0.0)
+                await telemetry_tracker.record(
+                    component="HandshakePipeline",
+                    event_type="pipeline_completed",
+                    twin_hash="-",
+                    latency_ms=0.0,
+                )
             if verifier is not None:
                 try:
                     artifact_path_raw = artifact.get("artifact_path")

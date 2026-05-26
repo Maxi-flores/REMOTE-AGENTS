@@ -98,10 +98,6 @@ class Orchestrator:
         )
 
         try:
-            intake_agent = self._load_agent("intake_specialist")
-            architect_agent = self._load_agent("software_architect")
-            risk_agent = self._load_agent("risk_compliance")
-            build_agent = self._load_agent("build_orchestrator")
             needed_roles = {"intake_specialist", "software_architect", "risk_compliance", "build_orchestrator"}
             if resume is not None:
                 if resume.active_stage == "intake_to_architecture":

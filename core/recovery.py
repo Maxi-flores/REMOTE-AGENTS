@@ -99,11 +99,9 @@ def _handshake_hash(
 def _atomic_write_json(path: Path, obj: Mapping[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     data = json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False) + "\n"
-    tmp_fd: int | None = None
     tmp_path: str | None = None
     try:
         fd, tmp = tempfile.mkstemp(prefix=path.name + ".", suffix=".tmp", dir=str(path.parent))
-        tmp_fd = fd
         tmp_path = tmp
         with os.fdopen(fd, "w", encoding="utf-8") as f:
             f.write(data)
@@ -111,9 +109,6 @@ def _atomic_write_json(path: Path, obj: Mapping[str, Any]) -> None:
             os.fsync(f.fileno())
         os.replace(tmp, path)
     finally:
-        if tmp_fd is not None:
-            # fd already closed by fdopen()
-            tmp_fd = None
         if tmp_path is not None:
             try:
                 if os.path.exists(tmp_path):
@@ -330,4 +325,3 @@ class CheckpointManager:
             if obj.get("event") == "STATE" and obj.get("state") == "Pending Intervention":
                 saw_pending = True
         return saw_pending and saw_misalignment
-

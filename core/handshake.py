@@ -689,20 +689,14 @@ class HandshakePipeline:
         except Exception as exc:
             for task in tasks:
                 task.cancel()
-            try:
+            if artifact_task is not None:
                 artifact_task.cancel()
-            except Exception:
-                pass
-            await asyncio.gather(*tasks, artifact_task, return_exceptions=True)
+            pending = [*tasks]
+            if artifact_task is not None:
+                pending.append(artifact_task)
+            if pending:
+                await asyncio.gather(*pending, return_exceptions=True)
             state["pipeline_state"] = "DEAD_HALT"
-            for task in tasks:
-                task.cancel()
-            if artifact_task is not None:
-                artifact_task.cancel()
-            if tasks:
-                await asyncio.gather(*tasks, return_exceptions=True)
-            if artifact_task is not None:
-                await asyncio.gather(artifact_task, return_exceptions=True)
             if telemetry_tracker is not None:
                 await telemetry_tracker.record(
                     component="HandshakePipeline",

@@ -1,8 +1,8 @@
 # Agent Guidance & Implementation Directory (AGENT_GUIDE_LIST.md)
 
 ## 1. System Overview
-18 repositories are mapped to required agent roles; 16 have both class and JSON definitions and are ready for training.
-2 are pending definition/training due to missing class and/or JSON configuration references.
+18 agent targets are tracked; 16 are Ready for Training and 2 are Pending.
+Pending breakdown: 0 Missing Class; 1 Pending Implementation; 1 Pending Definition/Training.
 
 ## 2. Agent Mapping by Repository
 
@@ -137,4 +137,3 @@
 | Primary: Next.js (React) Frontend Engineer; Twin: UI/UX + Motion Specialist (Tailwind v4 theme token compliance) | WOMmedia | `repository_name=WOMmedia` | Ready for Training |
 | Primary: Node.js/Express Event-Driven Workflow Orchestrator (SQLite Persistent); Twin: React/Vite Dashboard Frontend Engineer & Autonomy Compliance Twin | Trade Agent – V1 | `repository_name=Trade-Agent-V1` | Ready for Training |
 
----

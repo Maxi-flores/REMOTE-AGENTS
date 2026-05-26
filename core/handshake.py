@@ -18,8 +18,19 @@ class TwinAuditor:
 
     def sign_off(self, schema_file: str, packet: dict, from_agent: str, to_agent: str) -> str:
         self._validator.validate(schema_file, packet)
-        canonical = json.dumps(packet, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+        provided_hash = packet.get("handshake_hash")
+        canonical_packet = packet
+        if "handshake_hash" in packet:
+            canonical_packet = dict(packet)
+            canonical_packet.pop("handshake_hash", None)
+        canonical = json.dumps(canonical_packet, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
         handshake_hash = fnv1a_32(f"{from_agent}->{to_agent}:{schema_file}:{canonical}")
+        if provided_hash is not None:
+            if not isinstance(provided_hash, str) or provided_hash != handshake_hash:
+                raise PipelineHaltException(
+                    f"Handshake hash mismatch for {from_agent}->{to_agent} ({schema_file}): "
+                    f"provided={provided_hash!r} expected={handshake_hash!r}"
+                )
         self._log.info(
             "Twin-to-Twin Handshake Validated (%s -> %s, %s)",
             from_agent,

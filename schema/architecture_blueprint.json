@@ -6,6 +6,10 @@
   "additionalProperties": false,
   "required": ["origin_agent", "target_agent", "protocol", "blueprint"],
   "properties": {
+    "handshake_hash": {
+      "type": "string",
+      "description": "Optional precomputed FNV-1a token for tamper detection."
+    },
     "origin_agent": {
       "type": "string",
       "enum": ["SAS"]
@@ -61,4 +65,3 @@
     }
   }
 }
-

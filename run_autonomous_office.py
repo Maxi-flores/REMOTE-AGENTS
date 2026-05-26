@@ -10,9 +10,10 @@ from pathlib import Path
 
 from agents.registry import AgentRegistry
 from core.governance import GovernanceLogger
-from core.handshake import HandshakePipeline
+from core.handshake import HandshakePipeline, handshake_schemas
 from core.logconf import component_logger, configure_logging
 from core.orchestrator import run_sync
+from core.recovery import CheckpointFormatError, CheckpointManager
 
 
 def _read_business_case(args: argparse.Namespace) -> str:
@@ -80,6 +81,11 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Run the legacy OFFICE_INTAKE/INTAKE-driven pipeline path.",
     )
+    parser.add_argument(
+        "--resolve-intervention",
+        action="store_true",
+        help="Re-validate a human-fixed checkpoint payload and resume execution.",
+    )
     args = parser.parse_args(argv)
 
     if args.legacy_intake:
@@ -90,7 +96,30 @@ def main(argv: list[str] | None = None) -> int:
     business_case = _read_business_case(args)
 
     governance = GovernanceLogger(root=log_dir)
-    return run_sync(business_case=business_case, repo_root=repo_root, governance=governance)
+    checkpoint = CheckpointManager(logs_dir=log_dir, business_case=business_case)
+    resume = None
+    try:
+        resume = checkpoint.load()
+    except CheckpointFormatError as exc:
+        governance.emit_event({"event": "CHECKPOINT_INVALID", "error": str(exc)})
+        resume = None
+
+    if resume is not None and checkpoint.requires_manual_intervention():
+        governance.emit_event({"event": "INTERVENTION_REQUIRED", "active_stage": resume.active_stage})
+        if not args.resolve_intervention:
+            return 2
+        repaired = checkpoint.resolve_intervention(schemas=handshake_schemas())
+        if repaired is not None:
+            resume = repaired
+        governance.set_state("Running")
+
+    return run_sync(
+        business_case=business_case,
+        repo_root=repo_root,
+        governance=governance,
+        checkpoint=checkpoint,
+        resume=resume,
+    )
 
 
 if __name__ == "__main__":

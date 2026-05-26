@@ -31,6 +31,7 @@ from typing import Any, Iterable, Mapping, MutableMapping, TypedDict, cast
 from core.exceptions import ByzantineNodeException
 from core.hashutil import fnv1a_32
 from core.replay import ReadOnlyWorkspaceGuard
+from core.rollup import verify_rollup_payload
 
 
 class _TopologyNode(TypedDict):
@@ -590,6 +591,32 @@ class BFTConsensusNode:
         # The strict head check happens under the state lock in _handle_propose_block; keep a redundancy check here.
         if idx < 0:
             raise ByzantineNodeException("Index malformed", peer_id=peer_id, details={"block": block})
+
+        payload_obj = block.get("payload")
+        if isinstance(payload_obj, dict) and payload_obj.get("kind") == "ROLLUP_BLOCK":
+            journal_path = (self.log_dir / "ROLLUP_JOURNAL.jsonl").resolve()
+            try:
+                verify_rollup_payload(
+                    payload=cast(Mapping[str, Any], payload_obj),
+                    journal_path=journal_path,
+                    expected_prev_root=str(block.get("prev_hash") or ""),
+                )
+            except Exception as exc:
+                self._record_orphaned(
+                    kind="FRAUD_PROOF_QUARANTINE",
+                    peer_id=peer_id,
+                    details={
+                        "index": idx,
+                        "journal_path": str(journal_path),
+                        "error": str(exc),
+                        "payload": dict(payload_obj),
+                    },
+                )
+                raise ByzantineNodeException(
+                    "Rollup verification failed",
+                    peer_id=peer_id,
+                    details={"error": str(exc), "payload": payload_obj},
+                ) from exc
 
     async def _handle_prepare(self, msg: Mapping[str, Any], peer: _PeerConn) -> None:
         idx = msg.get("index")

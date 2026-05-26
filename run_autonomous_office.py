@@ -3,10 +3,15 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
+import json
 import sys
 from pathlib import Path
 
+from agents.registry import AgentRegistry
 from core.governance import GovernanceLogger
+from core.handshake import HandshakePipeline
+from core.logconf import component_logger, configure_logging
 from core.orchestrator import run_sync
 
 
@@ -19,6 +24,41 @@ def _read_business_case(args: argparse.Namespace) -> str:
     if not sys.stdin.isatty():
         return sys.stdin.read()
     raise SystemExit("Provide --business-case, --business-case-file, or pipe content via stdin.")
+
+
+def _load_source_text(repo_root: Path) -> tuple[str, str | None]:
+    """Deterministic intake sources (first match wins)."""
+    intake_json = repo_root / "OFFICE_INTAKE.json"
+    if intake_json.exists():
+        obj = json.loads(intake_json.read_text(encoding="utf-8"))
+        if isinstance(obj, dict) and isinstance(obj.get("source_text"), str):
+            return obj["source_text"], obj.get("repository_name")
+
+    intake_txt = repo_root / "INTAKE.txt"
+    if intake_txt.exists():
+        return intake_txt.read_text(encoding="utf-8"), None
+
+    return "Initialize autonomous office runtime core for REMOTE-AGENTS.", "REMOTE-AGENTS"
+
+
+async def _amain() -> int:
+    repo_root = Path(__file__).resolve().parent
+    logs_dir = repo_root / "logs"
+
+    configure_logging()
+    log = component_logger("OfficeRunner")
+
+    source_text, repository_name = _load_source_text(repo_root)
+    log.info("Office intake loaded (repository=%s, bytes=%s)", repository_name, len(source_text))
+
+    registry = AgentRegistry(repo_root=repo_root, logs_dir=logs_dir)
+    isa, sas, crs, boa = registry.build(repository_name=repository_name)
+
+    pipeline = HandshakePipeline(schema_dir=repo_root / "schema", logs_dir=logs_dir)
+    artifact = await pipeline.run(isa=isa, sas=sas, crs=crs, boa=boa, source_text=source_text, repository_name=repository_name)
+
+    print(json.dumps(artifact, indent=2, sort_keys=True, ensure_ascii=False))
+    return 0
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -35,7 +75,15 @@ def main(argv: list[str] | None = None) -> int:
         default=str(Path.cwd() / "logs"),
         help="Directory for governance logs (default: ./logs).",
     )
+    parser.add_argument(
+        "--legacy-intake",
+        action="store_true",
+        help="Run the legacy OFFICE_INTAKE/INTAKE-driven pipeline path.",
+    )
     args = parser.parse_args(argv)
+
+    if args.legacy_intake:
+        return asyncio.run(_amain())
 
     repo_root = Path(args.repo_root).resolve()
     log_dir = Path(args.log_dir).resolve()
@@ -47,4 +95,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

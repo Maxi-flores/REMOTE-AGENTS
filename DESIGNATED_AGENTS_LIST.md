@@ -20,4 +20,3 @@ default pipeline order for the REMOTE-AGENTS autonomous office.
   "repository_overrides": {}
 }
 ```
-

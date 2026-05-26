@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema/intake_handshake.json",
+  "title": "ISA -> SAS Deterministic JSON Packet",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["origin_agent", "target_agent", "protocol", "payload"],
+  "properties": {
+    "handshake_hash": {
+      "type": "string",
+      "description": "Optional precomputed FNV-1a token for tamper detection."
+    },
+    "origin_agent": {
+      "type": "string",
+      "enum": ["ISA"]
+    },
+    "target_agent": {
+      "type": "string",
+      "enum": ["SAS"]
+    },
+    "protocol": {
+      "type": "string",
+      "const": "Deterministic JSON Packet"
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["request_id", "source_text", "requirements"],
+      "properties": {
+        "request_id": {
+          "type": "string",
+          "description": "Stable identifier for cross-agent traceability (UUID recommended).",
+          "minLength": 1
+        },
+        "source_text": {
+          "type": "string",
+          "description": "Unstructured user/business input captured verbatim."
+        },
+        "requirements": {
+          "type": "array",
+          "description": "Tokenized requirements extracted from source_text.",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "constraints": {
+          "type": "object",
+          "description": "Initial constraints and non-functional requirements.",
+          "additionalProperties": true
+        },
+        "repo_targets": {
+          "type": "array",
+          "description": "Repositories impacted by the intake (optional hint).",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

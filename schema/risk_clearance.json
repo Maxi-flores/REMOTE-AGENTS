@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "schema/risk_clearance.json",
+  "title": "CRS -> BOA Risk Clearance Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["origin_agent", "target_agent", "protocol", "clearance"],
+  "properties": {
+    "handshake_hash": {
+      "type": "string",
+      "description": "Optional precomputed FNV-1a token for tamper detection."
+    },
+    "origin_agent": {
+      "type": "string",
+      "enum": ["CRS"]
+    },
+    "target_agent": {
+      "type": "string",
+      "enum": ["BOA"]
+    },
+    "protocol": {
+      "type": "string",
+      "const": "Risk Clearance Manifest"
+    },
+    "clearance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["build_ready", "risk_level", "findings"],
+      "properties": {
+        "build_ready": {
+          "type": "boolean",
+          "description": "Whether the build pipeline is permitted to proceed."
+        },
+        "risk_level": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"]
+        },
+        "risk_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "severity", "summary"],
+            "properties": {
+              "id": { "type": "string", "minLength": 1 },
+              "severity": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+              "summary": { "type": "string", "minLength": 1 },
+              "evidence": { "type": "string" },
+              "mitigation": { "type": "string" }
+            }
+          }
+        },
+        "approvals": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -8,3 +8,10 @@ class CriticalMisalignmentError(RuntimeError):
 
     code = "CRITICAL_MISALIGNMENT"
 
+
+class SchemaMismatchedException(Exception):
+    """Raised when a packet fails schema validation."""
+
+
+class PipelineHaltException(Exception):
+    """Raised when handshake auditing detects an unrecoverable pipeline fault."""

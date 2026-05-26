@@ -1,0 +1,191 @@
+# Sentient OS Repo Inventory 
+
+  
+
+Date: 2026-05-23 
+
+  
+
+Workspace: `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS` 
+
+  
+
+Source of truth: `Sentient OS - Repo Structure.txt` 
+
+  
+
+Sentient OS is a non-Git workspace registry. It is not a product repo and must not be initialized as Git unless explicitly instructed. 
+
+  
+
+## Active Local Git Repos 
+
+  
+
+| Project | Local path | Remote URL | Has `.git` | Classification | Recommended next action | 
+
+| --- | --- | --- | --- | --- | --- | 
+
+| ConceptSHOP | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\ConceptSHOP` | `https://github.com/Maxi-flores/ConceptShop` | yes | active-local-git-repo | Review/commit governance docs separately from existing dirty product files. | 
+
+| Mucho3D | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\Mucho3D` | `https://github.com/Maxi-flores/Mucho3D` | yes | active-local-git-repo | Continue runtime diagnostics review; keep `.env.local` and PNG assets uncommitted. | 
+
+| PF-WAI | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\PF-WAI` | `https://github.com/Maxi-flores/PORTFOLIO` | yes | active-local-git-repo | Review/commit governance docs separately from existing dirty product and lockfile changes. | 
+
+| Dealinstinct Frontend | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\Dealinstinct\dealinstinct-frontend` | `https://github.com/Maxi-flores/Dealinstinct` | yes | active-local-git-repo | Prepare repo-agent governance on `agent/dealinstinct-frontend/repo-agent-contract`. | 
+
+| Dealinstinct V2 | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\Dealinstinct\V2\dealinstinct-v2` | `https://github.com/Maxi-flores/Dealinstinct` | yes | active-local-git-repo | Prepare repo-agent governance on `agent/dealinstinct-v2/repo-agent-contract`. | 
+
+| Powerframe | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\Powerframe-Ecosystem\Powerframe` | `https://github.com/Maxi-flores/Powerframe` | yes | active-local-git-repo | Inspect status and add repo-agent governance in a later task. | 
+
+| Powerframe-CRM | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\Powerframe-Ecosystem\Powerframe-CRM` | `https://github.com/Maxi-flores/Powerframe-CRM` | yes | active-local-git-repo | Inspect status and add repo-agent governance in a later task. | 
+
+| Powerframe-GMS | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\Powerframe-Ecosystem\Powerframe-GMS` | `https://github.com/Maxi-flores/Powerframe-GMS` | yes | active-local-git-repo | Inspect status and add repo-agent governance in a later task. | 
+
+| Powerframe-TPR | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\Powerframe-Ecosystem\Powerframe-TPR` | `https://github.com/Maxi-flores/Powerframe-TPR` | yes | active-local-git-repo | Inspect status and add repo-agent governance in a later task. | 
+
+| Powerframe-WMS | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\Powerframe-Ecosystem\Powerframe-WMS` | `https://github.com/Maxi-flores/Powerframe-WMS` | yes | active-local-git-repo | Inspect status and add repo-agent governance in a later task. | 
+
+| PowerStarter | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\Powerframe-Ecosystem\PowerStarter` | `https://github.com/Maxi-flores/PowerStarter` | yes | active-local-git-repo | Inspect status and add repo-agent governance in a later task. | 
+
+| TheRocketTree-App | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\Powerframe-Ecosystem\TheRocketTree-App` | `https://github.com/Maxi-flores/TheRocketTree-App` | yes | active-local-git-repo | Inspect status and add repo-agent governance in a later task. | 
+
+| TheRocketTree-Web | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\Powerframe-Ecosystem\TheRocketTree-Web` | `https://github.com/Maxi-flores/TheRocketTree-Web` | yes | active-local-git-repo | Inspect status and add repo-agent governance in a later task. | 
+
+| TheRocketTreeUnity | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\Powerframe-Ecosystem\TheRocketTreeUnity` | `https://github.com/Maxi-flores/TheRocketTreeUnity` | yes | active-local-git-repo | Inspect status and add repo-agent governance in a later task. | 
+
+  
+
+## Local Folders Without Git But Mapped To GitHub 
+
+  
+
+| Project | Local path | Remote URL | Has `.git` | Classification | Recommended next action | 
+
+| --- | --- | --- | --- | --- | --- | 
+
+| Sapient KB | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\Powerframe-Ecosystem\Sapient KB` | `https://github.com/Maxi-flores/Sapient` | no | remote-mapped-local-folder | Decide whether this folder should become the Sapient clone or remain a local KB folder. | 
+
+| Bikerinstinct | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\Bikerinstinct` | `https://github.com/Maxi-flores/Bikerinstinct` | no | remote-mapped-local-folder | Decide whether to connect existing folder to remote or clone into a clean path. | 
+
+| WOMmedia | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\WOMmedia` | `https://github.com/Maxi-flores/WOMmedia` | no | remote-mapped-local-folder | Decide whether to connect existing folder to remote or clone into a clean path. | 
+
+| Sapient KB | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\Powerframe-Ecosystem\Sapient KB` | `https://github.com/Maxi-flores/Sapient` | no | remote-mapped-local-folder | Decide whether this folder should become the Sapient clone or remain a local KB folder. | 
+
+  
+
+## Workspace Or Group Folders 
+
+  
+
+| Project | Local path | Remote URL | Has `.git` | Classification | Recommended next action | 
+
+| --- | --- | --- | --- | --- | --- | 
+
+| Dealinstinct | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\Dealinstinct` | `https://github.com/Maxi-flores/Dealinstinct` | no | workspace-group-folder | Keep as group folder for nested Dealinstinct repos. | 
+
+| Powerframe-Ecosystem | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\Powerframe-Ecosystem` | none listed | no | workspace-group-folder | Keep as group folder for nested Powerframe repos. | 
+
+| Obsidian KB | `C:\shared_folder\Web.instinct\ProfoundProjects\Sentient OS\Powerframe-Ecosystem\Obsidian KB` | none listed | no | workspace-group-folder | Keep as local knowledge folder unless a remote is assigned. | 
+
+ 
+
+## Next Repos To Govern 
+
+1. `Dealinstinct\dealinstinct-frontend` 
+
+2. `Dealinstinct\V2\dealinstinct-v2` 
+
+ 
+
+## Agents & Manage: 
+
+TO Sentient OS / ProfoundProjects  
+
+| Powerframe-Ecosystem | 
+
+| Sapient KB |  
+
+ 
+
+## NEW > Rooting agents: 
+
+TO Trade Agent – V1 
+
+| Trade Agent – V1 |  
+
+ 
+
+ 
+
+DO > SENTIENT OS: 
+
+WOMmedia – M3D / F3D  
+
+| WOMmedia | 
+
+| Mucho3D | 
+
+TRT - Powerstarter / Powerframe 
+
+| PowerStarter |  
+
+| PF-WAI |  
+
+| TheRocketTree-App |  
+
+| Powerframe-GMS | 
+
+| Powerframe-TPR | 
+
+| Powerframe-CRM | 
+
+| Powerframe | 
+
+| TheRocketTree-Web |  
+
+CSHOP - Bi / Di 
+
+| Bikerinstinct | 
+
+| Dealinstinct V2 | 
+
+| ConceptSHOP | 
+
+ 
+
+## Production order: 
+
+| Trade Agent – V1 |  
+
+ 
+
+ 
+
+ 
+
+## Targets and tasks:  
+
+NL – IT 
+
+KVK – WOM 
+
+ES – MZ3/CVN 
+
+MZ3 – PT 
+
+TP – ME 
+
+AI – 10P 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 

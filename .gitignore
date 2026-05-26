@@ -1,2 +1,6 @@
 __pycache__/
 *.pyc
+logs/
+.remote_agents_logs/
+.venv/
+.python-version

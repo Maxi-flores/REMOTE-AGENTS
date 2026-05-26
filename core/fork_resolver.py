@@ -255,10 +255,10 @@ def _chain_tip_key(tip: _ChainTip) -> tuple[int, int, int, str]:
     )
 
 
-def _best_chain(blocks: Sequence[_ValidBlock]) -> tuple[list[_ValidBlock], int | None]:
-    """Return (chosen_chain_blocks, fork_point_index)."""
+def _best_chain(blocks: Sequence[_ValidBlock]) -> tuple[list[_ValidBlock], int | None, list[list[_ValidBlock]]]:
+    """Return (chosen_chain_blocks, fork_point_index, max_length_candidate_chains)."""
     if not blocks:
-        return ([], None)
+        return ([], None, [])
 
     fork_point = _detect_fork_point(blocks)
 
@@ -332,17 +332,26 @@ def _best_chain(blocks: Sequence[_ValidBlock]) -> tuple[list[_ValidBlock], int |
             )
         )
     if not tips:
-        return ([], fork_point)
+        return ([], fork_point, [])
 
     best_tip = max(tips, key=_chain_tip_key)
 
-    chosen: list[_ValidBlock] = []
-    cur: tuple[int, str, int] | None = best_tip.tip_id
-    while cur is not None:
-        chosen.append(nodes[cur])
-        cur = parent.get(cur)
-    chosen.reverse()
-    return (chosen, fork_point)
+    def _reconstruct(tip_id: tuple[int, str, int]) -> list[_ValidBlock]:
+        out: list[_ValidBlock] = []
+        cur: tuple[int, str, int] | None = tip_id
+        while cur is not None:
+            out.append(nodes[cur])
+            cur = parent.get(cur)
+        out.reverse()
+        return out
+
+    chosen = _reconstruct(best_tip.tip_id)
+
+    max_len = max(t.length for t in tips)
+    top_tips = [t for t in tips if t.length == max_len]
+    top_tips.sort(key=_chain_tip_key, reverse=True)
+    candidates = [_reconstruct(t.tip_id) for t in top_tips]
+    return (chosen, fork_point, candidates)
 
 
 def _write_orphaned(
@@ -425,6 +434,7 @@ class LedgerForkAuditor:
         self._repo_root = repo_root.resolve()
         self._log_dir = log_dir.resolve()
         self._ledger_path = (ledger_path or (self._log_dir / "PROOFS_LEDGER.jsonl")).resolve()
+        self._last_candidates: list[list[_ValidBlock]] = []
 
     @property
     def ledger_path(self) -> Path:
@@ -493,6 +503,14 @@ class LedgerForkAuditor:
                 ledger_path=ledger_path,
             )
 
+        if replay_verify and len(self._last_candidates) > 1:
+            try:
+                chosen_by_replay = asyncio.run(self._select_candidate_by_replay(self._last_candidates, fork_point))
+                if chosen_by_replay is not None:
+                    chosen_valid = chosen_by_replay
+            except Exception:
+                pass
+
         chosen_blocks = [b.block for b in chosen_valid]
         if replay_verify:
             # Replay in a read-only sandbox to confirm deterministic frame parsing (best-effort).
@@ -546,7 +564,56 @@ class LedgerForkAuditor:
                 "Ledger contains no self-consistent blocks to reconcile.",
                 ledger_path=self._ledger_path,
             )
-        return _best_chain(valid)
+        chosen, fork_point, candidates = _best_chain(valid)
+        self._last_candidates = candidates
+        return (chosen, fork_point)
+
+    async def _select_candidate_by_replay(
+        self, candidates: Sequence[Sequence[_ValidBlock]], fork_point: int | None
+    ) -> list[_ValidBlock] | None:
+        """Use the replay sandbox to pick among competing max-length candidates."""
+        if len(candidates) <= 1:
+            return list(candidates[0]) if candidates else None
+        threshold = 0 if fork_point is None else int(fork_point)
+
+        async def _eval_one(chain: Sequence[_ValidBlock]) -> tuple[bool, int, str, list[_ValidBlock]]:
+            has_quorum = False
+
+            async def _on_step(frame):  # type: ignore[no-untyped-def]
+                nonlocal has_quorum
+                if frame.ledger_index >= threshold and frame.frame_kind == "QUORUM_PASSED":
+                    has_quorum = True
+
+            tmp_path = self._write_chain_tmp([b.block for b in chain])
+            try:
+                controller = PipelineReplayController(repo_root=self._repo_root, log_dir=self._log_dir)
+                try:
+                    with ReadOnlyWorkspaceGuard(self._repo_root):
+                        await controller.replay_step_loop(source=str(tmp_path), on_step=_on_step)
+                finally:
+                    controller.close()
+            finally:
+                try:
+                    tmp_path.unlink(missing_ok=True)
+                except OSError:
+                    pass
+            tip = chain[-1]
+            return (has_quorum, int(tip.signature_u32), str(tip.hash), list(chain))
+
+        results: list[tuple[bool, int, str, list[_ValidBlock]]] = []
+        for chain in candidates:
+            try:
+                results.append(await _eval_one(chain))
+            except Exception:
+                # If replay fails for a candidate, treat it as non-quorum and keep selection deterministic.
+                tip = chain[-1]
+                results.append((False, int(tip.signature_u32), str(tip.hash), list(chain)))
+
+        any_quorum = any(r[0] for r in results)
+        filtered = [r for r in results if r[0]] if any_quorum else results
+        # LCR already enforced by candidate set; now apply deterministic tie-breakers.
+        filtered.sort(key=lambda r: (r[1], r[2]), reverse=True)
+        return filtered[0][3] if filtered else None
 
     async def _replay_verify_chain(self, blocks: Sequence[LedgerBlock]) -> None:
         tmp_path = self._write_chain_tmp(blocks)

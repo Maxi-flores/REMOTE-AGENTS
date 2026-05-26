@@ -243,6 +243,7 @@ async def run_three_stage_pipeline(
     q2: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] = asyncio.Queue(maxsize=1)
     q3: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] = asyncio.Queue(maxsize=1)
 
+    seed_stop: asyncio.Queue[PacketEnvelope[JSONObject] | _Stop] | None = None
     if resume is not None:
         env = PacketEnvelope(
             sequence=resume.active_stage,
@@ -255,10 +256,10 @@ async def run_three_stage_pipeline(
         )
         if env.sequence == "intake_to_architecture":
             await q1.put(env)
-            await q1.put(STOP)
+            seed_stop = q1
         elif env.sequence == "architecture_to_risk":
             await q2.put(env)
-            await q2.put(STOP)
+            seed_stop = q2
         elif env.sequence == "risk_to_build_execution":
             await q3.put(env)
         else:
@@ -367,6 +368,11 @@ async def run_three_stage_pipeline(
                 checkpoint.clear()
             return result
 
+    async def seed_stop_task() -> None:
+        if seed_stop is None:
+            return
+        await seed_stop.put(STOP)
+
     async with asyncio.TaskGroup() as tg:
         if resume is None:
             tg.create_task(intake_task())
@@ -382,6 +388,7 @@ async def run_three_stage_pipeline(
                 pass
             else:
                 raise CriticalMisalignmentError(f"Unsupported resume stage: {resume.active_stage}")
+            tg.create_task(seed_stop_task())
         build = tg.create_task(build_task())
 
     return build.result()
@@ -517,6 +524,13 @@ class HandshakePipeline:
             await asyncio.gather(*tasks)
             return await artifact_task
         except Exception as exc:
+            for task in tasks:
+                task.cancel()
+            try:
+                artifact_task.cancel()
+            except Exception:
+                pass
+            await asyncio.gather(*tasks, artifact_task, return_exceptions=True)
             state["pipeline_state"] = "DEAD_HALT"
             dump_critical_misalignment(self._logs_dir, state, exc)
             raise

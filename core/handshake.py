@@ -701,9 +701,6 @@ class HandshakePipeline:
         tasks: list[asyncio.Task[Any]] = []
         artifact_task: asyncio.Task[Any] | None = None
 
-        tasks: list[asyncio.Task] = []
-        artifact_task: asyncio.Task | None = None
-
         q_isa_out: asyncio.Queue = asyncio.Queue()
         q_sas_in: asyncio.Queue = asyncio.Queue()
         q_sas_out: asyncio.Queue = asyncio.Queue()

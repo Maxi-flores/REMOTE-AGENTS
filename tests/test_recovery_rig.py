@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import json
 import unittest
@@ -6,6 +8,8 @@ from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
 import run_autonomous_office
+from core.handshake import PacketEnvelope
+from core.types import JSONObject
 from agents.risk_compliance import RiskCompliance
 
 
@@ -31,7 +35,9 @@ class TestRecoveryRig(unittest.IsolatedAsyncioTestCase):
                 str(log_dir),
             ]
 
-            async def _crash_risk(self: RiskCompliance, *, architecture_envelope):  # type: ignore[no-untyped-def]
+            async def _crash_risk(
+                self: RiskCompliance, *, architecture_envelope: PacketEnvelope[JSONObject]
+            ) -> JSONObject:
                 await asyncio.sleep(0)
                 raise RuntimeError("simulated crash during Architecture -> Risk transition")
 
@@ -82,4 +88,3 @@ class TestRecoveryRig(unittest.IsolatedAsyncioTestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
-

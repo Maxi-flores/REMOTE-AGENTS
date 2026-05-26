@@ -10,6 +10,8 @@ from agents.registry import AgentRegistry
 from core.exceptions import PipelineHaltException, SchemaMismatchedException
 from core.handshake import HandshakePipeline
 from core.hashutil import fnv1a_32
+from core.matrix_verifier import GovernancePolicy, MatrixVerifier
+from core.telemetry import TelemetryTracker
 
 
 def _is_hex32(token: object) -> bool:
@@ -126,6 +128,23 @@ class TestAutonomousOfficeRig(unittest.IsolatedAsyncioTestCase):
         telemetry = artifact.get("telemetry")
         self.assertIsInstance(telemetry, list)
         self.assertEqual(len(telemetry), 3)
+
+        trace_path = self.logs_dir / "TELEMETRY_TRACE.json"
+        self.assertTrue(trace_path.exists(), "Expected logs/TELEMETRY_TRACE.json to be written after a successful build")
+        trace = _load_json(trace_path)
+        self.assertEqual(trace.get("allowed_path"), ["ISA", "SAS", "CRS", "BOA"])
+        self.assertEqual(
+            trace.get("audited_path"),
+            [{"from": "ISA", "to": "SAS"}, {"from": "SAS", "to": "CRS"}, {"from": "CRS", "to": "BOA"}],
+        )
+        self.assertEqual(trace.get("handshake_telemetry"), telemetry)
+        micro_log = trace.get("micro_log")
+        self.assertIsInstance(micro_log, list)
+        self.assertTrue(micro_log, "Expected micro_log to contain at least one event")
+        for idx, event in enumerate(micro_log[:10]):
+            self.assertIsInstance(event, dict, f"micro_log[{idx}] must be an object")
+            for key in ("component", "twin_hash", "event_type", "latency_ms"):
+                self.assertIn(key, event, f"micro_log[{idx}] missing key {key!r}")
 
         registry = AgentRegistry(repo_root=self.repo_root, logs_dir=self.logs_dir)
         isa, sas, crs, _boa = registry.build(repository_name="REMOTE-AGENTS")
@@ -246,6 +265,39 @@ class TestAutonomousOfficeRig(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(self.logs_dir.exists(), logs_dir_pre, "Config parsing must not mutate filesystem state")
         self.__class__._layer_results["markdown_parsing_resilience"] = True
+
+    async def test_05_governance_lookahead_violation_halts_pipeline(self) -> None:
+        source_text = "Governance: lookahead violation should halt pipeline"
+
+        registry = AgentRegistry(repo_root=self.repo_root, logs_dir=self.logs_dir)
+        isa, sas, crs, boa = registry.build(repository_name="REMOTE-AGENTS")
+
+        policy = GovernancePolicy(allowed_path=("ISA", "SAS", "BOA"), source_path="tests/test_autonomous_office_rig.py")
+        verifier = MatrixVerifier(policy)
+        telemetry = TelemetryTracker(max_events=256)
+
+        pipeline = HandshakePipeline(schema_dir=self.repo_root / "schema", logs_dir=self.logs_dir)
+        with self.assertRaises(PipelineHaltException):
+            await pipeline.run(
+                isa=isa,
+                sas=sas,
+                crs=crs,
+                boa=boa,
+                source_text=source_text,
+                repository_name="REMOTE-AGENTS",
+                telemetry_tracker=telemetry,
+                verifier=verifier,
+            )
+
+        critical = self.logs_dir / "CRITICAL_MISALIGNMENT.json"
+        self.assertTrue(critical.exists(), "Expected CRITICAL_MISALIGNMENT.json to be written on DEAD_HALT")
+        snapshot = _load_json(critical)
+        state = snapshot.get("state") or {}
+        rows = state.get("telemetry") or []
+        self.assertEqual(len(rows), 1, "Out-of-sequence hop must bypass normal telemetry append")
+        self.assertFalse((self.logs_dir / "TELEMETRY_TRACE.json").exists(), "Telemetry trace should only be written after a valid build")
+        micro_log = state.get("micro_log")
+        self.assertIsInstance(micro_log, list)
 
 
 if __name__ == "__main__":

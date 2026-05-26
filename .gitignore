@@ -8,3 +8,4 @@ logs/
 
 # Test artifacts
 QUORUM_DISSENT_TEST.txt
+FORENSIC_REPLAY_TEST.txt

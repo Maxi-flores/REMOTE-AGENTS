@@ -283,6 +283,21 @@ class BFTConsensusNode:
         """Prevent reconnects to a peer (used by tests and byzantine guardrails)."""
         self._quarantined_peers.add(peer_id)
 
+    def flush_quarantine(self, *, clear_orphaned: bool = True) -> Mapping[str, Any]:
+        """Lift the quarantine block and optionally clear ORPHANED_FORKS.jsonl."""
+
+        before = len(self._quarantined_peers)
+        self._quarantined_peers.clear()
+        cleared = False
+        if clear_orphaned:
+            try:
+                self._orphaned_path.parent.mkdir(parents=True, exist_ok=True)
+                self._orphaned_path.write_text("", encoding="utf-8")
+                cleared = True
+            except OSError:
+                cleared = False
+        return {"ok": True, "quarantined_before": before, "orphaned_cleared": cleared}
+
     def set_partition(self, blocked_peers: Iterable[str]) -> None:
         """Simulate a network partition by blocking connections/messages to peers."""
         self._partition_blocked_peers = set(blocked_peers)

@@ -30,6 +30,8 @@ from .transaction_manager import WorkspaceTransaction, cleanup_workspace_staging
 from .types import JSONObject
 from .validator import SchemaValidator
 from .sandbox import AgentSandboxExecutor
+from .cache import WorkspaceCacheEngine
+from .telemetry import TelemetryTracer
 
 T = TypeVar("T", bound=JSONObject)
 
@@ -701,6 +703,13 @@ class HandshakePipeline:
         tasks: list[asyncio.Task[Any]] = []
         artifact_task: asyncio.Task[Any] | None = None
 
+        repo_root = self._schema_dir.resolve().parent
+        cache = WorkspaceCacheEngine(repo_root=repo_root)
+        workspace_files = cache.compute_workspace_file_hashes()
+        correlation_id = fnv1a_32(source_text.strip() or "empty")
+        tracer = TelemetryTracer(logs_dir=self._logs_dir, capacity=4096)
+        stage_fps: dict[str, str] = {}
+
         q_isa_out: asyncio.Queue = asyncio.Queue()
         q_sas_in: asyncio.Queue = asyncio.Queue()
         q_sas_out: asyncio.Queue = asyncio.Queue()
@@ -714,13 +723,22 @@ class HandshakePipeline:
         verifier_lock = asyncio.Lock()
 
         async def _isa_task() -> None:
-            packet = await sandbox.run(
-                "ISA.ingest",
-                isa.ingest,
+            packet, decision = await cache.run_stage(
+                sandbox_run=sandbox.run,
+                label="ISA.ingest",
+                stage="ISA",
+                agent=isa,
+                fn_name="ingest",
                 fn_kwargs={"source_text": source_text, "repository_name": repository_name},
                 timeout_s=stage_timeout_s,
                 mode="auto",
+                tracer=tracer,
+                correlation_id=correlation_id,
+                transaction_id=correlation_id,
+                workspace_file_hashes=workspace_files,
+                upstream_fingerprints=(),
             )
+            stage_fps["ISA"] = decision.fingerprint
             state["isa_packet"] = packet
             if telemetry_tracker is not None:
                 await telemetry_tracker.record(
@@ -816,14 +834,23 @@ class HandshakePipeline:
                             extra={"queue_name": "q_sas_in"},
                         )
                 start = time.monotonic()
-                blueprint = await sandbox.run(
-                    "SAS.process",
-                    sas.process,
-                    pkt,
+                blueprint, decision = await cache.run_stage(
+                    sandbox_run=sandbox.run,
+                    label="SAS.process",
+                    stage="SAS",
+                    agent=sas,
+                    fn_name="process",
+                    fn_args=(pkt,),
                     timeout_s=stage_timeout_s,
                     mode="auto",
+                    tracer=tracer,
+                    correlation_id=correlation_id,
+                    transaction_id=correlation_id,
+                    workspace_file_hashes=workspace_files,
+                    upstream_fingerprints=(stage_fps.get("ISA", ""),),
                 )
                 end = time.monotonic()
+                stage_fps["SAS"] = decision.fingerprint
                 state["sas_packet"] = blueprint
                 if telemetry_tracker is not None:
                     await telemetry_tracker.record(
@@ -858,14 +885,23 @@ class HandshakePipeline:
                             extra={"queue_name": "q_crs_in"},
                         )
                 start = time.monotonic()
-                clearance = await sandbox.run(
-                    "CRS.assess",
-                    crs.assess,
-                    pkt,
+                clearance, decision = await cache.run_stage(
+                    sandbox_run=sandbox.run,
+                    label="CRS.assess",
+                    stage="CRS",
+                    agent=crs,
+                    fn_name="assess",
+                    fn_args=(pkt,),
                     timeout_s=stage_timeout_s,
                     mode="auto",
+                    tracer=tracer,
+                    correlation_id=correlation_id,
+                    transaction_id=correlation_id,
+                    workspace_file_hashes=workspace_files,
+                    upstream_fingerprints=(stage_fps.get("ISA", ""), stage_fps.get("SAS", "")),
                 )
                 end = time.monotonic()
+                stage_fps["CRS"] = decision.fingerprint
                 state["crs_packet"] = clearance
                 if telemetry_tracker is not None:
                     await telemetry_tracker.record(
@@ -899,15 +935,24 @@ class HandshakePipeline:
                             extra={"queue_name": "q_boa_in"},
                         )
                 start = time.monotonic()
-                artifact = await sandbox.run(
-                    "BOA.build",
-                    boa.build,
-                    pkt,
+                artifact, decision = await cache.run_stage(
+                    sandbox_run=sandbox.run,
+                    label="BOA.build",
+                    stage="BOA",
+                    agent=boa,
+                    fn_name="build",
+                    fn_args=(pkt,),
                     fn_kwargs={"telemetry": state.get("telemetry", [])},
                     timeout_s=stage_timeout_s,
                     mode="auto",
+                    tracer=tracer,
+                    correlation_id=correlation_id,
+                    transaction_id=correlation_id,
+                    workspace_file_hashes=workspace_files,
+                    upstream_fingerprints=(stage_fps.get("ISA", ""), stage_fps.get("SAS", ""), stage_fps.get("CRS", "")),
                 )
                 end = time.monotonic()
+                stage_fps["BOA"] = decision.fingerprint
                 state["pipeline_state"] = "COMPLETED"
                 state["artifact"] = artifact
                 if telemetry_tracker is not None:
@@ -1022,3 +1067,8 @@ class HandshakePipeline:
                 state["micro_log"] = await telemetry_tracker.snapshot()
             dump_critical_misalignment(self._logs_dir, state, exc)
             raise
+        finally:
+            try:
+                tracer.flush_trace()
+            except Exception:
+                pass

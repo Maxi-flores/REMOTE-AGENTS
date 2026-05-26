@@ -36,7 +36,7 @@ def _coerce_json_object(raw: str) -> JSONObject | None:
         obj = json.loads(raw)
     except json.JSONDecodeError:
         last = max(raw.rfind("}"), raw.rfind("]"))
-        if last <= 0:
+        if last < 0:
             return None
         try:
             obj = json.loads(raw[: last + 1])

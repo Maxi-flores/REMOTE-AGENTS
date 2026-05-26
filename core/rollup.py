@@ -112,9 +112,9 @@ def merkle_root_from_transactions(txs: Sequence[Mapping[str, Any]]) -> str:
 
     def _material(tx: Mapping[str, Any]) -> Mapping[str, Any]:
         # Only bind deterministic fields. The journal may store wall-clock
-        # timestamps for debugging, but they must not affect verification.
+        # timestamps and local sequencing for debugging, but they must not affect
+        # verification.
         return {
-            "seq": int(tx.get("seq") or 0),
             "correlation_id": str(tx.get("correlation_id") or ""),
             "event": str(tx.get("event") or ""),
             "wall_ms": float(tx.get("wall_ms") or 0.0),
@@ -122,8 +122,20 @@ def merkle_root_from_transactions(txs: Sequence[Mapping[str, Any]]) -> str:
             "bytes_transferred": int(tx.get("bytes_transferred") or 0),
         }
 
+    def _stable_key(tx: Mapping[str, Any]) -> tuple[str, str, int, int, int]:
+        material = _material(tx)
+        return (
+            str(material["correlation_id"]),
+            str(material["event"]),
+            int(material["bytes_transferred"]),
+            int(float(material["wall_ms"]) * 1_000_000),
+            int(float(material["cpu_ms"]) * 1_000_000),
+        )
+
+    ordered = sorted(txs, key=_stable_key)
+
     level: list[bytes] = []
-    for tx in txs:
+    for tx in ordered:
         leaf_material = _canonical_json(dict(_material(tx))).encode("utf-8", errors="surrogatepass")
         level.append(hashlib.sha256(b"L" + leaf_material).digest())
 
@@ -224,6 +236,12 @@ def verify_rollup_payload(*, payload: Mapping[str, Any], journal_path: Path, exp
     if payload.get("kind") != "ROLLUP_BLOCK":
         raise ValueError("payload kind is not ROLLUP_BLOCK")
 
+    algo = payload.get("algo")
+    if not isinstance(algo, str) or not algo:
+        raise ValueError("algo missing")
+    if algo != "sha256/merkle:v1":
+        raise ValueError("algo unsupported")
+
     seq_start = payload.get("seq_start")
     seq_end = payload.get("seq_end")
     tx_count = payload.get("tx_count")
@@ -232,6 +250,7 @@ def verify_rollup_payload(*, payload: Mapping[str, Any], journal_path: Path, exp
     corr_mask = payload.get("correlation_mask")
     token_hash = payload.get("execution_token_hash")
     target_root = payload.get("target_ledger_root")
+    zk_proof = payload.get("zk_proof")
 
     if not isinstance(seq_start, int) or isinstance(seq_start, bool) or seq_start <= 0:
         raise ValueError("seq_start invalid")
@@ -249,6 +268,8 @@ def verify_rollup_payload(*, payload: Mapping[str, Any], journal_path: Path, exp
         raise ValueError("execution_token_hash invalid")
     if not isinstance(target_root, str) or not _looks_like_hash(target_root, n=64):
         raise ValueError("target_ledger_root invalid")
+    if not isinstance(zk_proof, dict):
+        raise ValueError("zk_proof invalid")
 
     if prev_root != expected_prev_root:
         raise ValueError("previous_ledger_root does not match block prev_hash")
@@ -256,6 +277,8 @@ def verify_rollup_payload(*, payload: Mapping[str, Any], journal_path: Path, exp
     txs = [t for t in iter_rollup_journal(journal_path) if seq_start <= t["seq"] <= seq_end]
     if len(txs) != int(tx_count):
         raise ValueError(f"tx_count mismatch: journal has {len(txs)} records")
+
+    txs.sort(key=lambda t: (t["correlation_id"], t["event"], int(t["bytes_transferred"])))
 
     recomputed_merkle = merkle_root_from_transactions(txs)
     if recomputed_merkle != merkle_root:
@@ -283,6 +306,29 @@ def verify_rollup_payload(*, payload: Mapping[str, Any], journal_path: Path, exp
     )
     if recomputed_target != target_root:
         raise ValueError("target_ledger_root mismatch")
+
+    # Lightweight simulated ZK-proof: bind to key structural fields.
+    if str(zk_proof.get("previous_ledger_root") or "") != prev_root:
+        raise ValueError("zk_proof previous_ledger_root mismatch")
+    if str(zk_proof.get("target_ledger_root") or "") != target_root:
+        raise ValueError("zk_proof target_ledger_root mismatch")
+    if str(zk_proof.get("correlation_mask") or "") != corr_mask:
+        raise ValueError("zk_proof correlation_mask mismatch")
+    if str(zk_proof.get("execution_token_hash") or "") != token_hash:
+        raise ValueError("zk_proof execution_token_hash mismatch")
+    proof_hash = zk_proof.get("proof_hash")
+    if not isinstance(proof_hash, str) or not _looks_like_hash(proof_hash, n=64):
+        raise ValueError("zk_proof proof_hash invalid")
+    proof_material = _canonical_json(
+        {
+            "previous_ledger_root": prev_root,
+            "target_ledger_root": target_root,
+            "correlation_mask": corr_mask,
+            "execution_token_hash": token_hash,
+        }
+    ).encode("utf-8", errors="surrogatepass")
+    if _sha256_hex(proof_material) != proof_hash:
+        raise ValueError("zk_proof proof_hash mismatch")
 
     return cast(RollupPayload, dict(payload))
 
@@ -423,18 +469,19 @@ class WorkspaceRollupEngine:
         txs: Sequence[RollupTransaction],
         waiters: Sequence[asyncio.Future[RollupCommitResult]],
     ) -> RollupCommitResult:
-        seq_start = int(txs[0]["seq"])
-        seq_end = int(txs[-1]["seq"])
-        tx_count = int(len(txs))
+        ordered = sorted(txs, key=lambda t: (t["correlation_id"], t["event"], int(t["bytes_transferred"])))
+        seq_start = int(min(t["seq"] for t in ordered))
+        seq_end = int(max(t["seq"] for t in ordered))
+        tx_count = int(len(ordered))
         with self._mu:
             self._batch_counter += 1
             batch_id = f"{self._batch_counter}:{seq_start}-{seq_end}"
 
-        merkle_root = merkle_root_from_transactions(txs)
-        corr_mask = compute_correlation_mask((t["correlation_id"] for t in txs))
-        total_wall = sum(float(t["wall_ms"]) for t in txs)
-        total_cpu = sum(float(t["cpu_ms"]) for t in txs)
-        total_bytes = sum(int(t["bytes_transferred"]) for t in txs)
+        merkle_root = merkle_root_from_transactions(ordered)
+        corr_mask = compute_correlation_mask((t["correlation_id"] for t in ordered))
+        total_wall = sum(float(t["wall_ms"]) for t in ordered)
+        total_cpu = sum(float(t["cpu_ms"]) for t in ordered)
+        total_bytes = sum(int(t["bytes_transferred"]) for t in ordered)
         token_hash = compute_execution_token_hash(wall_ms=total_wall, cpu_ms=total_cpu, bytes_transferred=total_bytes)
 
         # Bind to the current ledger head as observed at submission time.

@@ -35,8 +35,8 @@ def _coerce_json_object(raw: str) -> JSONObject | None:
     try:
         obj = json.loads(raw)
     except json.JSONDecodeError:
-        last = max(raw.rfind("}"), raw.rfind("]"))
-        if last <= 0:
+        last = raw.rfind("}")
+        if last < 0:
             return None
         try:
             obj = json.loads(raw[: last + 1])
@@ -158,4 +158,3 @@ def _extract_single_json_document(text: str) -> JSONObject | None:
     # Fallback: first top-level {...} region.
     m = re.search(r"(\{.+\})", text, flags=re.DOTALL)
     return _coerce_json_object(m.group(1)) if m else None
-

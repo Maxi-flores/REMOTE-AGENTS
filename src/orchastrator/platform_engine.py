@@ -15,6 +15,7 @@ if str(_SRC_DIR) not in sys.path:
 
 from orchestrator.dispatcher import DispatcherConfig, OutboundCallbackDispatcher, build_delivery_envelope
 from tools.logger import archive_failed_payload, ensure_runtime_directories, log_agent_failure, log_engine_interruption
+from tools.workspace_mounter import resolve_repo_root, resolve_secure_path
 from routers.repo_governance_router import (
     build_governance_system_context,
     constraints_for_engine,
@@ -32,6 +33,10 @@ class PlatformAgentEngine:
         ensure_runtime_directories()
         self._artifacts_created: set[str] | None = None
         self._dispatcher: OutboundCallbackDispatcher | None = None
+        self._active_target_repository: str | None = None
+        self._active_repo_root: Path | None = None
+        self._active_execution_constraints: dict[str, object] = {}
+        self._active_default_profile: bool = False
         self._init_outbound_dispatcher()
         self._prune_stale_processing_lock(on_boot=True)
         self.load_mcp_tools()
@@ -60,31 +65,56 @@ class PlatformAgentEngine:
         print(f"⚙️ Executing system tool: {name}")
         try:
             if name == "workspace_file_router":
-                path = arguments.get("relative_path")
+                rel = arguments.get("relative_path") or arguments.get("path")
                 action = arguments.get("action")
+                if not isinstance(rel, str) or not rel.strip():
+                    raise ValueError("workspace_file_router requires non-empty relative_path")
+                if not isinstance(action, str) or not action.strip():
+                    raise ValueError("workspace_file_router requires action")
+
+                if self._active_repo_root is None:
+                    raise RuntimeError("No active repo root bound for workspace_file_router")
+
+                if self._active_default_profile and action == "write":
+                    raise PermissionError("Default diagnostic profile forbids workspace writes")
+
+                _enforce_repo_path_constraints(rel, self._active_execution_constraints)
+                repo_name = self._active_target_repository or self._active_repo_root.name
+                abs_path = resolve_secure_path(repo_name, rel)
                 if action == "write":
-                    with open(path, "w", encoding="utf-8") as f:
+                    with open(abs_path, "w", encoding="utf-8") as f:
                         f.write(arguments.get("content", ""))
-                    if self._artifacts_created is not None and isinstance(path, str) and path:
-                        self._artifacts_created.add(path)
-                    return f"Successfully written to {path}"
+                    if self._artifacts_created is not None:
+                        self._artifacts_created.add(f"{repo_name}:{rel}")
+                    return f"Successfully written to {repo_name}:{rel}"
                 if action == "read":
-                    with open(path, "r", encoding="utf-8") as f:
+                    with open(abs_path, "r", encoding="utf-8") as f:
                         return f.read()
                 raise ValueError(f"Unsupported workspace_file_router action: {action}")
 
             if name == "execute_isolated_task":
                 code = arguments.get("script_content")
+                if not isinstance(code, str):
+                    raise ValueError("execute_isolated_task requires script_content")
+                if self._active_repo_root is None:
+                    raise RuntimeError("No active repo root bound for execute_isolated_task")
+
+                readonly = bool(self._active_default_profile)
+                no_network = bool(self._active_default_profile)
+                wrapped = _wrap_script_for_sandbox(code, readonly=readonly, no_network=no_network)
                 result = subprocess.run(
-                    ["python", "-c", code],
+                    ["python", "-c", wrapped],
                     capture_output=True,
                     text=True,
                     timeout=10,
                     check=False,
+                    cwd=os.fspath(self._active_repo_root),
                 )
                 return f"STDOUT: {result.stdout}\nSTDERR: {result.stderr}"
 
             if name == "network_data_fetch":
+                if self._active_default_profile:
+                    raise PermissionError("Default diagnostic profile forbids network access")
                 url = arguments.get("url")
                 method = arguments.get("method")
                 res = requests.request(method, url, timeout=15)
@@ -253,6 +283,25 @@ class PlatformAgentEngine:
                     system_context = build_governance_system_context(route)
                     prompt_history = [{"system_context": system_context}, {"instruction": instruction}]
 
+                    # Bind the repository context for tool routing inside this task execution.
+                    self._active_default_profile = bool(route.used_default_profile)
+                    self._active_execution_constraints = dict(route.execution_constraints or {})
+                    self._active_target_repository = route.resolved_repository or route.target_repository
+                    try:
+                        if self._active_default_profile:
+                            self._active_repo_root = resolve_repo_root(None)
+                            # Prefer local, read-only diagnostics when routing falls back.
+                            self._active_target_repository = self._active_repo_root.name
+                        else:
+                            self._active_repo_root = resolve_repo_root(self._active_target_repository)
+                    except Exception as exc:
+                        # Fail closed: if we cannot resolve the repo root, do not allow tool execution.
+                        self._active_repo_root = None
+                        self._active_default_profile = True
+                        self._active_execution_constraints = {}
+                        self._active_target_repository = None
+                        raise RuntimeError(f"Failed to resolve repository workspace root: {exc}") from exc
+
                     if not self._try_acquire_processing_lock(task_id=task_id):
                         # Another engine instance has compute priority, or lock is stale.
                         time.sleep(2)
@@ -369,10 +418,122 @@ class PlatformAgentEngine:
                             )
                 finally:
                     self._artifacts_created = None
+                    self._active_target_repository = None
+                    self._active_repo_root = None
+                    self._active_execution_constraints = {}
+                    self._active_default_profile = False
                     if lock_acquired:
                         self._release_processing_lock()
                 
             time.sleep(10) # Cooling sleep cycle to prevent CPU throttling
+
+
+def _wrap_script_for_sandbox(script: str, *, readonly: bool, no_network: bool) -> str:
+    """Best-effort safety prelude for scripts executed via execute_isolated_task."""
+
+    prelude = f"""
+READONLY = {bool(readonly)!r}
+NO_NETWORK = {bool(no_network)!r}
+
+def _deny(msg: str):
+    raise PermissionError(msg)
+
+def _mode_is_write(mode: str) -> bool:
+    return any(flag in mode for flag in ("w", "a", "x", "+"))
+
+if READONLY:
+    import builtins as _builtins
+    import os as _os
+    import pathlib as _pathlib
+    import shutil as _shutil
+    import subprocess as _subprocess
+
+    _orig_open = _builtins.open
+    def _open(file, mode="r", *args, **kwargs):  # noqa: ANN001
+        if _mode_is_write(str(mode)):
+            _deny("read-only sandbox: writes are forbidden")
+        return _orig_open(file, mode, *args, **kwargs)
+    _builtins.open = _open
+
+    _orig_path_open = _pathlib.Path.open
+    def _path_open(self, mode="r", *args, **kwargs):  # noqa: ANN001
+        if _mode_is_write(str(mode)):
+            _deny("read-only sandbox: writes are forbidden")
+        return _orig_path_open(self, mode, *args, **kwargs)
+    _pathlib.Path.open = _path_open
+
+    def _blocked(*args, **kwargs):  # noqa: ANN001
+        _deny("read-only sandbox: filesystem mutation forbidden")
+
+    _os.remove = _blocked
+    _os.unlink = _blocked
+    _os.rmdir = _blocked
+    _os.mkdir = _blocked
+    _os.makedirs = _blocked
+    _os.rename = _blocked
+    _os.replace = _blocked
+    _os.chmod = _blocked
+    _os.chown = _blocked
+    _os.utime = _blocked
+    _os.system = _blocked
+
+    _pathlib.Path.unlink = _blocked
+    _pathlib.Path.mkdir = _blocked
+    _pathlib.Path.rmdir = _blocked
+    _pathlib.Path.rename = _blocked
+    _pathlib.Path.replace = _blocked
+
+    _shutil.rmtree = _blocked
+    _shutil.move = _blocked
+    _shutil.copy = _blocked
+    _shutil.copy2 = _blocked
+    _shutil.copytree = _blocked
+
+    _subprocess.Popen = _blocked
+    _subprocess.call = _blocked
+    _subprocess.check_call = _blocked
+    _subprocess.check_output = _blocked
+    _subprocess.run = _blocked
+
+if NO_NETWORK:
+    import socket as _socket
+    import urllib.request as _urllib_request
+
+    def _blocked_net(*args, **kwargs):  # noqa: ANN001
+        _deny("network disabled by diagnostic sandbox")
+
+    _socket.socket = _blocked_net
+    _socket.create_connection = _blocked_net
+    try:
+        _urllib_request.urlopen = _blocked_net
+    except Exception:
+        pass
+"""
+    return prelude.lstrip() + "\n" + (script or "")
+
+
+def _enforce_repo_path_constraints(rel: str, constraints: dict[str, object]) -> None:
+    """Optionally restrict workspace file access to per-repo allowed prefixes."""
+
+    if not isinstance(rel, str):
+        return
+    normalized = Path(rel).as_posix().lstrip("/")
+    while normalized.startswith("./"):
+        normalized = normalized[2:]
+
+    allow = constraints.get("allowed_path_prefixes")
+    if isinstance(allow, list) and allow:
+        allowed_prefixes = [str(x).strip().strip("/") for x in allow if isinstance(x, str) and str(x).strip()]
+        if allowed_prefixes:
+            ok = any(normalized == p or normalized.startswith(p + "/") for p in allowed_prefixes)
+            if not ok:
+                raise PermissionError("Path blocked by repository constraints (allowed_path_prefixes)")
+
+    deny = constraints.get("deny_path_prefixes")
+    if isinstance(deny, list) and deny:
+        denied_prefixes = [str(x).strip().strip("/") for x in deny if isinstance(x, str) and str(x).strip()]
+        if any(normalized == p or normalized.startswith(p + "/") for p in denied_prefixes):
+            raise PermissionError("Path blocked by repository constraints (deny_path_prefixes)")
 
 if __name__ == "__main__":
     try:

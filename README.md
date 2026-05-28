@@ -21,6 +21,17 @@ To feed the agent a task, drop a JSON packet containing `{"instruction": "your t
 
 On boot, the worker initializes `.platform_queue/` and `.logs/`. Failures are appended to `.logs/errors.json`, and failing payloads are archived to `.platform_queue/failed/` for human review.
 
+### 🌐 Live Event Ingestion Gateway (HTTP + WebSocket)
+For real-time triggers, run the async ingestion gateway (stdlib-only):
+
+```bash
+python src/orchestrator/gateway.py
+```
+
+- `POST /api/v1/trigger` with JSON `{"instruction":"..."}` enqueues a task.
+- `GET /health` reports `Idle`, `Processing`, or `Error-Locked`.
+- `GET /ws/events` upgrades to WebSocket; each text frame must be JSON containing `{"instruction":"..."}`.
+
 ## Additional Repository Components
 
 - Office runtime entrypoint: `run_autonomous_office.py`

@@ -15,6 +15,7 @@ if str(_SRC_DIR) not in sys.path:
 
 from orchestrator.dispatcher import DispatcherConfig, OutboundCallbackDispatcher, build_delivery_envelope
 from tools.logger import archive_failed_payload, ensure_runtime_directories, log_agent_failure, log_engine_interruption
+from tools.semantic_memory import append_memory, inject_relevant_memories
 from tools.workspace_mounter import resolve_repo_root, resolve_secure_path
 from routers.consensus_engine import TwinRejectedError, record_consensus_metrics_update, verify_with_twin_agent
 from routers.repo_governance_router import (
@@ -191,6 +192,39 @@ class PlatformAgentEngine:
             raise ValueError("Ollama response was not a JSON object")
         return body.get("response", "{}")
 
+    def _compress_intermediate_tool_logs(self, logs: str, *, num_thread: int = 4) -> str:
+        logs = str(logs or "").strip()
+        if not logs:
+            return ""
+        if len(logs) > 30_000:
+            logs = logs[-30_000:]
+
+        prompt = (
+            "INTERNAL COMPRESSOR:\n"
+            "Compress the following intermediate tool logs into a single snapshot <= 500 characters.\n"
+            "Keep file paths, error messages, and key outcomes. No markdown. Output ONLY the snapshot.\n\n"
+            f"LOGS:\n{logs}\n"
+        )
+        payload = {
+            "model": MODEL_NAME,
+            "prompt": prompt,
+            "stream": False,
+            "options": {"num_thread": int(num_thread)},
+        }
+        try:
+            response = requests.post(OLLAMA_URL, json=payload, timeout=45)
+            response.raise_for_status()
+            body = response.json()
+            snapshot = str(body.get("response") or "").strip()
+        except Exception:
+            snapshot = ""
+
+        if not snapshot:
+            snapshot = logs[-500:].strip()
+        if len(snapshot) > 500:
+            snapshot = snapshot[:500].rstrip() + "…"
+        return snapshot
+
     def _handle_failure(self, task_file: str, task_id: str, prompt_history: list, error_message: str, loop_count: int):
         log_agent_failure(
             task_id=task_id,
@@ -328,6 +362,7 @@ class PlatformAgentEngine:
                     failed = False
                     task_id = task_data.get("task_id") or task_data.get("id") or os.path.basename(task_file)
                     instruction = task_data.get("instruction") or ""
+                    last_approved_code_snippet: str = ""
 
                     route = resolve_repo_governance_route(task_data)
                     system_context = build_governance_system_context(route)
@@ -366,22 +401,49 @@ class PlatformAgentEngine:
                     self._active_num_thread = int(num_thread)
                     self._active_task_twin_rejection_count = 0
                     self._active_task_refinement_recorded = False
-                    context_chunks = deque([system_context, instruction])
-                    current_context_size = len(system_context) + len(instruction) + 1
+                    repo_name_for_memory = self._active_target_repository or (
+                        self._active_repo_root.name if self._active_repo_root is not None else ""
+                    )
+                    memory_context = ""
+                    try:
+                        memory_context = inject_relevant_memories(repo_name_for_memory, instruction)
+                    except Exception:
+                        memory_context = ""
+
+                    base_chunks: list[str] = [system_context]
+                    if memory_context:
+                        base_chunks.append(memory_context)
+                    base_chunks.append(instruction)
+                    log_chunks: deque[str] = deque()
+                    current_context_size = sum(len(chunk) + 1 for chunk in base_chunks) - 1
 
                     def append_context(chunk: str) -> None:
                         nonlocal current_context_size
                         chunk = chunk or ""
-                        context_chunks.append(chunk)
+                        log_chunks.append(chunk)
                         current_context_size += len(chunk) + 1
-                        while current_context_size > max_context_chars and len(context_chunks) > 1:
-                            removed = context_chunks.popleft()
+                        while current_context_size > max_context_chars and log_chunks:
+                            removed = log_chunks.popleft()
                             current_context_size -= len(removed) + 1
 
                     while current_loop < max_loops and not completed:
                         current_loop += 1
+                        if current_loop in (3, 4) and log_chunks:
+                            near_limit = current_context_size >= int(float(max_context_chars) * 0.85)
+                            if near_limit:
+                                snapshot = self._compress_intermediate_tool_logs(
+                                    "\n".join(log_chunks),
+                                    num_thread=num_thread,
+                                )
+                                log_chunks.clear()
+                                log_chunks.append(f"Intermediate logs snapshot: {snapshot}")
+                                current_context_size = (
+                                    (sum(len(chunk) + 1 for chunk in base_chunks) - 1)
+                                    + sum(len(chunk) + 1 for chunk in log_chunks)
+                                )
                         try:
-                            raw_decision = self.query_local_llm("\n".join(context_chunks), num_thread=num_thread)
+                            rendered = "\n".join(base_chunks + list(log_chunks))
+                            raw_decision = self.query_local_llm(rendered, num_thread=num_thread)
                         except Exception as e:
                             failed = True
                             failure_summary = f"Ollama disconnected: {e}"
@@ -413,7 +475,14 @@ class PlatformAgentEngine:
                         
                         if "tool_to_call" in decision:
                             try:
-                                tool_output = self.execute_tool(decision["tool_to_call"], decision.get("arguments", {}))
+                                tool_name = decision["tool_to_call"]
+                                tool_args = decision.get("arguments", {}) or {}
+                                if isinstance(tool_args, dict):
+                                    if tool_name == "workspace_file_router" and tool_args.get("action") == "write":
+                                        last_approved_code_snippet = str(tool_args.get("content") or "")
+                                    elif tool_name == "execute_isolated_task":
+                                        last_approved_code_snippet = str(tool_args.get("script_content") or "")
+                                tool_output = self.execute_tool(tool_name, tool_args)
                             except TwinRejectedError as e:
                                 prompt_history.append({"twin_rejection": e.feedback})
                                 append_context(f"Twin Rejection: {e.feedback}")
@@ -454,6 +523,16 @@ class PlatformAgentEngine:
                             loop_count=current_loop,
                         )
                     elif completed and not failed and os.path.exists(task_file):
+                        try:
+                            consensus_snippet = last_approved_code_snippet.strip() or final_summary.strip()
+                            if consensus_snippet:
+                                append_memory(
+                                    repo_name=repo_name_for_memory,
+                                    task_summary=instruction,
+                                    consensus_code_snippet=consensus_snippet,
+                                )
+                        except Exception:
+                            pass
                         os.remove(task_file) # Clear task from platform processing queue
 
                     if self._artifacts_created:

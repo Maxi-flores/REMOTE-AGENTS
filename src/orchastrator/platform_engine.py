@@ -7,6 +7,7 @@ import sys
 from collections import deque
 from pathlib import Path
 import traceback
+import errno
 
 _SRC_DIR = Path(__file__).resolve().parents[1]
 if str(_SRC_DIR) not in sys.path:
@@ -17,6 +18,8 @@ from tools.logger import archive_failed_payload, ensure_runtime_directories, log
 OLLAMA_URL = "http://localhost:11434/api/generate"
 MODEL_NAME = "qwen2.5-coder:3b" # Optimized for Meteor Lake P-Cores
 TOOLS_CONFIG_PATH = "config/platform_mcp_tools.json"
+PROCESSING_LOCK_FILE = ".platform_queue/processing.lock"
+LOCK_STALE_S = 15 * 60  # surface as Error-Locked via /health if stuck
 
 class PlatformAgentEngine:
     def __init__(self):
@@ -100,6 +103,61 @@ class PlatformAgentEngine:
         except Exception as e:
             print(f"⚠️ Failed to archive payload {task_file}: {e}")
 
+    def _processing_lock_age_s(self) -> float | None:
+        try:
+            st = os.stat(PROCESSING_LOCK_FILE)
+        except OSError:
+            return None
+        return time.time() - float(st.st_mtime)
+
+    def _try_acquire_processing_lock(self, *, task_id: str) -> bool:
+        ensure_runtime_directories()
+        age = self._processing_lock_age_s()
+        if age is not None and age > LOCK_STALE_S:
+            print(f"🧯 Error-Locked: stale processing lock detected (age_s={age:.1f}). Manual intervention required.")
+            return False
+
+        try:
+            fd = os.open(PROCESSING_LOCK_FILE, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
+        except OSError as e:
+            if e.errno in (errno.EEXIST,):
+                return False
+            raise
+
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                json.dump(
+                    {
+                        "task_id": task_id,
+                        "pid": os.getpid(),
+                        "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                    },
+                    f,
+                    ensure_ascii=False,
+                    indent=2,
+                )
+                f.write("\n")
+                f.flush()
+                os.fsync(f.fileno())
+        except Exception:
+            try:
+                os.close(fd)
+            except Exception:
+                pass
+            try:
+                os.remove(PROCESSING_LOCK_FILE)
+            except Exception:
+                pass
+            raise
+
+        return True
+
+    def _release_processing_lock(self) -> None:
+        try:
+            os.remove(PROCESSING_LOCK_FILE)
+        except FileNotFoundError:
+            pass
+
     def run_loop(self):
         print("🚀 24/7 Autonomous Node Listening to Platform Events...")
         while True:
@@ -108,104 +166,115 @@ class PlatformAgentEngine:
             
             if os.path.exists(task_file):
                 print("📬 Task discovered in platform loop.")
+                lock_acquired = False
                 try:
-                    with open(task_file, "r", encoding="utf-8") as f:
-                        task_data = json.load(f)
-                except Exception as e:
-                    self._handle_failure(
-                        task_file=task_file,
-                        task_id=os.path.basename(task_file),
-                        prompt_history=[],
-                        error_message=f"Failed to read/parse task payload: {e}",
-                        loop_count=0,
-                    )
-                    time.sleep(10)
-                    continue
-                
-                # Enforce loop breaker guardrail
-                max_loops = 5
-                current_loop = 0
-                completed = False
-                failed = False
-                task_id = task_data.get("task_id") or task_data.get("id") or os.path.basename(task_file)
-                instruction = task_data.get("instruction") or ""
-                prompt_history = [{"instruction": instruction}]
-
-                max_context_chars = 20_000
-                context_chunks = deque([instruction])
-                current_context_size = len(instruction)
-
-                def append_context(chunk: str) -> None:
-                    nonlocal current_context_size
-                    chunk = chunk or ""
-                    context_chunks.append(chunk)
-                    current_context_size += len(chunk) + 1
-                    while current_context_size > max_context_chars and len(context_chunks) > 1:
-                        removed = context_chunks.popleft()
-                        current_context_size -= len(removed) + 1
-
-                while current_loop < max_loops and not completed:
-                    current_loop += 1
                     try:
-                        raw_decision = self.query_local_llm("\n".join(context_chunks))
+                        with open(task_file, "r", encoding="utf-8") as f:
+                            task_data = json.load(f)
                     except Exception as e:
-                        failed = True
                         self._handle_failure(
                             task_file=task_file,
-                            task_id=task_id,
-                            prompt_history=prompt_history,
-                            error_message=f"Ollama disconnected: {e}",
-                            loop_count=current_loop,
+                            task_id=os.path.basename(task_file),
+                            prompt_history=[],
+                            error_message=f"Failed to read/parse task payload: {e}",
+                            loop_count=0,
                         )
-                        completed = True
-                        break
+                        time.sleep(10)
+                        continue
 
-                    prompt_history.append({"raw_decision": raw_decision})
-                    try:
-                        decision = json.loads(raw_decision)
-                    except Exception as e:
-                        failed = True
-                        self._handle_failure(
-                            task_file=task_file,
-                            task_id=task_id,
-                            prompt_history=prompt_history,
-                            error_message=f"Model formatting failure (invalid JSON): {e}",
-                            loop_count=current_loop,
-                        )
-                        completed = True
-                        break
-                    
-                    if "tool_to_call" in decision:
+                    # Enforce loop breaker guardrail
+                    max_loops = 5
+                    current_loop = 0
+                    completed = False
+                    failed = False
+                    task_id = task_data.get("task_id") or task_data.get("id") or os.path.basename(task_file)
+                    instruction = task_data.get("instruction") or ""
+                    prompt_history = [{"instruction": instruction}]
+
+                    if not self._try_acquire_processing_lock(task_id=task_id):
+                        # Another engine instance has compute priority, or lock is stale.
+                        time.sleep(2)
+                        continue
+                    lock_acquired = True
+
+                    max_context_chars = 20_000
+                    context_chunks = deque([instruction])
+                    current_context_size = len(instruction)
+
+                    def append_context(chunk: str) -> None:
+                        nonlocal current_context_size
+                        chunk = chunk or ""
+                        context_chunks.append(chunk)
+                        current_context_size += len(chunk) + 1
+                        while current_context_size > max_context_chars and len(context_chunks) > 1:
+                            removed = context_chunks.popleft()
+                            current_context_size -= len(removed) + 1
+
+                    while current_loop < max_loops and not completed:
+                        current_loop += 1
                         try:
-                            tool_output = self.execute_tool(decision["tool_to_call"], decision.get("arguments", {}))
+                            raw_decision = self.query_local_llm("\n".join(context_chunks))
                         except Exception as e:
                             failed = True
                             self._handle_failure(
                                 task_file=task_file,
                                 task_id=task_id,
                                 prompt_history=prompt_history,
-                                error_message=str(e),
+                                error_message=f"Ollama disconnected: {e}",
                                 loop_count=current_loop,
                             )
                             completed = True
                             break
-                        prompt_history.append({"tool_output": tool_output})
-                        append_context(f"Tool Observation: {tool_output}")
-                    else:
-                        print(f"🎉 Task Finished: {decision.get('final_response')}")
-                        completed = True
-                
-                if not completed and current_loop >= max_loops:
-                    failed = True
-                    self._handle_failure(
-                        task_file=task_file,
-                        task_id=task_id,
-                        prompt_history=prompt_history,
-                        error_message="Loop breaker triggered: max loops reached",
-                        loop_count=current_loop,
-                    )
-                elif completed and not failed and os.path.exists(task_file):
-                    os.remove(task_file) # Clear task from platform processing queue
+
+                        prompt_history.append({"raw_decision": raw_decision})
+                        try:
+                            decision = json.loads(raw_decision)
+                        except Exception as e:
+                            failed = True
+                            self._handle_failure(
+                                task_file=task_file,
+                                task_id=task_id,
+                                prompt_history=prompt_history,
+                                error_message=f"Model formatting failure (invalid JSON): {e}",
+                                loop_count=current_loop,
+                            )
+                            completed = True
+                            break
+                        
+                        if "tool_to_call" in decision:
+                            try:
+                                tool_output = self.execute_tool(decision["tool_to_call"], decision.get("arguments", {}))
+                            except Exception as e:
+                                failed = True
+                                self._handle_failure(
+                                    task_file=task_file,
+                                    task_id=task_id,
+                                    prompt_history=prompt_history,
+                                    error_message=str(e),
+                                    loop_count=current_loop,
+                                )
+                                completed = True
+                                break
+                            prompt_history.append({"tool_output": tool_output})
+                            append_context(f"Tool Observation: {tool_output}")
+                        else:
+                            print(f"🎉 Task Finished: {decision.get('final_response')}")
+                            completed = True
+                    
+                    if not completed and current_loop >= max_loops:
+                        failed = True
+                        self._handle_failure(
+                            task_file=task_file,
+                            task_id=task_id,
+                            prompt_history=prompt_history,
+                            error_message="Loop breaker triggered: max loops reached",
+                            loop_count=current_loop,
+                        )
+                    elif completed and not failed and os.path.exists(task_file):
+                        os.remove(task_file) # Clear task from platform processing queue
+                finally:
+                    if lock_acquired:
+                        self._release_processing_lock()
                 
             time.sleep(10) # Cooling sleep cycle to prevent CPU throttling
 

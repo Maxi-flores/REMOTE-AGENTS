@@ -15,6 +15,11 @@ if str(_SRC_DIR) not in sys.path:
 
 from orchestrator.dispatcher import DispatcherConfig, OutboundCallbackDispatcher, build_delivery_envelope
 from tools.logger import archive_failed_payload, ensure_runtime_directories, log_agent_failure, log_engine_interruption
+from routers.repo_governance_router import (
+    build_governance_system_context,
+    constraints_for_engine,
+    resolve_repo_governance_route,
+)
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
 MODEL_NAME = "qwen2.5-coder:3b" # Optimized for Meteor Lake P-Cores
@@ -90,14 +95,14 @@ class PlatformAgentEngine:
         except Exception as e:
             raise RuntimeError(f"Tool {name} crashed: {e}") from e
 
-    def query_local_llm(self, prompt_content):
+    def query_local_llm(self, prompt_content, *, num_thread: int = 4):
         # Enforce exact 4 thread runtime to stay on hardware P-cores
         payload = {
             "model": MODEL_NAME,
             "prompt": f"System Tools available:\n{json.dumps(self.tools_schema)}\n\nUser Task: {prompt_content}\n\nRespond with a JSON object containing 'tool_to_call' and 'arguments' if needed, or 'final_response'.",
             "stream": False,
             "format": "json",
-            "options": {"num_thread": 4} 
+            "options": {"num_thread": int(num_thread)} 
         }
         response = requests.post(OLLAMA_URL, json=payload, timeout=60)
         response.raise_for_status()
@@ -243,7 +248,10 @@ class PlatformAgentEngine:
                     failed = False
                     task_id = task_data.get("task_id") or task_data.get("id") or os.path.basename(task_file)
                     instruction = task_data.get("instruction") or ""
-                    prompt_history = [{"instruction": instruction}]
+
+                    route = resolve_repo_governance_route(task_data)
+                    system_context = build_governance_system_context(route)
+                    prompt_history = [{"system_context": system_context}, {"instruction": instruction}]
 
                     if not self._try_acquire_processing_lock(task_id=task_id):
                         # Another engine instance has compute priority, or lock is stale.
@@ -253,9 +261,9 @@ class PlatformAgentEngine:
                     task_start_monotonic = time.monotonic()
                     self._artifacts_created = set()
 
-                    max_context_chars = 20_000
-                    context_chunks = deque([instruction])
-                    current_context_size = len(instruction)
+                    num_thread, max_context_chars = constraints_for_engine(route)
+                    context_chunks = deque([system_context, instruction])
+                    current_context_size = len(system_context) + len(instruction) + 1
 
                     def append_context(chunk: str) -> None:
                         nonlocal current_context_size
@@ -269,7 +277,7 @@ class PlatformAgentEngine:
                     while current_loop < max_loops and not completed:
                         current_loop += 1
                         try:
-                            raw_decision = self.query_local_llm("\n".join(context_chunks))
+                            raw_decision = self.query_local_llm("\n".join(context_chunks), num_thread=num_thread)
                         except Exception as e:
                             failed = True
                             failure_summary = f"Ollama disconnected: {e}"

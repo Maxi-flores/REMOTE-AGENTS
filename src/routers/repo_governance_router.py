@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import json
-import os
-import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -226,4 +224,3 @@ def constraints_for_engine(route: RepoGovernanceRoute) -> tuple[int, int]:
     num_thread = _safe_int(constraints.get("num_thread"), 4)
     max_context_chars = _safe_int(constraints.get("max_context_chars"), 12000)
     return num_thread, max_context_chars
-

@@ -30,6 +30,7 @@ if str(_SRC_DIR) not in sys.path:
     sys.path.insert(0, str(_SRC_DIR))
 
 from tools.logger import ensure_runtime_directories  # noqa: E402
+from tools.workspace_mounter import workspace_dir_health  # noqa: E402
 
 
 PLATFORM_TASK_FILE = Path(".platform_queue/next_task.json")
@@ -447,7 +448,12 @@ class EventGateway:
 
         try:
             if path == "/health" and method == "GET":
-                body = _json_bytes(await self.scheduler.snapshot())
+                snapshot = await self.scheduler.snapshot()
+                try:
+                    snapshot["workspace"] = workspace_dir_health()
+                except Exception as exc:
+                    snapshot["workspace"] = {"error": str(exc)}
+                body = _json_bytes(snapshot)
                 writer.write(_http_response(200, body))
                 await writer.drain()
                 writer.close()

@@ -278,7 +278,7 @@ class PlatformAgentEngine:
         )
         return True
 
-    def _try_acquire_processing_lock(self, *, task_id: str) -> bool:
+    def _try_acquire_processing_lock(self, *, task_id: str, details: dict[str, object] | None = None) -> bool:
         ensure_runtime_directories()
         age = self._processing_lock_age_s()
         if age is not None and age > LOCK_STALE_S:
@@ -295,16 +295,17 @@ class PlatformAgentEngine:
 
         try:
             with os.fdopen(fd, "w", encoding="utf-8") as f:
-                json.dump(
-                    {
-                        "task_id": task_id,
-                        "pid": os.getpid(),
-                        "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                    },
-                    f,
-                    ensure_ascii=False,
-                    indent=2,
-                )
+                payload: dict[str, object] = {
+                    "task_id": task_id,
+                    "pid": os.getpid(),
+                    "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                }
+                if isinstance(details, dict):
+                    for k, v in details.items():
+                        if v is None:
+                            continue
+                        payload[str(k)] = v
+                json.dump(payload, f, ensure_ascii=False, indent=2)
                 f.write("\n")
                 f.flush()
                 os.fsync(f.fileno())
@@ -389,7 +390,13 @@ class PlatformAgentEngine:
                         self._active_target_repository = None
                         raise RuntimeError(f"Failed to resolve repository workspace root: {exc}") from exc
 
-                    if not self._try_acquire_processing_lock(task_id=task_id):
+                    lock_details = {
+                        "target_repository": self._active_target_repository,
+                        "primary_agent_class": self._active_primary_agent_class,
+                        "twin_agent_class": self._active_twin_agent_class,
+                        "num_thread": int((route.execution_constraints or {}).get("num_thread") or 4),
+                    }
+                    if not self._try_acquire_processing_lock(task_id=task_id, details=lock_details):
                         # Another engine instance has compute priority, or lock is stale.
                         time.sleep(2)
                         continue

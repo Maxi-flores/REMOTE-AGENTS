@@ -15,6 +15,8 @@ To spin up the continuous platform worker loop, execute via your standard develo
 python src/orchastrator/platform_engine.py
 ```
 
+> Note: the repository directory is currently named `src/orchastrator/`.
+
 To feed the agent a task, drop a JSON packet containing `{"instruction": "your text command here"}` into `.platform_queue/next_task.json`.
 
 ## Additional Repository Components

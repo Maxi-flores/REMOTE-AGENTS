@@ -70,6 +70,93 @@ def _parse_instruction_payload(raw: bytes) -> tuple[str, int]:
     return instruction, int(priority)
 
 
+def _read_processing_lock_details() -> dict[str, Any] | None:
+    try:
+        raw = PLATFORM_LOCK_FILE.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+    try:
+        obj = json.loads(raw)
+    except Exception:
+        return {"raw": raw[:4096]}
+    if isinstance(obj, dict):
+        return obj
+    return {"raw": raw[:4096]}
+
+
+def _system_memory_metrics() -> dict[str, Any]:
+    total_bytes: int | None = None
+    available_bytes: int | None = None
+    used_bytes: int | None = None
+    used_percent: float | None = None
+    process_rss_bytes: int | None = None
+
+    # System totals (best-effort; cross-platform, stdlib-only).
+    try:
+        if sys.platform.startswith("linux") and os.path.exists("/proc/meminfo"):
+            meminfo: dict[str, int] = {}
+            with open("/proc/meminfo", "r", encoding="utf-8", errors="replace") as f:
+                for line in f:
+                    if ":" not in line:
+                        continue
+                    k, v = line.split(":", 1)
+                    parts = v.strip().split()
+                    if not parts:
+                        continue
+                    try:
+                        meminfo[k] = int(parts[0]) * 1024  # kB -> bytes
+                    except Exception:
+                        continue
+            total_bytes = meminfo.get("MemTotal")
+            available_bytes = meminfo.get("MemAvailable") or meminfo.get("MemFree")
+    except Exception:
+        pass
+
+    if total_bytes is None:
+        try:
+            page_size = int(os.sysconf("SC_PAGE_SIZE"))
+            phys_pages = int(os.sysconf("SC_PHYS_PAGES"))
+            total_bytes = page_size * phys_pages
+        except Exception:
+            pass
+
+    if total_bytes is not None and available_bytes is not None:
+        used_bytes = max(0, int(total_bytes) - int(available_bytes))
+        used_percent = round((float(used_bytes) / float(total_bytes)) * 100.0, 2)
+
+    # Process RSS (fallback when system availability isn't accessible).
+    try:
+        if sys.platform.startswith("linux") and os.path.exists("/proc/self/statm"):
+            with open("/proc/self/statm", "r", encoding="utf-8", errors="replace") as f:
+                parts = f.read().strip().split()
+            if parts:
+                rss_pages = int(parts[1])
+                page_size = int(os.sysconf("SC_PAGE_SIZE"))
+                process_rss_bytes = rss_pages * page_size
+    except Exception:
+        pass
+
+    if process_rss_bytes is None:
+        try:
+            import resource
+
+            ru = resource.getrusage(resource.RUSAGE_SELF)
+            # Linux: kilobytes, macOS: bytes. Heuristic: treat small values as kB.
+            rss = int(getattr(ru, "ru_maxrss", 0))
+            if rss > 0:
+                process_rss_bytes = rss if rss > 10_000_000 else rss * 1024
+        except Exception:
+            pass
+
+    return {
+        "system_total_bytes": total_bytes,
+        "system_available_bytes": available_bytes,
+        "system_used_bytes": used_bytes,
+        "system_used_percent": used_percent,
+        "process_rss_bytes": process_rss_bytes,
+    }
+
+
 def _ws_accept_value(key: str) -> str:
     raw = (key + _WS_GUID).encode("ascii", errors="strict")
     digest = hashlib.sha1(raw).digest()
@@ -232,11 +319,14 @@ class InMemoryScheduler:
         return {
             "ts_utc": _utc_ts(),
             "state": state,
+            "stale_lock_threshold_s": float(self.stale_lock_s),
             "buffered": buffered,
             "disk_task_present": PLATFORM_TASK_FILE.exists(),
             "processing_lock_present": PLATFORM_LOCK_FILE.exists(),
             "processing_lock_age_s": _readable_duration_s(lock_age_s),
+            "processing_lock_details": _read_processing_lock_details(),
             "last_flush_error": last_error,
+            "resources": _system_memory_metrics(),
         }
 
     def _lock_age_s(self) -> float | None:
@@ -481,4 +571,3 @@ async def _main() -> None:
 
 if __name__ == "__main__":
     asyncio.run(_main())
-

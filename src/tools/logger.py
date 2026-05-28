@@ -49,6 +49,28 @@ def log_agent_failure(
     _atomic_write_json(ERRORS_FILE, existing)
 
 
+def log_engine_interruption(*, event_type: str, message: str, details: dict[str, Any] | None = None) -> None:
+    """Record non-task interruptions (e.g. stale lock pruning) into `.logs/errors.json`."""
+    ensure_runtime_directories()
+    record = {
+        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+        "task_id": "platform_engine_boot",
+        "loop_count_reached": 0,
+        "error_type": str(event_type),
+        "last_known_error": str(message),
+        "context_snapshot": json.dumps(details or {}, ensure_ascii=False),
+    }
+
+    try:
+        existing = _read_json_list(ERRORS_FILE)
+    except Exception as e:
+        existing = []
+        record["last_known_error"] = f"{message}\n\n[logger] Failed to read existing {ERRORS_FILE}: {e}"
+
+    existing.append(record)
+    _atomic_write_json(ERRORS_FILE, existing)
+
+
 def archive_failed_payload(task_file_path: str, task_id: str) -> str:
     ensure_runtime_directories()
 
@@ -103,4 +125,3 @@ def _atomic_write_json(path: str, data: Any) -> None:
         f.flush()
         os.fsync(f.fileno())
     os.replace(tmp_path, path)
-

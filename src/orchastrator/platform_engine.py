@@ -126,6 +126,7 @@ class PlatformAgentEngine:
                 max_loops = 5
                 current_loop = 0
                 completed = False
+                failed = False
                 task_id = task_data.get("task_id") or task_data.get("id") or os.path.basename(task_file)
                 instruction = task_data.get("instruction") or ""
                 prompt_history = [{"instruction": instruction}]
@@ -148,6 +149,7 @@ class PlatformAgentEngine:
                     try:
                         raw_decision = self.query_local_llm("\n".join(context_chunks))
                     except Exception as e:
+                        failed = True
                         self._handle_failure(
                             task_file=task_file,
                             task_id=task_id,
@@ -162,6 +164,7 @@ class PlatformAgentEngine:
                     try:
                         decision = json.loads(raw_decision)
                     except Exception as e:
+                        failed = True
                         self._handle_failure(
                             task_file=task_file,
                             task_id=task_id,
@@ -176,6 +179,7 @@ class PlatformAgentEngine:
                         try:
                             tool_output = self.execute_tool(decision["tool_to_call"], decision.get("arguments", {}))
                         except Exception as e:
+                            failed = True
                             self._handle_failure(
                                 task_file=task_file,
                                 task_id=task_id,
@@ -192,6 +196,7 @@ class PlatformAgentEngine:
                         completed = True
                 
                 if not completed and current_loop >= max_loops:
+                    failed = True
                     self._handle_failure(
                         task_file=task_file,
                         task_id=task_id,
@@ -199,7 +204,7 @@ class PlatformAgentEngine:
                         error_message="Loop breaker triggered: max loops reached",
                         loop_count=current_loop,
                     )
-                elif os.path.exists(task_file):
+                elif completed and not failed and os.path.exists(task_file):
                     os.remove(task_file) # Clear task from platform processing queue
                 
             time.sleep(10) # Cooling sleep cycle to prevent CPU throttling

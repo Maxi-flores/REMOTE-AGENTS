@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "description": "Platform-local tool schema exposed to the on-device LLM for autonomous governance routing.",
+  "tools": [
+    {
+      "name": "workspace_file_router",
+      "description": "Read/write a repo-relative file path inside the active target repository (path traversal protected). Writes require Twin approval.",
+      "arguments": {
+        "type": "object",
+        "properties": {
+          "relative_path": { "type": "string", "description": "Repo-relative path to read/write." },
+          "action": { "type": "string", "enum": ["read", "write"] },
+          "content": { "type": "string", "description": "Required when action=write." }
+        },
+        "required": ["relative_path", "action"]
+      }
+    },
+    {
+      "name": "execute_isolated_task",
+      "description": "Execute a short python snippet inside a best-effort sandbox prelude. Requires Twin approval.",
+      "arguments": {
+        "type": "object",
+        "properties": {
+          "script_content": { "type": "string" }
+        },
+        "required": ["script_content"]
+      }
+    },
+    {
+      "name": "network_data_fetch",
+      "description": "Fetch network data via HTTP. Disabled in default diagnostic profile.",
+      "arguments": {
+        "type": "object",
+        "properties": {
+          "url": { "type": "string" },
+          "method": { "type": "string", "description": "GET/POST/etc." }
+        },
+        "required": ["url", "method"]
+      }
+    },
+    {
+      "name": "graphics_validate_transform_math",
+      "description": "Validate 3D transforms (matrix/translation/rotation/scale) and bounding boxes for NaN/Inf and divide-by-zero risk.",
+      "arguments": {
+        "type": "object",
+        "properties": {
+          "payload": {
+            "description": "JSON object or JSON string containing matrix/translation/rotation/scale/bounding_box fields.",
+            "type": ["object", "string"]
+          }
+        },
+        "required": ["payload"]
+      }
+    },
+    {
+      "name": "graphics_parse_matrix4",
+      "description": "Parse a 4x4 matrix (nested/flat or JSON string) into 16 finite floats.",
+      "arguments": {
+        "type": "object",
+        "properties": {
+          "matrix": { "description": "16-length array, 4x4 nested array, or JSON string.", "type": ["array", "string", "object"] }
+        },
+        "required": ["matrix"]
+      }
+    },
+    {
+      "name": "trace_asset_compilation",
+      "description": "Run a repo-pinned local asset compilation command (non-shell) and return a structured trace of warnings/errors/stdout/stderr.",
+      "arguments": {
+        "type": "object",
+        "properties": {
+          "repo_name": { "type": "string" },
+          "asset_path": { "type": "string", "description": "Repo-relative asset path being compiled/transformed (validated inside repo boundary)." },
+          "compile_command": { "type": "string", "description": "Command to run WITHOUT shell operators. Examples: 'npm run build', 'python scripts/build_assets.py'." }
+        },
+        "required": ["repo_name", "asset_path", "compile_command"]
+      }
+    }
+  ]
+}
+

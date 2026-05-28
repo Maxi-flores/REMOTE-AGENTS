@@ -15,6 +15,7 @@ if str(_SRC_DIR) not in sys.path:
 
 from orchestrator.dispatcher import DispatcherConfig, OutboundCallbackDispatcher, build_delivery_envelope
 from tools.logger import archive_failed_payload, ensure_runtime_directories, log_agent_failure, log_engine_interruption
+from tools.graphics_sandbox import parse_matrix4, trace_asset_compilation, validate_transform_math
 from tools.semantic_memory import append_memory, inject_relevant_memories
 from tools.workspace_mounter import resolve_repo_root, resolve_secure_path
 from routers.consensus_engine import TwinRejectedError, record_consensus_metrics_update, verify_with_twin_agent
@@ -85,7 +86,7 @@ class PlatformAgentEngine:
                 if self._active_default_profile and action == "write":
                     raise PermissionError("Default diagnostic profile forbids workspace writes")
 
-                _enforce_repo_path_constraints(rel, self._active_execution_constraints)
+                _enforce_repo_path_constraints(rel, self._active_execution_constraints, action=action)
                 repo_name = self._active_target_repository or self._active_repo_root.name
                 abs_path = resolve_secure_path(repo_name, rel)
                 if action == "write":
@@ -122,6 +123,78 @@ class PlatformAgentEngine:
                         return f.read()
                 raise ValueError(f"Unsupported workspace_file_router action: {action}")
 
+            if name == "graphics_validate_transform_math":
+                payload = arguments.get("payload")
+                result = validate_transform_math(payload)
+                return json.dumps(result, ensure_ascii=False)
+
+            if name == "graphics_parse_matrix4":
+                matrix = arguments.get("matrix")
+                result = parse_matrix4(matrix)
+                return json.dumps(result, ensure_ascii=False)
+
+            if name == "trace_asset_compilation":
+                if self._active_repo_root is None:
+                    raise RuntimeError("No active repo root bound for trace_asset_compilation")
+
+                expected_repo = self._active_target_repository or self._active_repo_root.name
+                repo_name = arguments.get("repo_name") or expected_repo
+                if repo_name != expected_repo:
+                    raise PermissionError("trace_asset_compilation repo_name must match the active target repository")
+
+                asset_path = arguments.get("asset_path")
+                compile_command = arguments.get("compile_command")
+                if not isinstance(asset_path, str) or not asset_path.strip():
+                    raise ValueError("trace_asset_compilation requires asset_path")
+                if not isinstance(compile_command, str) or not compile_command.strip():
+                    raise ValueError("trace_asset_compilation requires compile_command")
+
+                try:
+                    trace = trace_asset_compilation(repo_name=expected_repo, asset_path=asset_path, compile_command=compile_command)
+                except subprocess.TimeoutExpired as exc:
+                    trace = {
+                        "ok": False,
+                        "repo_name": expected_repo,
+                        "asset_path": asset_path,
+                        "compile_command": compile_command,
+                        "exit_code": None,
+                        "duration_s": None,
+                        "error": f"timeout_expired: {exc}",
+                    }
+                except Exception as exc:
+                    trace = {
+                        "ok": False,
+                        "repo_name": expected_repo,
+                        "asset_path": asset_path,
+                        "compile_command": compile_command,
+                        "exit_code": None,
+                        "duration_s": None,
+                        "error": f"trace_failed: {exc}",
+                    }
+
+                # If the compilation failed, ask the Twin to provide an actionable explanation rather than
+                # terminating the main tool loop. This allows the Primary to iterate within max_loops.
+                if not bool(trace.get("ok")):
+                    try:
+                        twin_role = self._active_twin_agent_class or "RuntimeDiagnosticTwinAgent"
+                        snippet = json.dumps(trace, ensure_ascii=False)
+                        if len(snippet) > 8000:
+                            snippet = snippet[-8000:]
+                        twin_review = verify_with_twin_agent(
+                            repo_name=expected_repo,
+                            proposed_code=snippet,
+                            twin_role=twin_role,
+                            tool_name=name,
+                            relative_path=str(asset_path),
+                            num_thread=int(self._active_num_thread or 4),
+                            max_prompt_code_chars=8000,
+                        )
+                        trace["twin_feedback"] = str(twin_review.get("feedback") or "")
+                    except Exception:
+                        pass
+
+                return json.dumps(trace, ensure_ascii=False)
+
             if name == "execute_isolated_task":
                 code = arguments.get("script_content")
                 if not isinstance(code, str):
@@ -129,8 +202,12 @@ class PlatformAgentEngine:
                 if self._active_repo_root is None:
                     raise RuntimeError("No active repo root bound for execute_isolated_task")
 
-                readonly = bool(self._active_default_profile)
-                no_network = bool(self._active_default_profile)
+                readonly = bool(self._active_default_profile) or bool(
+                    (self._active_execution_constraints or {}).get("execute_isolated_task_readonly")
+                )
+                no_network = bool(self._active_default_profile) or bool(
+                    (self._active_execution_constraints or {}).get("execute_isolated_task_no_network")
+                )
                 repo_name = self._active_target_repository or self._active_repo_root.name
                 review = verify_with_twin_agent(
                     repo_name=repo_name,
@@ -668,8 +745,13 @@ if NO_NETWORK:
     return prelude.lstrip() + "\n" + (script or "")
 
 
-def _enforce_repo_path_constraints(rel: str, constraints: dict[str, object]) -> None:
-    """Optionally restrict workspace file access to per-repo allowed prefixes."""
+def _enforce_repo_path_constraints(rel: str, constraints: dict[str, object], *, action: str | None = None) -> None:
+    """Optionally restrict workspace file access to per-repo allowed prefixes.
+
+    Supports:
+      - allowed_path_prefixes / deny_path_prefixes (applies to reads+writes)
+      - allowed_write_path_prefixes / deny_write_path_prefixes (applies only when action == "write")
+    """
 
     if not isinstance(rel, str):
         return
@@ -690,6 +772,23 @@ def _enforce_repo_path_constraints(rel: str, constraints: dict[str, object]) -> 
         denied_prefixes = [str(x).strip().strip("/") for x in deny if isinstance(x, str) and str(x).strip()]
         if any(normalized == p or normalized.startswith(p + "/") for p in denied_prefixes):
             raise PermissionError("Path blocked by repository constraints (deny_path_prefixes)")
+
+    if action != "write":
+        return
+
+    allow_write = constraints.get("allowed_write_path_prefixes")
+    if isinstance(allow_write, list) and allow_write:
+        allowed_prefixes = [str(x).strip().strip("/") for x in allow_write if isinstance(x, str) and str(x).strip()]
+        if allowed_prefixes:
+            ok = any(normalized == p or normalized.startswith(p + "/") for p in allowed_prefixes)
+            if not ok:
+                raise PermissionError("Path blocked by repository constraints (allowed_write_path_prefixes)")
+
+    deny_write = constraints.get("deny_write_path_prefixes")
+    if isinstance(deny_write, list) and deny_write:
+        denied_prefixes = [str(x).strip().strip("/") for x in deny_write if isinstance(x, str) and str(x).strip()]
+        if any(normalized == p or normalized.startswith(p + "/") for p in denied_prefixes):
+            raise PermissionError("Path blocked by repository constraints (deny_write_path_prefixes)")
 
 if __name__ == "__main__":
     try:

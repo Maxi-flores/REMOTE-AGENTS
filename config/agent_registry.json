@@ -35,10 +35,12 @@
     ],
     "three_d_and_game_tools": [
       "Sapient KB",
+      "Mucho3D",
       "TheRocketTreeUnity"
     ],
     "pending_unmapped_fallbacks": [
-      "Mucho3D",
+    ],
+    "ml_and_metadata_pipelines": [
       "PF-WAI"
     ]
   },
@@ -188,31 +190,26 @@
       }
     },
     "Mucho3D": {
-      "primary_agent_class": "PendingRepositoryPrimaryAgent",
-      "twin_agent_class": "PendingRepositoryTwinAgent",
+      "primary_agent_class": "3DSceneOrchestratorAgent",
+      "twin_agent_class": "WebGLComplianceAuditor",
       "execution_constraints": {
         "num_thread": 4,
         "quantization_preference": "Q5_K_M",
-        "max_context_chars": 12000
-      },
-      "routing": {
-        "enabled": false,
-        "reason": "Pending/unmapped repository: route to default diagnostic profile."
+        "max_context_chars": 16000
       }
     },
     "PF-WAI": {
-      "primary_agent_class": "PendingRepositoryPrimaryAgent",
-      "twin_agent_class": "PendingRepositoryTwinAgent",
+      "primary_agent_class": "NeuralNetworkModelAdapter",
+      "twin_agent_class": "TensorGraphTwinVerifier",
       "execution_constraints": {
         "num_thread": 4,
         "quantization_preference": "Q5_K_M",
-        "max_context_chars": 12000
-      },
-      "routing": {
-        "enabled": false,
-        "reason": "Pending/unmapped repository: route to default diagnostic profile."
+        "max_context_chars": 12000,
+        "execute_isolated_task_readonly": true,
+        "allowed_write_path_prefixes": [
+          ".pfwai_output"
+        ]
       }
     }
   }
 }
-

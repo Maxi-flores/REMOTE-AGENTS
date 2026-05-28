@@ -46,8 +46,10 @@ class TestRepoGovernanceRouter(unittest.TestCase):
         self.assertGreaterEqual(len(errors), 1)
         self.assertEqual(errors[-1].get("error_type"), "REPO_ROUTER_FALLBACK")
 
-    def test_unmapped_repository_falls_back(self) -> None:
+    def test_pf_wai_routes_to_profile(self) -> None:
         route = resolve_repo_governance_route({"instruction": "x", "target_repository": "PF-WAI"})
-        self.assertTrue(route.used_default_profile)
-        self.assertEqual(route.primary_agent_class, "RuntimeDiagnosticAgent")
-        self.assertEqual(route.twin_agent_class, "RuntimeDiagnosticTwinAgent")
+        self.assertFalse(route.used_default_profile)
+        self.assertEqual(route.primary_agent_class, "NeuralNetworkModelAdapter")
+        self.assertEqual(route.twin_agent_class, "TensorGraphTwinVerifier")
+        self.assertEqual(int(route.execution_constraints.get("num_thread")), 4)
+        self.assertEqual(int(route.execution_constraints.get("max_context_chars")), 12000)

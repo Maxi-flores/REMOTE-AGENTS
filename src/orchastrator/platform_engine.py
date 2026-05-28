@@ -13,7 +13,8 @@ _SRC_DIR = Path(__file__).resolve().parents[1]
 if str(_SRC_DIR) not in sys.path:
     sys.path.insert(0, str(_SRC_DIR))
 
-from tools.logger import archive_failed_payload, ensure_runtime_directories, log_agent_failure
+from orchestrator.dispatcher import DispatcherConfig, OutboundCallbackDispatcher, build_delivery_envelope
+from tools.logger import archive_failed_payload, ensure_runtime_directories, log_agent_failure, log_engine_interruption
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
 MODEL_NAME = "qwen2.5-coder:3b" # Optimized for Meteor Lake P-Cores
@@ -24,9 +25,22 @@ LOCK_STALE_S = 15 * 60  # surface as Error-Locked via /health if stuck
 class PlatformAgentEngine:
     def __init__(self):
         ensure_runtime_directories()
+        self._artifacts_created: set[str] | None = None
+        self._dispatcher: OutboundCallbackDispatcher | None = None
+        self._init_outbound_dispatcher()
+        self._prune_stale_processing_lock(on_boot=True)
         self.load_mcp_tools()
         print("⚡ Platform Agent Infrastructure Initialized.")
         print(f"🔒 Guardrails active: 4 P-Core enforcement, OLLAMA Keep-Alive ready.")
+
+    def _init_outbound_dispatcher(self) -> None:
+        callback_url = os.environ.get("PLATFORM_CALLBACK_URL", "").strip()
+        if not callback_url:
+            return
+        token = os.environ.get("PLATFORM_CALLBACK_BEARER_TOKEN", "").strip() or None
+        cfg = DispatcherConfig(callback_url=callback_url, bearer_token=token)
+        self._dispatcher = OutboundCallbackDispatcher(cfg)
+        self._dispatcher.start()
 
     def load_mcp_tools(self):
         try:
@@ -46,6 +60,8 @@ class PlatformAgentEngine:
                 if action == "write":
                     with open(path, "w", encoding="utf-8") as f:
                         f.write(arguments.get("content", ""))
+                    if self._artifacts_created is not None and isinstance(path, str) and path:
+                        self._artifacts_created.add(path)
                     return f"Successfully written to {path}"
                 if action == "read":
                     with open(path, "r", encoding="utf-8") as f:
@@ -110,12 +126,46 @@ class PlatformAgentEngine:
             return None
         return time.time() - float(st.st_mtime)
 
+    def _prune_stale_processing_lock(self, *, on_boot: bool) -> bool:
+        age = self._processing_lock_age_s()
+        if age is None or age <= LOCK_STALE_S:
+            return False
+
+        details: dict[str, object] = {"lock_age_s": round(float(age), 3), "lock_path": PROCESSING_LOCK_FILE}
+        try:
+            with open(PROCESSING_LOCK_FILE, "r", encoding="utf-8") as f:
+                lock_body = json.load(f)
+            if isinstance(lock_body, dict):
+                details["lock_details"] = lock_body
+        except Exception:
+            pass
+
+        try:
+            os.remove(PROCESSING_LOCK_FILE)
+        except FileNotFoundError:
+            return True
+        except Exception as exc:
+            log_engine_interruption(
+                event_type="STALE_LOCK_PRUNE_FAILED",
+                message=f"Failed to delete stale processing lock (age_s={age:.1f}): {exc}",
+                details=details,
+            )
+            return False
+
+        log_engine_interruption(
+            event_type="STALE_LOCK_PRUNED",
+            message=f"Deleted stale processing lock (age_s={age:.1f}){' on boot' if on_boot else ''}.",
+            details=details,
+        )
+        return True
+
     def _try_acquire_processing_lock(self, *, task_id: str) -> bool:
         ensure_runtime_directories()
         age = self._processing_lock_age_s()
         if age is not None and age > LOCK_STALE_S:
-            print(f"🧯 Error-Locked: stale processing lock detected (age_s={age:.1f}). Manual intervention required.")
-            return False
+            if not self._prune_stale_processing_lock(on_boot=False):
+                print(f"🧯 Error-Locked: stale processing lock detected (age_s={age:.1f}).")
+                return False
 
         try:
             fd = os.open(PROCESSING_LOCK_FILE, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
@@ -167,6 +217,10 @@ class PlatformAgentEngine:
             if os.path.exists(task_file):
                 print("📬 Task discovered in platform loop.")
                 lock_acquired = False
+                task_start_monotonic: float | None = None
+                artifacts_created: list[str] = []
+                final_summary: str = ""
+                failure_summary: str = ""
                 try:
                     try:
                         with open(task_file, "r", encoding="utf-8") as f:
@@ -196,6 +250,8 @@ class PlatformAgentEngine:
                         time.sleep(2)
                         continue
                     lock_acquired = True
+                    task_start_monotonic = time.monotonic()
+                    self._artifacts_created = set()
 
                     max_context_chars = 20_000
                     context_chunks = deque([instruction])
@@ -216,11 +272,12 @@ class PlatformAgentEngine:
                             raw_decision = self.query_local_llm("\n".join(context_chunks))
                         except Exception as e:
                             failed = True
+                            failure_summary = f"Ollama disconnected: {e}"
                             self._handle_failure(
                                 task_file=task_file,
                                 task_id=task_id,
                                 prompt_history=prompt_history,
-                                error_message=f"Ollama disconnected: {e}",
+                                error_message=failure_summary,
                                 loop_count=current_loop,
                             )
                             completed = True
@@ -231,11 +288,12 @@ class PlatformAgentEngine:
                             decision = json.loads(raw_decision)
                         except Exception as e:
                             failed = True
+                            failure_summary = f"Model formatting failure (invalid JSON): {e}"
                             self._handle_failure(
                                 task_file=task_file,
                                 task_id=task_id,
                                 prompt_history=prompt_history,
-                                error_message=f"Model formatting failure (invalid JSON): {e}",
+                                error_message=failure_summary,
                                 loop_count=current_loop,
                             )
                             completed = True
@@ -246,11 +304,12 @@ class PlatformAgentEngine:
                                 tool_output = self.execute_tool(decision["tool_to_call"], decision.get("arguments", {}))
                             except Exception as e:
                                 failed = True
+                                failure_summary = str(e)
                                 self._handle_failure(
                                     task_file=task_file,
                                     task_id=task_id,
                                     prompt_history=prompt_history,
-                                    error_message=str(e),
+                                    error_message=failure_summary,
                                     loop_count=current_loop,
                                 )
                                 completed = True
@@ -258,21 +317,50 @@ class PlatformAgentEngine:
                             prompt_history.append({"tool_output": tool_output})
                             append_context(f"Tool Observation: {tool_output}")
                         else:
-                            print(f"🎉 Task Finished: {decision.get('final_response')}")
+                            final_summary = str(decision.get("final_response") or "")
+                            print(f"🎉 Task Finished: {final_summary}")
                             completed = True
                     
                     if not completed and current_loop >= max_loops:
                         failed = True
+                        failure_summary = "Loop breaker triggered: max loops reached"
                         self._handle_failure(
                             task_file=task_file,
                             task_id=task_id,
                             prompt_history=prompt_history,
-                            error_message="Loop breaker triggered: max loops reached",
+                            error_message=failure_summary,
                             loop_count=current_loop,
                         )
                     elif completed and not failed and os.path.exists(task_file):
                         os.remove(task_file) # Clear task from platform processing queue
+
+                    if self._artifacts_created:
+                        artifacts_created = sorted(self._artifacts_created)
+                    duration_s = 0.0
+                    if task_start_monotonic is not None:
+                        duration_s = max(0.0, float(time.monotonic() - task_start_monotonic))
+                    status = "FAILED" if failed else "COMPLETED"
+                    execution_summary = failure_summary if failed else final_summary
+                    if execution_summary is None:
+                        execution_summary = ""
+                    if self._dispatcher is not None:
+                        envelope = build_delivery_envelope(
+                            task_id=str(task_id),
+                            status=status,
+                            duration_seconds=duration_s,
+                            execution_summary=str(execution_summary),
+                            artifacts_created=artifacts_created,
+                        )
+                        try:
+                            self._dispatcher.enqueue(envelope)
+                        except Exception as exc:
+                            log_engine_interruption(
+                                event_type="DISPATCH_ENQUEUE_FAILED",
+                                message=f"Failed to enqueue outbound delivery envelope for task_id={task_id}: {exc}",
+                                details={"task_id": str(task_id), "status": status},
+                            )
                 finally:
+                    self._artifacts_created = None
                     if lock_acquired:
                         self._release_processing_lock()
                 

@@ -35,6 +35,7 @@ from tools.workspace_mounter import workspace_dir_health  # noqa: E402
 
 PLATFORM_TASK_FILE = Path(".platform_queue/next_task.json")
 PLATFORM_LOCK_FILE = Path(".platform_queue/processing.lock")
+CONSENSUS_METRICS_FILE = Path(".logs/consensus_metrics.json")
 
 _WS_GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 
@@ -160,6 +161,24 @@ def _system_memory_metrics() -> dict[str, Any]:
         "system_used_bytes": used_bytes,
         "system_used_percent": used_percent,
         "process_rss_bytes": process_rss_bytes,
+    }
+
+
+def _consensus_metrics() -> dict[str, int]:
+    try:
+        raw = CONSENSUS_METRICS_FILE.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        raw = ""
+    try:
+        obj = json.loads(raw) if raw else {}
+    except Exception:
+        obj = {}
+    if not isinstance(obj, dict):
+        obj = {}
+    return {
+        "total_consensus_reviews": int(obj.get("total_consensus_reviews") or 0),
+        "twin_rejections": int(obj.get("twin_rejections") or 0),
+        "successful_refinements": int(obj.get("successful_refinements") or 0),
     }
 
 
@@ -453,6 +472,7 @@ class EventGateway:
                     snapshot["workspace"] = workspace_dir_health()
                 except Exception as exc:
                     snapshot["workspace"] = {"error": str(exc)}
+                snapshot["consensus"] = _consensus_metrics()
                 body = _json_bytes(snapshot)
                 writer.write(_http_response(200, body))
                 await writer.drain()

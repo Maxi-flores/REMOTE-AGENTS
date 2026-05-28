@@ -18,6 +18,7 @@ python src/orchastrator/platform_engine.py
 > Note: the repository directory is currently named `src/orchastrator/`.
 
 To feed the agent a task, drop a JSON packet containing `{"instruction": "your text command here"}` into `.platform_queue/next_task.json`.
+Optionally include `target_repository` (e.g. `{"instruction":"...", "target_repository":"ConceptSHOP"}`) to activate multi-repo governance routing.
 
 On boot, the worker initializes `.platform_queue/` and `.logs/`. Failures are appended to `.logs/errors.json`, and failing payloads are archived to `.platform_queue/failed/` for human review.
 

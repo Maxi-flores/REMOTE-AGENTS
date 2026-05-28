@@ -52,7 +52,7 @@ def _readable_duration_s(age_s: float | None) -> float | None:
     return float(round(float(age_s), 3))
 
 
-def _parse_instruction_payload(raw: bytes) -> tuple[str, int]:
+def _parse_instruction_payload(raw: bytes) -> tuple[str, int, str | None]:
     try:
         obj = json.loads(raw.decode("utf-8", errors="strict"))
     except Exception as exc:
@@ -67,7 +67,12 @@ def _parse_instruction_payload(raw: bytes) -> tuple[str, int]:
         priority = 0
     if not isinstance(priority, int) or isinstance(priority, bool):
         raise ValueError("priority must be an integer")
-    return instruction, int(priority)
+    target_repository = obj.get("target_repository")
+    if not isinstance(target_repository, str) or not target_repository.strip():
+        target_repository = None
+    else:
+        target_repository = target_repository.strip()
+    return instruction, int(priority), target_repository
 
 
 def _read_processing_lock_details() -> dict[str, Any] | None:
@@ -253,6 +258,7 @@ class _BufferedTask:
     seq: int
     task_id: str
     instruction: str
+    target_repository: str | None
     enqueued_utc: str
 
 
@@ -285,7 +291,14 @@ class InMemoryScheduler:
             pass
         self._flush_task = None
 
-    async def enqueue(self, *, instruction: str, priority: int = 0, task_id: str | None = None) -> str:
+    async def enqueue(
+        self,
+        *,
+        instruction: str,
+        priority: int = 0,
+        task_id: str | None = None,
+        target_repository: str | None = None,
+    ) -> str:
         if task_id is None:
             task_id = str(uuid.uuid4())
         task = _BufferedTask(
@@ -293,6 +306,7 @@ class InMemoryScheduler:
             seq=0,
             task_id=str(task_id),
             instruction=str(instruction),
+            target_repository=str(target_repository) if isinstance(target_repository, str) and target_repository else None,
             enqueued_utc=_utc_ts(),
         )
         async with self._mu:
@@ -364,7 +378,13 @@ class InMemoryScheduler:
                     heapq.heappush(self._heap, (-int(task.priority), int(task.seq), task))
 
     def _write_new_task_file(self, task: _BufferedTask) -> None:
-        payload = {"task_id": task.task_id, "instruction": task.instruction, "enqueued_utc": task.enqueued_utc}
+        payload: dict[str, Any] = {
+            "task_id": task.task_id,
+            "instruction": task.instruction,
+            "enqueued_utc": task.enqueued_utc,
+        }
+        if task.target_repository:
+            payload["target_repository"] = task.target_repository
         data = _json_bytes(payload)
         PLATFORM_TASK_FILE.parent.mkdir(parents=True, exist_ok=True)
         fd = os.open(str(PLATFORM_TASK_FILE), os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
@@ -446,7 +466,7 @@ class EventGateway:
 
                 raw = await reader.readexactly(content_length)
                 try:
-                    instruction, priority = _parse_instruction_payload(raw)
+                    instruction, priority, target_repository = _parse_instruction_payload(raw)
                 except Exception as exc:
                     writer.write(_http_response(400, _json_bytes({"error": str(exc)})))
                     await writer.drain()
@@ -458,7 +478,11 @@ class EventGateway:
                 except Exception:
                     pass
 
-                task_id = await self.scheduler.enqueue(instruction=instruction, priority=priority)
+                task_id = await self.scheduler.enqueue(
+                    instruction=instruction,
+                    priority=priority,
+                    target_repository=target_repository,
+                )
                 writer.write(_http_response(202, _json_bytes({"ok": True, "task_id": task_id})))
                 await writer.drain()
                 writer.close()
@@ -544,7 +568,7 @@ class EventGateway:
                 continue
 
             try:
-                instruction, priority = _parse_instruction_payload(payload)
+                instruction, priority, target_repository = _parse_instruction_payload(payload)
             except Exception:
                 # Policy: immediately close on invalid payload to protect the core loop.
                 try:
@@ -554,7 +578,11 @@ class EventGateway:
                     pass
                 return
 
-            task_id = await self.scheduler.enqueue(instruction=instruction, priority=priority)
+            task_id = await self.scheduler.enqueue(
+                instruction=instruction,
+                priority=priority,
+                target_repository=target_repository,
+            )
             try:
                 writer.write(_make_ws_frame(payload=_json_bytes({"ok": True, "task_id": task_id}), opcode=0x1))
                 await writer.drain()

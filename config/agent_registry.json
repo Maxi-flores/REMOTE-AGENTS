@@ -1,0 +1,218 @@
+{
+  "schema_version": 1,
+  "description": "Master agent registry for multi-repo governance routing.",
+  "default_profile": {
+    "primary_agent_class": "RuntimeDiagnosticAgent",
+    "twin_agent_class": "RuntimeDiagnosticTwinAgent",
+    "execution_constraints": {
+      "num_thread": 4,
+      "quantization_preference": "Q5_K_M",
+      "max_context_chars": 12000
+    }
+  },
+  "groups": {
+    "spa_ui_frontends_vite_react": [
+      "ConceptSHOP",
+      "Powerframe-CRM",
+      "TheRocketTree-Web"
+    ],
+    "full_stack_frameworks_nextjs": [
+      "Dealinstinct Frontend",
+      "Dealinstinct V2",
+      "Bikerinstinct",
+      "WOMmedia"
+    ],
+    "monorepos_and_hubs": [
+      "Powerframe",
+      "PowerStarter",
+      "TheRocketTree-App"
+    ],
+    "data_pipelines_and_workers": [
+      "Powerframe-GMS",
+      "Powerframe-TPR",
+      "Powerframe-WMS",
+      "Trade Agent – V1"
+    ],
+    "three_d_and_game_tools": [
+      "Sapient KB",
+      "TheRocketTreeUnity"
+    ],
+    "pending_unmapped_fallbacks": [
+      "Mucho3D",
+      "PF-WAI"
+    ]
+  },
+  "repositories": {
+    "ConceptSHOP": {
+      "primary_agent_class": "ViteReactPrimaryAgent",
+      "twin_agent_class": "ViteReactTwinAgent",
+      "execution_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      }
+    },
+    "Powerframe-CRM": {
+      "primary_agent_class": "ViteReactPrimaryAgent",
+      "twin_agent_class": "ViteReactTwinAgent",
+      "execution_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      }
+    },
+    "TheRocketTree-Web": {
+      "primary_agent_class": "ViteReactPrimaryAgent",
+      "twin_agent_class": "ViteReactTwinAgent",
+      "execution_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      }
+    },
+    "Dealinstinct Frontend": {
+      "primary_agent_class": "NextJsPrimaryAgent",
+      "twin_agent_class": "NextJsTwinAgent",
+      "execution_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      }
+    },
+    "Dealinstinct V2": {
+      "primary_agent_class": "NextJsPrimaryAgent",
+      "twin_agent_class": "NextJsTwinAgent",
+      "execution_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      }
+    },
+    "Bikerinstinct": {
+      "primary_agent_class": "NextJsPrimaryAgent",
+      "twin_agent_class": "NextJsTwinAgent",
+      "execution_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      }
+    },
+    "WOMmedia": {
+      "primary_agent_class": "NextJsPrimaryAgent",
+      "twin_agent_class": "NextJsTwinAgent",
+      "execution_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      }
+    },
+    "Powerframe": {
+      "primary_agent_class": "MonorepoHubPrimaryAgent",
+      "twin_agent_class": "MonorepoHubTwinAgent",
+      "execution_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      }
+    },
+    "PowerStarter": {
+      "primary_agent_class": "MonorepoHubPrimaryAgent",
+      "twin_agent_class": "MonorepoHubTwinAgent",
+      "execution_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      }
+    },
+    "TheRocketTree-App": {
+      "primary_agent_class": "MonorepoHubPrimaryAgent",
+      "twin_agent_class": "MonorepoHubTwinAgent",
+      "execution_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      }
+    },
+    "Powerframe-GMS": {
+      "primary_agent_class": "PipelineWorkerPrimaryAgent",
+      "twin_agent_class": "PipelineWorkerTwinAgent",
+      "execution_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      }
+    },
+    "Powerframe-TPR": {
+      "primary_agent_class": "PipelineWorkerPrimaryAgent",
+      "twin_agent_class": "PipelineWorkerTwinAgent",
+      "execution_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      }
+    },
+    "Powerframe-WMS": {
+      "primary_agent_class": "PipelineWorkerPrimaryAgent",
+      "twin_agent_class": "PipelineWorkerTwinAgent",
+      "execution_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      }
+    },
+    "Trade Agent – V1": {
+      "primary_agent_class": "PipelineWorkerPrimaryAgent",
+      "twin_agent_class": "PipelineWorkerTwinAgent",
+      "execution_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      }
+    },
+    "Sapient KB": {
+      "primary_agent_class": "ThreeDToolsPrimaryAgent",
+      "twin_agent_class": "ThreeDToolsTwinAgent",
+      "execution_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      }
+    },
+    "TheRocketTreeUnity": {
+      "primary_agent_class": "ThreeDToolsPrimaryAgent",
+      "twin_agent_class": "ThreeDToolsTwinAgent",
+      "execution_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      }
+    },
+    "Mucho3D": {
+      "primary_agent_class": "PendingRepositoryPrimaryAgent",
+      "twin_agent_class": "PendingRepositoryTwinAgent",
+      "execution_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      },
+      "routing": {
+        "enabled": false,
+        "reason": "Pending/unmapped repository: route to default diagnostic profile."
+      }
+    },
+    "PF-WAI": {
+      "primary_agent_class": "PendingRepositoryPrimaryAgent",
+      "twin_agent_class": "PendingRepositoryTwinAgent",
+      "execution_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      },
+      "routing": {
+        "enabled": false,
+        "reason": "Pending/unmapped repository: route to default diagnostic profile."
+      }
+    }
+  }
+}
+

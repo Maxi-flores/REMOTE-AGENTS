@@ -1,18 +1,27 @@
-# REMOTE-AGENTS
+# Local Autonomous Platform Agent Workspace
 
-Autonomous multi-agent office runtime.
+This package runs a 24/7 background worker utilizing local system hardware via the Model Context Protocol (MCP).
 
-## Run
+### ⚙️ Prerequisites
+1. Windows 11 on Intel Core Ultra 5 (Meteor Lake)
+2. 32GB RAM available
+3. <a href="https://ollama.com">Ollama Desktop installed</a> with `qwen2.5-coder:3b` pulled
+4. Set the host environment configuration to prevent swapping: `OLLAMA_KEEP_ALIVE=-1`
 
-1) Ensure `AGENT_GUIDE_LIST.md` and `DESIGNATED_AGENTS_LIST.md` exist in the repo root.
-2) Execute:
+### 🚀 Launching the Production Workspace Engine
+To spin up the continuous platform worker loop, execute via your standard development terminal:
 
-python run_autonomous_office.py --business-case "Build the core runtime for REMOTE-AGENTS."
+```bash
+python src/orchastrator/platform_engine.py
+```
 
-Governance events are written to `logs/governance.jsonl`.
+> Note: the repository directory is currently named `src/orchastrator/`.
 
-## 3D Dashboard
+To feed the agent a task, drop a JSON packet containing `{"instruction": "your text command here"}` into `.platform_queue/next_task.json`.
 
-- Frontend: `packages/dashboard-3d/` (Vite + TS + Tailwind + R3F)
-- Backend bridge module: `core/mcp_bridge.py` (stdlib-only WebSocket + MCP-style tools/events)
+## Additional Repository Components
+
+- Office runtime entrypoint: `run_autonomous_office.py`
+- 3D dashboard frontend: `packages/dashboard-3d/`
+- Backend bridge module: `core/mcp_bridge.py`
 - Integration rig: `tests/test_3d_canvas_integration.py`

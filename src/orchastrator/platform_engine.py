@@ -16,6 +16,7 @@ if str(_SRC_DIR) not in sys.path:
 from orchestrator.dispatcher import DispatcherConfig, OutboundCallbackDispatcher, build_delivery_envelope
 from tools.logger import archive_failed_payload, ensure_runtime_directories, log_agent_failure, log_engine_interruption
 from tools.workspace_mounter import resolve_repo_root, resolve_secure_path
+from routers.consensus_engine import TwinRejectedError, record_consensus_metrics_update, verify_with_twin_agent
 from routers.repo_governance_router import (
     build_governance_system_context,
     constraints_for_engine,
@@ -37,6 +38,11 @@ class PlatformAgentEngine:
         self._active_repo_root: Path | None = None
         self._active_execution_constraints: dict[str, object] = {}
         self._active_default_profile: bool = False
+        self._active_primary_agent_class: str | None = None
+        self._active_twin_agent_class: str | None = None
+        self._active_num_thread: int = 4
+        self._active_task_twin_rejection_count: int = 0
+        self._active_task_refinement_recorded: bool = False
         self._init_outbound_dispatcher()
         self._prune_stale_processing_lock(on_boot=True)
         self.load_mcp_tools()
@@ -82,6 +88,29 @@ class PlatformAgentEngine:
                 repo_name = self._active_target_repository or self._active_repo_root.name
                 abs_path = resolve_secure_path(repo_name, rel)
                 if action == "write":
+                    review = verify_with_twin_agent(
+                        repo_name=repo_name,
+                        proposed_code=arguments.get("content", ""),
+                        twin_role=self._active_twin_agent_class or "RuntimeDiagnosticTwinAgent",
+                        tool_name=name,
+                        relative_path=rel,
+                        num_thread=int(self._active_num_thread or 4),
+                    )
+                    approved = bool(review.get("approved"))
+                    feedback = str(review.get("feedback") or "")
+                    record_consensus_metrics_update(
+                        total_consensus_reviews_delta=1,
+                        twin_rejections_delta=0 if approved else 1,
+                    )
+                    if not approved:
+                        self._active_task_twin_rejection_count += 1
+                        raise TwinRejectedError(feedback)
+                    if (
+                        self._active_task_twin_rejection_count > 0
+                        and not self._active_task_refinement_recorded
+                    ):
+                        record_consensus_metrics_update(successful_refinements_delta=1)
+                        self._active_task_refinement_recorded = True
                     with open(abs_path, "w", encoding="utf-8") as f:
                         f.write(arguments.get("content", ""))
                     if self._artifacts_created is not None:
@@ -101,6 +130,27 @@ class PlatformAgentEngine:
 
                 readonly = bool(self._active_default_profile)
                 no_network = bool(self._active_default_profile)
+                repo_name = self._active_target_repository or self._active_repo_root.name
+                review = verify_with_twin_agent(
+                    repo_name=repo_name,
+                    proposed_code=code,
+                    twin_role=self._active_twin_agent_class or "RuntimeDiagnosticTwinAgent",
+                    tool_name=name,
+                    relative_path=None,
+                    num_thread=int(self._active_num_thread or 4),
+                )
+                approved = bool(review.get("approved"))
+                feedback = str(review.get("feedback") or "")
+                record_consensus_metrics_update(
+                    total_consensus_reviews_delta=1,
+                    twin_rejections_delta=0 if approved else 1,
+                )
+                if not approved:
+                    self._active_task_twin_rejection_count += 1
+                    raise TwinRejectedError(feedback)
+                if self._active_task_twin_rejection_count > 0 and not self._active_task_refinement_recorded:
+                    record_consensus_metrics_update(successful_refinements_delta=1)
+                    self._active_task_refinement_recorded = True
                 wrapped = _wrap_script_for_sandbox(code, readonly=readonly, no_network=no_network)
                 result = subprocess.run(
                     ["python", "-c", wrapped],
@@ -287,6 +337,8 @@ class PlatformAgentEngine:
                     self._active_default_profile = bool(route.used_default_profile)
                     self._active_execution_constraints = dict(route.execution_constraints or {})
                     self._active_target_repository = route.resolved_repository or route.target_repository
+                    self._active_primary_agent_class = str(route.primary_agent_class or "")
+                    self._active_twin_agent_class = str(route.twin_agent_class or "")
                     try:
                         if self._active_default_profile:
                             self._active_repo_root = resolve_repo_root(None)
@@ -311,6 +363,9 @@ class PlatformAgentEngine:
                     self._artifacts_created = set()
 
                     num_thread, max_context_chars = constraints_for_engine(route)
+                    self._active_num_thread = int(num_thread)
+                    self._active_task_twin_rejection_count = 0
+                    self._active_task_refinement_recorded = False
                     context_chunks = deque([system_context, instruction])
                     current_context_size = len(system_context) + len(instruction) + 1
 
@@ -359,6 +414,10 @@ class PlatformAgentEngine:
                         if "tool_to_call" in decision:
                             try:
                                 tool_output = self.execute_tool(decision["tool_to_call"], decision.get("arguments", {}))
+                            except TwinRejectedError as e:
+                                prompt_history.append({"twin_rejection": e.feedback})
+                                append_context(f"Twin Rejection: {e.feedback}")
+                                continue
                             except Exception as e:
                                 failed = True
                                 failure_summary = str(e)
@@ -380,7 +439,13 @@ class PlatformAgentEngine:
                     
                     if not completed and current_loop >= max_loops:
                         failed = True
-                        failure_summary = "Loop breaker triggered: max loops reached"
+                        if self._active_task_twin_rejection_count > 0:
+                            failure_summary = (
+                                "DUAL_AGENT_CONSENSUS_TIMEOUT: "
+                                "max loops reached without twin approval for code execution/write."
+                            )
+                        else:
+                            failure_summary = "Loop breaker triggered: max loops reached"
                         self._handle_failure(
                             task_file=task_file,
                             task_id=task_id,
@@ -422,6 +487,11 @@ class PlatformAgentEngine:
                     self._active_repo_root = None
                     self._active_execution_constraints = {}
                     self._active_default_profile = False
+                    self._active_primary_agent_class = None
+                    self._active_twin_agent_class = None
+                    self._active_num_thread = 4
+                    self._active_task_twin_rejection_count = 0
+                    self._active_task_refinement_recorded = False
                     if lock_acquired:
                         self._release_processing_lock()
                 

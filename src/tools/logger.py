@@ -86,6 +86,8 @@ def archive_failed_payload(task_file_path: str, task_id: str) -> str:
 
 def _infer_error_type(error_message: str, loop_count: int) -> str:
     lowered = (error_message or "").lower()
+    if "dual_agent_consensus_timeout" in lowered:
+        return "DUAL_AGENT_CONSENSUS_TIMEOUT"
     if loop_count >= 5 and ("max_iterations" in lowered or "max loops" in lowered or "loop breaker" in lowered):
         return "MAX_ITERATIONS_EXCEEDED"
     if "ollama" in lowered or "11434" in lowered or "disconnected" in lowered:

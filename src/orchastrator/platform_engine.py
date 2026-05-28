@@ -6,6 +6,7 @@ import requests
 import sys
 from collections import deque
 from pathlib import Path
+import traceback
 
 _SRC_DIR = Path(__file__).resolve().parents[1]
 if str(_SRC_DIR) not in sys.path:
@@ -25,8 +26,12 @@ class PlatformAgentEngine:
         print(f"🔒 Guardrails active: 4 P-Core enforcement, OLLAMA Keep-Alive ready.")
 
     def load_mcp_tools(self):
-        with open(TOOLS_CONFIG_PATH, "r") as f:
-            self.tools_schema = json.load(f)["tools"]
+        try:
+            with open(TOOLS_CONFIG_PATH, "r", encoding="utf-8") as f:
+                self.tools_schema = json.load(f)["tools"]
+        except FileNotFoundError:
+            self.tools_schema = []
+            print(f"⚠️ Tools config not found at {TOOLS_CONFIG_PATH}; continuing with no tools.")
 
     def execute_tool(self, name, arguments):
         """Standard routing layout for autonomous system tool execution"""
@@ -200,5 +205,14 @@ class PlatformAgentEngine:
             time.sleep(10) # Cooling sleep cycle to prevent CPU throttling
 
 if __name__ == "__main__":
-    engine = PlatformAgentEngine()
-    engine.run_loop()
+    try:
+        engine = PlatformAgentEngine()
+        engine.run_loop()
+    except Exception:
+        log_agent_failure(
+            task_id="platform_engine_boot",
+            prompt_history=[],
+            error_message=traceback.format_exc(),
+            loop_count=0,
+        )
+        raise

@@ -30,6 +30,7 @@ if str(_SRC_DIR) not in sys.path:
     sys.path.insert(0, str(_SRC_DIR))
 
 from tools.logger import ensure_runtime_directories  # noqa: E402
+from tools.semantic_memory import memory_counts_by_repository  # noqa: E402
 from tools.workspace_mounter import workspace_dir_health  # noqa: E402
 
 
@@ -179,6 +180,24 @@ def _consensus_metrics() -> dict[str, int]:
         "total_consensus_reviews": int(obj.get("total_consensus_reviews") or 0),
         "twin_rejections": int(obj.get("twin_rejections") or 0),
         "successful_refinements": int(obj.get("successful_refinements") or 0),
+    }
+
+
+def _semantic_memory_metrics() -> dict[str, Any]:
+    try:
+        by_repo = memory_counts_by_repository()
+    except Exception:
+        by_repo = {}
+
+    flat: dict[str, int] = {}
+    for repo_name, count in sorted(by_repo.items(), key=lambda t: t[0].lower()):
+        safe = "".join(ch if (ch.isalnum() or ch == "_") else "_" for ch in str(repo_name))
+        flat[f"{safe}_memories_count"] = int(count)
+
+    return {
+        "total_records": int(sum(int(v) for v in by_repo.values())),
+        "by_repository": {str(k): int(v) for k, v in by_repo.items()},
+        "flat_counts": flat,
     }
 
 
@@ -473,6 +492,10 @@ class EventGateway:
                 except Exception as exc:
                     snapshot["workspace"] = {"error": str(exc)}
                 snapshot["consensus"] = _consensus_metrics()
+                semantic = _semantic_memory_metrics()
+                snapshot["semantic_memory"] = semantic
+                # Provide flat keys for quick dashboards (e.g. ConceptSHOP_memories_count).
+                snapshot.update(semantic.get("flat_counts") or {})
                 body = _json_bytes(snapshot)
                 writer.write(_http_response(200, body))
                 await writer.drain()

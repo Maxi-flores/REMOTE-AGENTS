@@ -390,3 +390,22 @@ Consequences:
 - `.platform_queue/next_task.json` semantics remain unchanged.
 - No gate enforcement, queue mutation, mission execution, or agent execution is introduced.
 - Orchestration outputs are advisory artifacts only, written under `.control_plane/orchestration/`.
+
+## ADR-0021: Add Advisory Executive Mission Briefing Layer (EMBL)
+
+Date: 2026-05-30
+
+Decision:
+- Add `src/executive_briefing/` with advisory contracts, deterministic analysis, briefing builder, report writers, and CLI.
+- Consume existing advisory artifacts only: CPOL reports, release readiness, gate traces, release center timelines, lifecycle state, control-plane snapshot, and Sentient UI view-model exports.
+- Export executive briefing artifacts under `.control_plane/executive/`.
+- Add optional Sentient UI executive panel adapters in `src/sentient_ui/executive_panels.py`.
+
+Reason:
+- CPOL already produces stage-level orchestration health; operators need executive interpretation across systems without introducing runtime enforcement.
+
+Consequences:
+- Runtime execution remains unchanged.
+- Queue semantics remain unchanged.
+- No deployments, git operations, CI execution, or enforcement behavior is introduced.
+- Executive outputs are deterministic, advisory-only, and suitable for future Sentient OS executive views.

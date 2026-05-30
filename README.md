@@ -314,6 +314,28 @@ python src/control_plane/cli.py --run-orchestration --print
 
 See `docs/control-plane-orchestration-layer.md`.
 
+## Executive Mission Briefing Layer (EMBL)
+
+Phase 18 adds an advisory executive interpretation layer over CPOL and related control-plane artifacts.
+
+It reads advisory artifacts and produces executive-grade briefings with:
+- overall status
+- top risks
+- blocked items
+- recommended next actions
+- release/lifecycle/governance summaries
+
+This phase does not execute missions, enforce gates, modify runtime behavior, or change queue semantics.
+
+Examples:
+
+```bash
+python src/executive_briefing/cli.py --print
+python src/executive_briefing/cli.py --export
+python src/executive_briefing/cli.py --export-jsonl
+python src/executive_briefing/cli.py --from-orchestration-report ".control_plane/orchestration/orchestration_report.json" --print
+```
+
 ## Runtime Contracts
 
 See `docs/runtime-contracts.md` for the Phase 0 contracts covering:

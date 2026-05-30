@@ -190,3 +190,13 @@ Status: complete.
 - Add `src/control_plane/orchestrator_cli.py` for print/export/export-jsonl report modes with optional mission context.
 - Keep missing artifacts non-fatal (`warning`/`not_run`) to preserve local compatibility.
 - Keep `platform_engine.py` and `.platform_queue/next_task.json` runtime behavior unchanged.
+
+Phase 18: Executive Mission Briefing Layer (EMBL).
+Status: complete.
+
+- Add `src/executive_briefing/` contracts, deterministic analyzer, briefing builder, report writers, and CLI.
+- Consume advisory artifacts from CPOL, release readiness, release gates, release center, lifecycle, control-plane snapshots, and Sentient UI exports.
+- Produce executive-grade advisory outputs (summary, top risks, blocked items, and recommended actions).
+- Export optional artifacts under `.control_plane/executive/`.
+- Add optional Sentient UI executive panels through `src/sentient_ui/executive_panels.py`.
+- Keep runtime execution, queue behavior, and enforcement unchanged.

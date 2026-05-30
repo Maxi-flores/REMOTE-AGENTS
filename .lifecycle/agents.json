@@ -1,6 +1,1283 @@
 {
-  "capability_profiles": {},
-  "events": [],
-  "lifecycle_states": {},
+  "capability_profiles": {
+    "3DSceneOrchestratorAgent": {
+      "agent_class": "3DSceneOrchestratorAgent",
+      "allowed_tools": [
+        "execute_isolated_task",
+        "graphics_parse_matrix4",
+        "graphics_validate_transform_math",
+        "network_data_fetch",
+        "trace_asset_compilation",
+        "workspace_file_router"
+      ],
+      "capabilities": [
+        "Runtime diagnostic and web audit specialist for 3D scenes"
+      ],
+      "capability_profile_id": "capability_profile_eb89ea7e352d471b951ed98a0eea901b",
+      "category": "diagnostic",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "crew_family": "three_d_graphics_neural_pipeline",
+      "denied_tools": [],
+      "display_name": "3D Scene Orchestrator Agent",
+      "health_requirements": {
+        "min_status": "active"
+      },
+      "metadata": {
+        "advisory_only": true,
+        "seed_sources": [
+          "config/registries/agents.json",
+          "config/agent_registry.json",
+          "AGENT_GUIDE_LIST.md",
+          "DESIGNATED_AGENTS_LIST.md"
+        ],
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_metrics": {
+        "mission_count": 0,
+        "success_rate": null
+      },
+      "primary_roles": [
+        "Mucho3D"
+      ],
+      "repositories": [
+        "Mucho3D"
+      ],
+      "repository_groups": [
+        "three_d_and_game_tools"
+      ],
+      "risk_tier": "medium",
+      "secondary_roles": [],
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z"
+    },
+    "MonorepoHubPrimaryAgent": {
+      "agent_class": "MonorepoHubPrimaryAgent",
+      "allowed_tools": [
+        "execute_isolated_task",
+        "graphics_parse_matrix4",
+        "graphics_validate_transform_math",
+        "network_data_fetch",
+        "trace_asset_compilation",
+        "workspace_file_router"
+      ],
+      "capabilities": [
+        "TypeScript/React monorepo and hub execution specialist"
+      ],
+      "capability_profile_id": "capability_profile_6489f59befa04239ba594b88f214fc38",
+      "category": "execution",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "crew_family": "data_core_infrastructure",
+      "denied_tools": [],
+      "display_name": "Monorepo Hub Primary Agent",
+      "health_requirements": {
+        "min_status": "active"
+      },
+      "metadata": {
+        "advisory_only": true,
+        "seed_sources": [
+          "config/registries/agents.json",
+          "config/agent_registry.json",
+          "AGENT_GUIDE_LIST.md",
+          "DESIGNATED_AGENTS_LIST.md"
+        ],
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_metrics": {
+        "mission_count": 0,
+        "success_rate": null
+      },
+      "primary_roles": [
+        "PowerStarter",
+        "Powerframe",
+        "TheRocketTree-App"
+      ],
+      "repositories": [
+        "PowerStarter",
+        "Powerframe",
+        "TheRocketTree-App"
+      ],
+      "repository_groups": [
+        "monorepos_and_hubs"
+      ],
+      "risk_tier": "medium",
+      "secondary_roles": [],
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z"
+    },
+    "MonorepoHubTwinAgent": {
+      "agent_class": "MonorepoHubTwinAgent",
+      "allowed_tools": [
+        "execute_isolated_task",
+        "graphics_parse_matrix4",
+        "graphics_validate_transform_math",
+        "network_data_fetch",
+        "trace_asset_compilation",
+        "workspace_file_router"
+      ],
+      "capabilities": [
+        "Monorepo governance and infrastructure auditor"
+      ],
+      "capability_profile_id": "capability_profile_b91152034928483dad9bd83decbdf983",
+      "category": "audit",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "crew_family": "data_core_infrastructure",
+      "denied_tools": [],
+      "display_name": "Monorepo Hub Twin Agent",
+      "health_requirements": {
+        "min_status": "active"
+      },
+      "metadata": {
+        "advisory_only": true,
+        "seed_sources": [
+          "config/registries/agents.json",
+          "config/agent_registry.json",
+          "AGENT_GUIDE_LIST.md",
+          "DESIGNATED_AGENTS_LIST.md"
+        ],
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_metrics": {
+        "mission_count": 0,
+        "success_rate": null
+      },
+      "primary_roles": [],
+      "repositories": [
+        "PowerStarter",
+        "Powerframe",
+        "TheRocketTree-App"
+      ],
+      "repository_groups": [
+        "monorepos_and_hubs"
+      ],
+      "risk_tier": "medium",
+      "secondary_roles": [
+        "PowerStarter",
+        "Powerframe",
+        "TheRocketTree-App"
+      ],
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z"
+    },
+    "NeuralNetworkModelAdapter": {
+      "agent_class": "NeuralNetworkModelAdapter",
+      "allowed_tools": [
+        "execute_isolated_task",
+        "graphics_parse_matrix4",
+        "graphics_validate_transform_math",
+        "network_data_fetch",
+        "trace_asset_compilation",
+        "workspace_file_router"
+      ],
+      "capabilities": [
+        "ML metadata and tensor graph adapter"
+      ],
+      "capability_profile_id": "capability_profile_981e7a7d729b457bb4a1c98df819321f",
+      "category": "general",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "crew_family": "three_d_graphics_neural_pipeline",
+      "denied_tools": [],
+      "display_name": "Neural Network Model Adapter",
+      "health_requirements": {
+        "min_status": "active"
+      },
+      "metadata": {
+        "advisory_only": true,
+        "seed_sources": [
+          "config/registries/agents.json",
+          "config/agent_registry.json",
+          "AGENT_GUIDE_LIST.md",
+          "DESIGNATED_AGENTS_LIST.md"
+        ],
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_metrics": {
+        "mission_count": 0,
+        "success_rate": null
+      },
+      "primary_roles": [
+        "PF-WAI"
+      ],
+      "repositories": [
+        "PF-WAI"
+      ],
+      "repository_groups": [
+        "ml_and_metadata_pipelines"
+      ],
+      "risk_tier": "medium",
+      "secondary_roles": [],
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z"
+    },
+    "NextJsPrimaryAgent": {
+      "agent_class": "NextJsPrimaryAgent",
+      "allowed_tools": [
+        "execute_isolated_task",
+        "graphics_parse_matrix4",
+        "graphics_validate_transform_math",
+        "network_data_fetch",
+        "trace_asset_compilation",
+        "workspace_file_router"
+      ],
+      "capabilities": [
+        "Next.js App Router execution specialist"
+      ],
+      "capability_profile_id": "capability_profile_b82c6f0a6dc848f994dfaaa1a357de5a",
+      "category": "execution",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "crew_family": "full_stack_ecosystem",
+      "denied_tools": [],
+      "display_name": "Next.js Primary Agent",
+      "health_requirements": {
+        "min_status": "active"
+      },
+      "metadata": {
+        "advisory_only": true,
+        "seed_sources": [
+          "config/registries/agents.json",
+          "config/agent_registry.json",
+          "AGENT_GUIDE_LIST.md",
+          "DESIGNATED_AGENTS_LIST.md"
+        ],
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_metrics": {
+        "mission_count": 0,
+        "success_rate": null
+      },
+      "primary_roles": [
+        "Bikerinstinct",
+        "Dealinstinct Frontend",
+        "Dealinstinct V2",
+        "WOMmedia"
+      ],
+      "repositories": [
+        "Bikerinstinct",
+        "Dealinstinct Frontend",
+        "Dealinstinct V2",
+        "WOMmedia"
+      ],
+      "repository_groups": [
+        "full_stack_frameworks_nextjs"
+      ],
+      "risk_tier": "medium",
+      "secondary_roles": [],
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z"
+    },
+    "NextJsTwinAgent": {
+      "agent_class": "NextJsTwinAgent",
+      "allowed_tools": [
+        "execute_isolated_task",
+        "graphics_parse_matrix4",
+        "graphics_validate_transform_math",
+        "network_data_fetch",
+        "trace_asset_compilation",
+        "workspace_file_router"
+      ],
+      "capabilities": [
+        "Next.js security and framework compliance auditor"
+      ],
+      "capability_profile_id": "capability_profile_0cb4fd6acdc14378b9410160fcf1c130",
+      "category": "audit",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "crew_family": "full_stack_ecosystem",
+      "denied_tools": [],
+      "display_name": "Next.js Twin Agent",
+      "health_requirements": {
+        "min_status": "active"
+      },
+      "metadata": {
+        "advisory_only": true,
+        "seed_sources": [
+          "config/registries/agents.json",
+          "config/agent_registry.json",
+          "AGENT_GUIDE_LIST.md",
+          "DESIGNATED_AGENTS_LIST.md"
+        ],
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_metrics": {
+        "mission_count": 0,
+        "success_rate": null
+      },
+      "primary_roles": [],
+      "repositories": [
+        "Bikerinstinct",
+        "Dealinstinct Frontend",
+        "Dealinstinct V2",
+        "WOMmedia"
+      ],
+      "repository_groups": [
+        "full_stack_frameworks_nextjs"
+      ],
+      "risk_tier": "medium",
+      "secondary_roles": [
+        "Bikerinstinct",
+        "Dealinstinct Frontend",
+        "Dealinstinct V2",
+        "WOMmedia"
+      ],
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z"
+    },
+    "PipelineWorkerPrimaryAgent": {
+      "agent_class": "PipelineWorkerPrimaryAgent",
+      "allowed_tools": [
+        "execute_isolated_task",
+        "graphics_parse_matrix4",
+        "graphics_validate_transform_math",
+        "network_data_fetch",
+        "trace_asset_compilation",
+        "workspace_file_router"
+      ],
+      "capabilities": [
+        "Data pipeline and worker execution specialist"
+      ],
+      "capability_profile_id": "capability_profile_44030f56a3bd4f29ad83448d3f68d70b",
+      "category": "execution",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "crew_family": "data_core_infrastructure",
+      "denied_tools": [],
+      "display_name": "Pipeline Worker Primary Agent",
+      "health_requirements": {
+        "min_status": "active"
+      },
+      "metadata": {
+        "advisory_only": true,
+        "seed_sources": [
+          "config/registries/agents.json",
+          "config/agent_registry.json",
+          "AGENT_GUIDE_LIST.md",
+          "DESIGNATED_AGENTS_LIST.md"
+        ],
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_metrics": {
+        "mission_count": 0,
+        "success_rate": null
+      },
+      "primary_roles": [
+        "Powerframe-GMS",
+        "Powerframe-TPR",
+        "Powerframe-WMS",
+        "Trade Agent \u2013 V1"
+      ],
+      "repositories": [
+        "Powerframe-GMS",
+        "Powerframe-TPR",
+        "Powerframe-WMS",
+        "Trade Agent \u2013 V1"
+      ],
+      "repository_groups": [
+        "data_pipelines_and_workers"
+      ],
+      "risk_tier": "medium",
+      "secondary_roles": [],
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z"
+    },
+    "PipelineWorkerTwinAgent": {
+      "agent_class": "PipelineWorkerTwinAgent",
+      "allowed_tools": [
+        "execute_isolated_task",
+        "graphics_parse_matrix4",
+        "graphics_validate_transform_math",
+        "network_data_fetch",
+        "trace_asset_compilation",
+        "workspace_file_router"
+      ],
+      "capabilities": [
+        "Security, schema, and edge-case validator"
+      ],
+      "capability_profile_id": "capability_profile_1155e65ece40400bb118e41bdb0b1c0a",
+      "category": "audit",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "crew_family": "data_core_infrastructure",
+      "denied_tools": [],
+      "display_name": "Pipeline Worker Twin Agent",
+      "health_requirements": {
+        "min_status": "active"
+      },
+      "metadata": {
+        "advisory_only": true,
+        "seed_sources": [
+          "config/registries/agents.json",
+          "config/agent_registry.json",
+          "AGENT_GUIDE_LIST.md",
+          "DESIGNATED_AGENTS_LIST.md"
+        ],
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_metrics": {
+        "mission_count": 0,
+        "success_rate": null
+      },
+      "primary_roles": [],
+      "repositories": [
+        "Powerframe-GMS",
+        "Powerframe-TPR",
+        "Powerframe-WMS",
+        "Trade Agent \u2013 V1"
+      ],
+      "repository_groups": [
+        "data_pipelines_and_workers"
+      ],
+      "risk_tier": "medium",
+      "secondary_roles": [
+        "Powerframe-GMS",
+        "Powerframe-TPR",
+        "Powerframe-WMS",
+        "Trade Agent \u2013 V1"
+      ],
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z"
+    },
+    "RuntimeDiagnosticAgent": {
+      "agent_class": "RuntimeDiagnosticAgent",
+      "allowed_tools": [
+        "execute_isolated_task",
+        "graphics_parse_matrix4",
+        "graphics_validate_transform_math",
+        "network_data_fetch",
+        "trace_asset_compilation",
+        "workspace_file_router"
+      ],
+      "capabilities": [
+        "Fallback runtime troubleshooter"
+      ],
+      "capability_profile_id": "capability_profile_6888bc0a7f4547759f133b9cb5256089",
+      "category": "general",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "crew_family": "system_diagnostic",
+      "denied_tools": [],
+      "display_name": "Runtime Diagnostic Agent",
+      "health_requirements": {
+        "min_status": "active"
+      },
+      "metadata": {
+        "advisory_only": true,
+        "seed_sources": [
+          "config/registries/agents.json",
+          "config/agent_registry.json",
+          "AGENT_GUIDE_LIST.md",
+          "DESIGNATED_AGENTS_LIST.md"
+        ],
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_metrics": {
+        "mission_count": 0,
+        "success_rate": null
+      },
+      "primary_roles": [],
+      "repositories": [],
+      "repository_groups": [],
+      "risk_tier": "medium",
+      "secondary_roles": [],
+      "status": "planned",
+      "updated_utc": "2026-05-30T23:18:55Z"
+    },
+    "RuntimeDiagnosticTwinAgent": {
+      "agent_class": "RuntimeDiagnosticTwinAgent",
+      "allowed_tools": [
+        "execute_isolated_task",
+        "graphics_parse_matrix4",
+        "graphics_validate_transform_math",
+        "network_data_fetch",
+        "trace_asset_compilation",
+        "workspace_file_router"
+      ],
+      "capabilities": [
+        "Fallback safety reviewer"
+      ],
+      "capability_profile_id": "capability_profile_b84cc746a94442f6b369f9f4df9d283e",
+      "category": "general",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "crew_family": "system_diagnostic",
+      "denied_tools": [],
+      "display_name": "Runtime Diagnostic Twin Agent",
+      "health_requirements": {
+        "min_status": "active"
+      },
+      "metadata": {
+        "advisory_only": true,
+        "seed_sources": [
+          "config/registries/agents.json",
+          "config/agent_registry.json",
+          "AGENT_GUIDE_LIST.md",
+          "DESIGNATED_AGENTS_LIST.md"
+        ],
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_metrics": {
+        "mission_count": 0,
+        "success_rate": null
+      },
+      "primary_roles": [],
+      "repositories": [],
+      "repository_groups": [],
+      "risk_tier": "medium",
+      "secondary_roles": [],
+      "status": "planned",
+      "updated_utc": "2026-05-30T23:18:55Z"
+    },
+    "TensorGraphTwinVerifier": {
+      "agent_class": "TensorGraphTwinVerifier",
+      "allowed_tools": [
+        "execute_isolated_task",
+        "graphics_parse_matrix4",
+        "graphics_validate_transform_math",
+        "network_data_fetch",
+        "trace_asset_compilation",
+        "workspace_file_router"
+      ],
+      "capabilities": [
+        "Tensor graph and finite-number validation twin"
+      ],
+      "capability_profile_id": "capability_profile_54b3fc9a5b084913bb522f9e34435f6b",
+      "category": "general",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "crew_family": "three_d_graphics_neural_pipeline",
+      "denied_tools": [],
+      "display_name": "Tensor Graph Twin Verifier",
+      "health_requirements": {
+        "min_status": "active"
+      },
+      "metadata": {
+        "advisory_only": true,
+        "seed_sources": [
+          "config/registries/agents.json",
+          "config/agent_registry.json",
+          "AGENT_GUIDE_LIST.md",
+          "DESIGNATED_AGENTS_LIST.md"
+        ],
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_metrics": {
+        "mission_count": 0,
+        "success_rate": null
+      },
+      "primary_roles": [],
+      "repositories": [
+        "PF-WAI"
+      ],
+      "repository_groups": [
+        "ml_and_metadata_pipelines"
+      ],
+      "risk_tier": "medium",
+      "secondary_roles": [
+        "PF-WAI"
+      ],
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z"
+    },
+    "ThreeDToolsPrimaryAgent": {
+      "agent_class": "ThreeDToolsPrimaryAgent",
+      "allowed_tools": [
+        "execute_isolated_task",
+        "graphics_parse_matrix4",
+        "graphics_validate_transform_math",
+        "network_data_fetch",
+        "trace_asset_compilation",
+        "workspace_file_router"
+      ],
+      "capabilities": [
+        "3D, game, and spatial pipeline execution specialist"
+      ],
+      "capability_profile_id": "capability_profile_e846fac64a1d4ee98a77b8f0b1ed3609",
+      "category": "execution",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "crew_family": "three_d_graphics_neural_pipeline",
+      "denied_tools": [],
+      "display_name": "3D Tools Primary Agent",
+      "health_requirements": {
+        "min_status": "active"
+      },
+      "metadata": {
+        "advisory_only": true,
+        "seed_sources": [
+          "config/registries/agents.json",
+          "config/agent_registry.json",
+          "AGENT_GUIDE_LIST.md",
+          "DESIGNATED_AGENTS_LIST.md"
+        ],
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_metrics": {
+        "mission_count": 0,
+        "success_rate": null
+      },
+      "primary_roles": [
+        "Sapient KB",
+        "TheRocketTreeUnity"
+      ],
+      "repositories": [
+        "Sapient KB",
+        "TheRocketTreeUnity"
+      ],
+      "repository_groups": [
+        "three_d_and_game_tools"
+      ],
+      "risk_tier": "medium",
+      "secondary_roles": [],
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z"
+    },
+    "ThreeDToolsTwinAgent": {
+      "agent_class": "ThreeDToolsTwinAgent",
+      "allowed_tools": [
+        "execute_isolated_task",
+        "graphics_parse_matrix4",
+        "graphics_validate_transform_math",
+        "network_data_fetch",
+        "trace_asset_compilation",
+        "workspace_file_router"
+      ],
+      "capabilities": [
+        "Finite-number and sandbox security sentinel"
+      ],
+      "capability_profile_id": "capability_profile_f8de9b312525491aac379aed001547fd",
+      "category": "audit",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "crew_family": "three_d_graphics_neural_pipeline",
+      "denied_tools": [],
+      "display_name": "3D Tools Twin Agent",
+      "health_requirements": {
+        "min_status": "active"
+      },
+      "metadata": {
+        "advisory_only": true,
+        "seed_sources": [
+          "config/registries/agents.json",
+          "config/agent_registry.json",
+          "AGENT_GUIDE_LIST.md",
+          "DESIGNATED_AGENTS_LIST.md"
+        ],
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_metrics": {
+        "mission_count": 0,
+        "success_rate": null
+      },
+      "primary_roles": [],
+      "repositories": [
+        "Sapient KB",
+        "TheRocketTreeUnity"
+      ],
+      "repository_groups": [
+        "three_d_and_game_tools"
+      ],
+      "risk_tier": "medium",
+      "secondary_roles": [
+        "Sapient KB",
+        "TheRocketTreeUnity"
+      ],
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z"
+    },
+    "ViteReactPrimaryAgent": {
+      "agent_class": "ViteReactPrimaryAgent",
+      "allowed_tools": [
+        "execute_isolated_task",
+        "graphics_parse_matrix4",
+        "graphics_validate_transform_math",
+        "network_data_fetch",
+        "trace_asset_compilation",
+        "workspace_file_router"
+      ],
+      "capabilities": [
+        "React/Vite frontend execution specialist"
+      ],
+      "capability_profile_id": "capability_profile_7f3afb9157bc4fe8852f8804fb817783",
+      "category": "execution",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "crew_family": "full_stack_ecosystem",
+      "denied_tools": [],
+      "display_name": "Vite React Primary Agent",
+      "health_requirements": {
+        "min_status": "active"
+      },
+      "metadata": {
+        "advisory_only": true,
+        "seed_sources": [
+          "config/registries/agents.json",
+          "config/agent_registry.json",
+          "AGENT_GUIDE_LIST.md",
+          "DESIGNATED_AGENTS_LIST.md"
+        ],
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_metrics": {
+        "mission_count": 0,
+        "success_rate": null
+      },
+      "primary_roles": [
+        "ConceptSHOP",
+        "Powerframe-CRM",
+        "TheRocketTree-Web"
+      ],
+      "repositories": [
+        "ConceptSHOP",
+        "Powerframe-CRM",
+        "TheRocketTree-Web"
+      ],
+      "repository_groups": [
+        "spa_ui_frontends_vite_react"
+      ],
+      "risk_tier": "medium",
+      "secondary_roles": [],
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z"
+    },
+    "ViteReactTwinAgent": {
+      "agent_class": "ViteReactTwinAgent",
+      "allowed_tools": [
+        "execute_isolated_task",
+        "graphics_parse_matrix4",
+        "graphics_validate_transform_math",
+        "network_data_fetch",
+        "trace_asset_compilation",
+        "workspace_file_router"
+      ],
+      "capabilities": [
+        "Frontend framework and UX compliance auditor"
+      ],
+      "capability_profile_id": "capability_profile_879e092de5244b308584983788da5c3e",
+      "category": "audit",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "crew_family": "full_stack_ecosystem",
+      "denied_tools": [],
+      "display_name": "Vite React Twin Agent",
+      "health_requirements": {
+        "min_status": "active"
+      },
+      "metadata": {
+        "advisory_only": true,
+        "seed_sources": [
+          "config/registries/agents.json",
+          "config/agent_registry.json",
+          "AGENT_GUIDE_LIST.md",
+          "DESIGNATED_AGENTS_LIST.md"
+        ],
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_metrics": {
+        "mission_count": 0,
+        "success_rate": null
+      },
+      "primary_roles": [],
+      "repositories": [
+        "ConceptSHOP",
+        "Powerframe-CRM",
+        "TheRocketTree-Web"
+      ],
+      "repository_groups": [
+        "spa_ui_frontends_vite_react"
+      ],
+      "risk_tier": "medium",
+      "secondary_roles": [
+        "ConceptSHOP",
+        "Powerframe-CRM",
+        "TheRocketTree-Web"
+      ],
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z"
+    },
+    "WebGLComplianceAuditor": {
+      "agent_class": "WebGLComplianceAuditor",
+      "allowed_tools": [
+        "execute_isolated_task",
+        "graphics_parse_matrix4",
+        "graphics_validate_transform_math",
+        "network_data_fetch",
+        "trace_asset_compilation",
+        "workspace_file_router"
+      ],
+      "capabilities": [
+        "3D/web graphics compliance twin"
+      ],
+      "capability_profile_id": "capability_profile_562489d2d297492b9ed2aab8f5c983b0",
+      "category": "general",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "crew_family": "three_d_graphics_neural_pipeline",
+      "denied_tools": [],
+      "display_name": "WebGL Compliance Auditor",
+      "health_requirements": {
+        "min_status": "active"
+      },
+      "metadata": {
+        "advisory_only": true,
+        "seed_sources": [
+          "config/registries/agents.json",
+          "config/agent_registry.json",
+          "AGENT_GUIDE_LIST.md",
+          "DESIGNATED_AGENTS_LIST.md"
+        ],
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_metrics": {
+        "mission_count": 0,
+        "success_rate": null
+      },
+      "primary_roles": [],
+      "repositories": [
+        "Mucho3D"
+      ],
+      "repository_groups": [
+        "three_d_and_game_tools"
+      ],
+      "risk_tier": "medium",
+      "secondary_roles": [
+        "Mucho3D"
+      ],
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z"
+    }
+  },
+  "events": [
+    {
+      "active_agent_classes": 16,
+      "added_lifecycle_states": 16,
+      "added_profiles": 16,
+      "advisory_only": true,
+      "created_utc": "2026-05-30T23:18:55Z",
+      "event_type": "lifecycle_seed"
+    }
+  ],
+  "lifecycle_states": {
+    "agent::3DSceneOrchestratorAgent": {
+      "agent_class": "3DSceneOrchestratorAgent",
+      "agent_id": "agent::3DSceneOrchestratorAgent",
+      "assigned_repositories": [
+        "Mucho3D"
+      ],
+      "availability": "available",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "current_missions": [],
+      "health": "healthy",
+      "last_seen_utc": "2026-05-30T23:18:55Z",
+      "lifecycle_notes": [
+        "Seeded from lifecycle bootstrap using canonical and legacy registries."
+      ],
+      "metadata": {
+        "advisory_only": true,
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_summary": {
+        "missions_completed": 0,
+        "success_rate": null
+      },
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z",
+      "version": "v1"
+    },
+    "agent::MonorepoHubPrimaryAgent": {
+      "agent_class": "MonorepoHubPrimaryAgent",
+      "agent_id": "agent::MonorepoHubPrimaryAgent",
+      "assigned_repositories": [
+        "PowerStarter",
+        "Powerframe",
+        "TheRocketTree-App"
+      ],
+      "availability": "available",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "current_missions": [],
+      "health": "healthy",
+      "last_seen_utc": "2026-05-30T23:18:55Z",
+      "lifecycle_notes": [
+        "Seeded from lifecycle bootstrap using canonical and legacy registries."
+      ],
+      "metadata": {
+        "advisory_only": true,
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_summary": {
+        "missions_completed": 0,
+        "success_rate": null
+      },
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z",
+      "version": "v1"
+    },
+    "agent::MonorepoHubTwinAgent": {
+      "agent_class": "MonorepoHubTwinAgent",
+      "agent_id": "agent::MonorepoHubTwinAgent",
+      "assigned_repositories": [
+        "PowerStarter",
+        "Powerframe",
+        "TheRocketTree-App"
+      ],
+      "availability": "available",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "current_missions": [],
+      "health": "healthy",
+      "last_seen_utc": "2026-05-30T23:18:55Z",
+      "lifecycle_notes": [
+        "Seeded from lifecycle bootstrap using canonical and legacy registries."
+      ],
+      "metadata": {
+        "advisory_only": true,
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_summary": {
+        "missions_completed": 0,
+        "success_rate": null
+      },
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z",
+      "version": "v1"
+    },
+    "agent::NeuralNetworkModelAdapter": {
+      "agent_class": "NeuralNetworkModelAdapter",
+      "agent_id": "agent::NeuralNetworkModelAdapter",
+      "assigned_repositories": [
+        "PF-WAI"
+      ],
+      "availability": "available",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "current_missions": [],
+      "health": "healthy",
+      "last_seen_utc": "2026-05-30T23:18:55Z",
+      "lifecycle_notes": [
+        "Seeded from lifecycle bootstrap using canonical and legacy registries."
+      ],
+      "metadata": {
+        "advisory_only": true,
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_summary": {
+        "missions_completed": 0,
+        "success_rate": null
+      },
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z",
+      "version": "v1"
+    },
+    "agent::NextJsPrimaryAgent": {
+      "agent_class": "NextJsPrimaryAgent",
+      "agent_id": "agent::NextJsPrimaryAgent",
+      "assigned_repositories": [
+        "Bikerinstinct",
+        "Dealinstinct Frontend",
+        "Dealinstinct V2",
+        "WOMmedia"
+      ],
+      "availability": "available",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "current_missions": [],
+      "health": "healthy",
+      "last_seen_utc": "2026-05-30T23:18:55Z",
+      "lifecycle_notes": [
+        "Seeded from lifecycle bootstrap using canonical and legacy registries."
+      ],
+      "metadata": {
+        "advisory_only": true,
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_summary": {
+        "missions_completed": 0,
+        "success_rate": null
+      },
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z",
+      "version": "v1"
+    },
+    "agent::NextJsTwinAgent": {
+      "agent_class": "NextJsTwinAgent",
+      "agent_id": "agent::NextJsTwinAgent",
+      "assigned_repositories": [
+        "Bikerinstinct",
+        "Dealinstinct Frontend",
+        "Dealinstinct V2",
+        "WOMmedia"
+      ],
+      "availability": "available",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "current_missions": [],
+      "health": "healthy",
+      "last_seen_utc": "2026-05-30T23:18:55Z",
+      "lifecycle_notes": [
+        "Seeded from lifecycle bootstrap using canonical and legacy registries."
+      ],
+      "metadata": {
+        "advisory_only": true,
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_summary": {
+        "missions_completed": 0,
+        "success_rate": null
+      },
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z",
+      "version": "v1"
+    },
+    "agent::PipelineWorkerPrimaryAgent": {
+      "agent_class": "PipelineWorkerPrimaryAgent",
+      "agent_id": "agent::PipelineWorkerPrimaryAgent",
+      "assigned_repositories": [
+        "Powerframe-GMS",
+        "Powerframe-TPR",
+        "Powerframe-WMS",
+        "Trade Agent \u2013 V1"
+      ],
+      "availability": "available",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "current_missions": [],
+      "health": "healthy",
+      "last_seen_utc": "2026-05-30T23:18:55Z",
+      "lifecycle_notes": [
+        "Seeded from lifecycle bootstrap using canonical and legacy registries."
+      ],
+      "metadata": {
+        "advisory_only": true,
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_summary": {
+        "missions_completed": 0,
+        "success_rate": null
+      },
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z",
+      "version": "v1"
+    },
+    "agent::PipelineWorkerTwinAgent": {
+      "agent_class": "PipelineWorkerTwinAgent",
+      "agent_id": "agent::PipelineWorkerTwinAgent",
+      "assigned_repositories": [
+        "Powerframe-GMS",
+        "Powerframe-TPR",
+        "Powerframe-WMS",
+        "Trade Agent \u2013 V1"
+      ],
+      "availability": "available",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "current_missions": [],
+      "health": "healthy",
+      "last_seen_utc": "2026-05-30T23:18:55Z",
+      "lifecycle_notes": [
+        "Seeded from lifecycle bootstrap using canonical and legacy registries."
+      ],
+      "metadata": {
+        "advisory_only": true,
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_summary": {
+        "missions_completed": 0,
+        "success_rate": null
+      },
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z",
+      "version": "v1"
+    },
+    "agent::RuntimeDiagnosticAgent": {
+      "agent_class": "RuntimeDiagnosticAgent",
+      "agent_id": "agent::RuntimeDiagnosticAgent",
+      "assigned_repositories": [],
+      "availability": "paused",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "current_missions": [],
+      "health": "unknown",
+      "last_seen_utc": null,
+      "lifecycle_notes": [
+        "Seeded from lifecycle bootstrap using canonical and legacy registries."
+      ],
+      "metadata": {
+        "advisory_only": true,
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_summary": {
+        "missions_completed": 0,
+        "success_rate": null
+      },
+      "status": "planned",
+      "updated_utc": "2026-05-30T23:18:55Z",
+      "version": "v1"
+    },
+    "agent::RuntimeDiagnosticTwinAgent": {
+      "agent_class": "RuntimeDiagnosticTwinAgent",
+      "agent_id": "agent::RuntimeDiagnosticTwinAgent",
+      "assigned_repositories": [],
+      "availability": "paused",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "current_missions": [],
+      "health": "unknown",
+      "last_seen_utc": null,
+      "lifecycle_notes": [
+        "Seeded from lifecycle bootstrap using canonical and legacy registries."
+      ],
+      "metadata": {
+        "advisory_only": true,
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_summary": {
+        "missions_completed": 0,
+        "success_rate": null
+      },
+      "status": "planned",
+      "updated_utc": "2026-05-30T23:18:55Z",
+      "version": "v1"
+    },
+    "agent::TensorGraphTwinVerifier": {
+      "agent_class": "TensorGraphTwinVerifier",
+      "agent_id": "agent::TensorGraphTwinVerifier",
+      "assigned_repositories": [
+        "PF-WAI"
+      ],
+      "availability": "available",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "current_missions": [],
+      "health": "healthy",
+      "last_seen_utc": "2026-05-30T23:18:55Z",
+      "lifecycle_notes": [
+        "Seeded from lifecycle bootstrap using canonical and legacy registries."
+      ],
+      "metadata": {
+        "advisory_only": true,
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_summary": {
+        "missions_completed": 0,
+        "success_rate": null
+      },
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z",
+      "version": "v1"
+    },
+    "agent::ThreeDToolsPrimaryAgent": {
+      "agent_class": "ThreeDToolsPrimaryAgent",
+      "agent_id": "agent::ThreeDToolsPrimaryAgent",
+      "assigned_repositories": [
+        "Sapient KB",
+        "TheRocketTreeUnity"
+      ],
+      "availability": "available",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "current_missions": [],
+      "health": "healthy",
+      "last_seen_utc": "2026-05-30T23:18:55Z",
+      "lifecycle_notes": [
+        "Seeded from lifecycle bootstrap using canonical and legacy registries."
+      ],
+      "metadata": {
+        "advisory_only": true,
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_summary": {
+        "missions_completed": 0,
+        "success_rate": null
+      },
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z",
+      "version": "v1"
+    },
+    "agent::ThreeDToolsTwinAgent": {
+      "agent_class": "ThreeDToolsTwinAgent",
+      "agent_id": "agent::ThreeDToolsTwinAgent",
+      "assigned_repositories": [
+        "Sapient KB",
+        "TheRocketTreeUnity"
+      ],
+      "availability": "available",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "current_missions": [],
+      "health": "healthy",
+      "last_seen_utc": "2026-05-30T23:18:55Z",
+      "lifecycle_notes": [
+        "Seeded from lifecycle bootstrap using canonical and legacy registries."
+      ],
+      "metadata": {
+        "advisory_only": true,
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_summary": {
+        "missions_completed": 0,
+        "success_rate": null
+      },
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z",
+      "version": "v1"
+    },
+    "agent::ViteReactPrimaryAgent": {
+      "agent_class": "ViteReactPrimaryAgent",
+      "agent_id": "agent::ViteReactPrimaryAgent",
+      "assigned_repositories": [
+        "ConceptSHOP",
+        "Powerframe-CRM",
+        "TheRocketTree-Web"
+      ],
+      "availability": "available",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "current_missions": [],
+      "health": "healthy",
+      "last_seen_utc": "2026-05-30T23:18:55Z",
+      "lifecycle_notes": [
+        "Seeded from lifecycle bootstrap using canonical and legacy registries."
+      ],
+      "metadata": {
+        "advisory_only": true,
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_summary": {
+        "missions_completed": 0,
+        "success_rate": null
+      },
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z",
+      "version": "v1"
+    },
+    "agent::ViteReactTwinAgent": {
+      "agent_class": "ViteReactTwinAgent",
+      "agent_id": "agent::ViteReactTwinAgent",
+      "assigned_repositories": [
+        "ConceptSHOP",
+        "Powerframe-CRM",
+        "TheRocketTree-Web"
+      ],
+      "availability": "available",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "current_missions": [],
+      "health": "healthy",
+      "last_seen_utc": "2026-05-30T23:18:55Z",
+      "lifecycle_notes": [
+        "Seeded from lifecycle bootstrap using canonical and legacy registries."
+      ],
+      "metadata": {
+        "advisory_only": true,
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_summary": {
+        "missions_completed": 0,
+        "success_rate": null
+      },
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z",
+      "version": "v1"
+    },
+    "agent::WebGLComplianceAuditor": {
+      "agent_class": "WebGLComplianceAuditor",
+      "agent_id": "agent::WebGLComplianceAuditor",
+      "assigned_repositories": [
+        "Mucho3D"
+      ],
+      "availability": "available",
+      "created_utc": "2026-05-30T23:18:55Z",
+      "current_missions": [],
+      "health": "healthy",
+      "last_seen_utc": "2026-05-30T23:18:55Z",
+      "lifecycle_notes": [
+        "Seeded from lifecycle bootstrap using canonical and legacy registries."
+      ],
+      "metadata": {
+        "advisory_only": true,
+        "seeded_by": "lifecycle.bootstrap"
+      },
+      "performance_summary": {
+        "missions_completed": 0,
+        "success_rate": null
+      },
+      "status": "active",
+      "updated_utc": "2026-05-30T23:18:55Z",
+      "version": "v1"
+    }
+  },
   "schema_version": 1
 }

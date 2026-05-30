@@ -1,0 +1,14 @@
+{
+  "scenario_pack_id": "experimental_release_scenarios",
+  "display_name": "Experimental Preview Scenario Pack",
+  "description": "Compares experimental and default policies for permissive preview visibility.",
+  "policy_names": [
+    "experimental_gate_policy",
+    "default_gate_policy"
+  ],
+  "comparison_strategy": "permissive_preview",
+  "advisory_only": true,
+  "metadata": {
+    "phase": 13
+  }
+}

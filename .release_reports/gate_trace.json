@@ -1,0 +1,33 @@
+{
+  "decision": {
+    "advisory_only": true,
+    "blockers": [],
+    "created_utc": "2026-05-30T22:50:40Z",
+    "decision": "pass",
+    "decision_id": "gate_decision_bootstrap",
+    "evaluated_artifacts": [],
+    "metadata": {
+      "bootstrap": true
+    },
+    "policy_id": "default_gate_policy",
+    "readiness_score": 100.0,
+    "report_id": "release_readiness_bootstrap",
+    "warnings": []
+  },
+  "metadata": {
+    "advisory_only": true,
+    "bootstrap": true
+  },
+  "policy_summary": {
+    "advisory_only": true,
+    "minimum_readiness_score": 70,
+    "policy_id": "default_gate_policy"
+  },
+  "report_summary": {
+    "finding_count": 0,
+    "readiness_score": 100.0,
+    "readiness_status": "ready",
+    "report_id": "release_readiness_bootstrap"
+  },
+  "trace_id": "gate_trace_bootstrap"
+}

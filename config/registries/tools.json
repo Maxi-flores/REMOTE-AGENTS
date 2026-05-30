@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "description": "Canonical seed registry for platform tools. Mirrors config/platform_mcp_tools.json without changing runtime loading.",
+  "source_config": "config/platform_mcp_tools.json",
+  "tools": [
+    {
+      "name": "workspace_file_router",
+      "description": "Read/write a repo-relative file path inside the active target repository.",
+      "risk_tier": "high",
+      "approval_requirements": [
+        "Twin approval required for writes",
+        "Repository path constraints enforced before writes"
+      ],
+      "allowed_runtime_context": [
+        "active_target_repository",
+        "local_worker"
+      ],
+      "current_implementation_status": "implemented"
+    },
+    {
+      "name": "execute_isolated_task",
+      "description": "Execute a short Python snippet inside a best-effort sandbox prelude.",
+      "risk_tier": "high",
+      "approval_requirements": [
+        "Twin approval required",
+        "Read-only and no-network restrictions may be enforced by profile"
+      ],
+      "allowed_runtime_context": [
+        "active_target_repository",
+        "local_worker"
+      ],
+      "current_implementation_status": "implemented"
+    },
+    {
+      "name": "network_data_fetch",
+      "description": "Fetch network data via HTTP.",
+      "risk_tier": "high",
+      "approval_requirements": [
+        "Disabled in default diagnostic profile",
+        "Future human approval policy expected before broad network use"
+      ],
+      "allowed_runtime_context": [
+        "non_default_repository_profile"
+      ],
+      "current_implementation_status": "implemented_but_restricted"
+    },
+    {
+      "name": "graphics_validate_transform_math",
+      "description": "Validate 3D transforms and bounding boxes for non-finite values and divide-by-zero risk.",
+      "risk_tier": "low",
+      "approval_requirements": [],
+      "allowed_runtime_context": [
+        "local_worker",
+        "read_only_diagnostic"
+      ],
+      "current_implementation_status": "implemented"
+    },
+    {
+      "name": "graphics_parse_matrix4",
+      "description": "Parse a 4x4 matrix into 16 finite floats.",
+      "risk_tier": "low",
+      "approval_requirements": [],
+      "allowed_runtime_context": [
+        "local_worker",
+        "read_only_diagnostic"
+      ],
+      "current_implementation_status": "implemented"
+    },
+    {
+      "name": "trace_asset_compilation",
+      "description": "Run a repo-pinned local asset compilation command without shell operators and return structured traces.",
+      "risk_tier": "medium",
+      "approval_requirements": [
+        "Command allowlist enforced",
+        "Repo boundary enforced for asset and repo-local script paths",
+        "Failed traces may be sent to the twin for feedback"
+      ],
+      "allowed_runtime_context": [
+        "active_target_repository",
+        "local_worker"
+      ],
+      "current_implementation_status": "implemented"
+    }
+  ]
+}

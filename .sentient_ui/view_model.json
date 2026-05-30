@@ -1,0 +1,170 @@
+{
+  "agent_panel": {
+    "alerts": [],
+    "cards": [],
+    "graph_edges": [],
+    "graph_nodes": [],
+    "metadata": {
+      "bootstrap": true
+    },
+    "metrics": {},
+    "panel_id": "agents",
+    "status": "unknown",
+    "summary": "bootstrap-minimal",
+    "tables": [],
+    "timelines": [],
+    "title": "Agents"
+  },
+  "alerts": [],
+  "approval_panel": {
+    "alerts": [],
+    "cards": [],
+    "graph_edges": [],
+    "graph_nodes": [],
+    "metadata": {
+      "bootstrap": true
+    },
+    "metrics": {},
+    "panel_id": "approvals",
+    "status": "unknown",
+    "summary": "bootstrap-minimal",
+    "tables": [],
+    "timelines": [],
+    "title": "Approvals"
+  },
+  "consensus_panel": {
+    "alerts": [],
+    "cards": [],
+    "graph_edges": [],
+    "graph_nodes": [],
+    "metadata": {
+      "bootstrap": true
+    },
+    "metrics": {},
+    "panel_id": "consensus",
+    "status": "unknown",
+    "summary": "bootstrap-minimal",
+    "tables": [],
+    "timelines": [],
+    "title": "Consensus"
+  },
+  "generated_utc": "2026-05-30T22:50:40Z",
+  "memory_panel": {
+    "alerts": [],
+    "cards": [],
+    "graph_edges": [],
+    "graph_nodes": [],
+    "metadata": {
+      "bootstrap": true
+    },
+    "metrics": {},
+    "panel_id": "memory",
+    "status": "unknown",
+    "summary": "bootstrap-minimal",
+    "tables": [],
+    "timelines": [],
+    "title": "Memory"
+  },
+  "metadata": {
+    "bootstrap": true
+  },
+  "mission_panel": {
+    "alerts": [],
+    "cards": [],
+    "graph_edges": [],
+    "graph_nodes": [],
+    "metadata": {
+      "bootstrap": true
+    },
+    "metrics": {},
+    "panel_id": "missions",
+    "status": "unknown",
+    "summary": "bootstrap-minimal",
+    "tables": [],
+    "timelines": [],
+    "title": "Missions"
+  },
+  "observability_panel": {
+    "alerts": [],
+    "cards": [],
+    "graph_edges": [],
+    "graph_nodes": [],
+    "metadata": {
+      "bootstrap": true
+    },
+    "metrics": {},
+    "panel_id": "observability",
+    "status": "unknown",
+    "summary": "bootstrap-minimal",
+    "tables": [],
+    "timelines": [],
+    "title": "Observability"
+  },
+  "repository_panel": {
+    "alerts": [],
+    "cards": [],
+    "graph_edges": [],
+    "graph_nodes": [],
+    "metadata": {
+      "bootstrap": true
+    },
+    "metrics": {},
+    "panel_id": "repositories",
+    "status": "unknown",
+    "summary": "bootstrap-minimal",
+    "tables": [],
+    "timelines": [],
+    "title": "Repositories"
+  },
+  "runtime_panel": {
+    "alerts": [],
+    "cards": [],
+    "graph_edges": [],
+    "graph_nodes": [],
+    "metadata": {
+      "bootstrap": true
+    },
+    "metrics": {},
+    "panel_id": "runtime",
+    "status": "unknown",
+    "summary": "bootstrap-minimal",
+    "tables": [],
+    "timelines": [],
+    "title": "Runtime"
+  },
+  "scheduler_panel": {
+    "alerts": [],
+    "cards": [],
+    "graph_edges": [],
+    "graph_nodes": [],
+    "metadata": {
+      "bootstrap": true
+    },
+    "metrics": {},
+    "panel_id": "scheduler",
+    "status": "unknown",
+    "summary": "bootstrap-minimal",
+    "tables": [],
+    "timelines": [],
+    "title": "Scheduler"
+  },
+  "schema_version": 1,
+  "source_snapshot_id": "cp_snapshot_bootstrap",
+  "tool_panel": {
+    "alerts": [],
+    "cards": [],
+    "graph_edges": [],
+    "graph_nodes": [],
+    "metadata": {
+      "bootstrap": true
+    },
+    "metrics": {},
+    "panel_id": "tools",
+    "status": "unknown",
+    "summary": "bootstrap-minimal",
+    "tables": [],
+    "timelines": [],
+    "title": "Tools"
+  },
+  "view_model_id": "sentient_vm_bootstrap_880a035165d34a4da12a1ee5f42d0db1"
+}

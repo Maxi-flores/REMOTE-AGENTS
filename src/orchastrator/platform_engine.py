@@ -25,8 +25,8 @@ from routers.repo_governance_router import (
     resolve_repo_governance_route,
 )
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL_NAME = "qwen2.5-coder:3b" # Optimized for Meteor Lake P-Cores
+OLLAMA_URL = os.environ.get("PLATFORM_OLLAMA_URL", "").strip() or "http://localhost:11434/api/generate"
+MODEL_NAME = os.environ.get("PLATFORM_OLLAMA_MODEL", "").strip() or "qwen2.5-coder:3b" # Optimized for Meteor Lake P-Cores
 TOOLS_CONFIG_PATH = "config/platform_mcp_tools.json"
 PROCESSING_LOCK_FILE = ".platform_queue/processing.lock"
 LOCK_STALE_S = 15 * 60  # surface as Error-Locked via /health if stuck

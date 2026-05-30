@@ -1,32 +1,72 @@
 # Local Autonomous Platform Agent Workspace
 
-This package runs a 24/7 background worker utilizing local system hardware via the Model Context Protocol (MCP).
+REMOTE-AGENTS is the current local-first autonomous runtime foundation for the future Sentient OS backend control plane. Phase 0 keeps the existing worker behavior stable while documenting the contracts that later phases will build on.
 
-### ⚙️ Prerequisites
+## Current Runtime Boundary
+
+The current runtime is:
+- local-first
+- single-worker
+- queue-file driven
+- Ollama-compatible by default
+- guarded by repository routing and twin approval for selected side-effecting tools
+
+The current runtime does not yet provide:
+- distributed queue guarantees
+- a Mission DAG Engine
+- a Human Approval API
+- cloud execution
+- multi-worker leases
+
+Those capabilities are planned for later roadmap phases. See `docs/architecture-roadmap.md`.
+
+## Prerequisites
+
 1. Windows 11 on Intel Core Ultra 5 (Meteor Lake)
 2. 32GB RAM available
-3. <a href="https://ollama.com">Ollama Desktop installed</a> with `qwen2.5-coder:3b` pulled
+3. Ollama Desktop installed with `qwen2.5-coder:3b` pulled
 4. Set the host environment configuration to prevent swapping: `OLLAMA_KEEP_ALIVE=-1`
 
-### 🚀 Launching the Production Workspace Engine
+## Environment Variables
+
+| Variable | Default | Purpose |
+| :--- | :--- | :--- |
+| `PLATFORM_OLLAMA_URL` | `http://localhost:11434/api/generate` | Ollama-compatible generation endpoint used by the platform worker and twin consensus. |
+| `PLATFORM_OLLAMA_MODEL` | `qwen2.5-coder:3b` | Local model name used by the platform worker and twin consensus. |
+| `PLATFORM_CALLBACK_URL` | unset | Optional HTTP endpoint for completion delivery envelopes. |
+| `PLATFORM_CALLBACK_BEARER_TOKEN` | unset | Optional bearer token for callback delivery. |
+| `GATEWAY_HOST` | `127.0.0.1` | Gateway bind host. |
+| `GATEWAY_PORT` | `8080` | Gateway bind port. |
+| `OLLAMA_KEEP_ALIVE` | external Ollama default | Recommended as `-1` for long-lived local operation. |
+
+## Launching the Workspace Engine
+
 To spin up the continuous platform worker loop, execute via your standard development terminal:
 
 ```bash
 python src/orchastrator/platform_engine.py
 ```
 
-> Note: the repository directory is currently named `src/orchastrator/`.
+The legacy typo path above remains supported. New callers may use the canonical alias:
+
+```bash
+python src/orchestrator/platform_engine.py
+```
 
 To feed the agent a task, drop a JSON packet containing `{"instruction": "your text command here"}` into `.platform_queue/next_task.json`.
-Optionally include `target_repository` (e.g. `{"instruction":"...", "target_repository":"ConceptSHOP"}`) to activate multi-repo governance routing.
+Optionally include `target_repository`, for example:
 
-Alternatively, use the manual dispatcher CLI (atomic single-flight writer):
+```json
+{"instruction":"Update Vite proxy config to point to the new API port","target_repository":"ConceptSHOP"}
+```
+
+Alternatively, use the manual dispatcher CLI:
 
 ```bash
 python src/orchestrator/dispatcher.py --repo "ConceptSHOP" --task "Update Vite proxy config to point to new API port" --priority 2
 ```
 
-Manual stale-lock prune (debugging escape hatch):
+Manual stale-lock prune:
 
 ```bash
 python src/orchestrator/dispatcher.py --flush-locks
@@ -34,8 +74,9 @@ python src/orchestrator/dispatcher.py --flush-locks
 
 On boot, the worker initializes `.platform_queue/` and `.logs/`. Failures are appended to `.logs/errors.json`, and failing payloads are archived to `.platform_queue/failed/` for human review.
 
-### 🌐 Live Event Ingestion Gateway (HTTP + WebSocket)
-For real-time triggers, run the async ingestion gateway (stdlib-only):
+## Live Event Ingestion Gateway
+
+For real-time triggers, run the async ingestion gateway:
 
 ```bash
 python src/orchestrator/gateway.py
@@ -45,12 +86,265 @@ python src/orchestrator/gateway.py
 - `GET /health` reports `Idle`, `Processing`, or `Error-Locked`.
 - `GET /ws/events` upgrades to WebSocket; each text frame must be JSON containing `{"instruction":"..."}`.
 
-### 🖥️ Terminal Command Center Dashboard (TUI)
-For a live operator view (repo matrix + semantic memory counts + telemetry), run:
+## Terminal Command Center Dashboard
+
+For a live operator view:
 
 ```bash
 python src/ui/terminal_dashboard.py
 ```
+
+## Mission Engine MVP
+
+Phase 2 adds a Mission Engine MVP as a control-plane layer above the existing queue. It creates mission/task JSON state under `.missions/` and can adapt the first pending task into the existing `.platform_queue/next_task.json` payload.
+
+It does not replace the current queue or worker.
+
+Single-repository mission:
+
+```bash
+python src/mission_engine/cli.py --repo "ConceptSHOP" --title "Fix Vite proxy" --instruction "Update Vite proxy config to point to new API port" --priority 2 --enqueue
+```
+
+Multi-repository mission:
+
+```bash
+python src/mission_engine/cli.py --repos "Powerframe,PowerStarter" --title "Audit build scripts" --instruction "Audit build scripts and document missing commands" --priority 1 --enqueue
+```
+
+See `docs/mission-engine.md` for the contract and compatibility notes.
+
+## Semantic Memory Graph MVP
+
+Phase 4 adds an optional local memory graph at `.memory/graph.json` for mission facts and relationships. It can ingest mission snapshots into repository, task, agent, tool, approval, consensus, artifact, incident, and decision nodes.
+
+This is a seed graph for future Sentient OS Memory Graph UI work. It does not replace `.logs/semantic_memory.json`, and `platform_engine.py` memory injection remains unchanged.
+
+See `docs/semantic-memory-graph.md` for the graph contract, storage shape, ingestion helpers, and query boundary.
+
+## MCP Tool Routing Framework MVP
+
+Phase 5 adds a compatibility-safe tool routing metadata layer. It resolves route plans from `config/registries/tools.json` and `config/platform_mcp_tools.json`, applies policy helper defaults, and can format audit records for future control-plane use.
+
+This does not replace `platform_engine.py` tool execution. Tool invocation still happens in the legacy engine, and the new router is not required at runtime.
+
+See `docs/tool-routing-framework.md` for the route contract, policy defaults, and audit formatting boundary.
+
+## Scheduler Worker Leases MVP
+
+Phase 6 adds local worker descriptors, task lease records, and scheduling planning helpers under `.scheduler/state.json`.
+
+This does not introduce distributed workers, replace `.platform_queue/next_task.json`, or replace `platform_engine.py`. Worker leases are metadata only, intended to prepare Sentient OS views for workers, leases, and queue backpressure.
+
+See `docs/scheduler-worker-leases.md` for the descriptor contracts, lease contracts, local state shape, planner rules, and queue compatibility notes.
+
+## Repository Governance MVP
+
+Phase 7 adds repository governance profiles, health snapshots, audit records, registry import helpers, and policy evaluation metadata under `.governance/repositories.json`.
+
+This does not replace `platform_engine.py`, mutate target repositories, or make governance enforcement mandatory at runtime. It prepares future CI, PR governance, rollback, and Sentient OS Repository Center views.
+
+See `docs/repository-governance.md` for the profile, health, audit, store, import, and policy contracts.
+
+## Control-Plane Exporters MVP
+
+Phase 8 adds read-only control-plane dashboard snapshot exporters for future Sentient OS UI consumption.
+
+This phase does not add an API server. It reads existing local runtime state and writes export artifacts only under `.control_plane/`.
+
+Examples:
+
+```bash
+python src/control_plane/cli.py --print
+python src/control_plane/cli.py --export
+python src/control_plane/cli.py --export-jsonl
+```
+
+See `docs/control-plane-exporters.md` for snapshot contracts, collector behavior, and export boundaries.
+
+## Sentient UI Adapter MVP
+
+Phase 9 adds a frontend-ready view-model adapter layer that reads `.control_plane` snapshots and builds typed dashboard panel envelopes for future Sentient-Control-UI integration.
+
+This does not introduce a live API. It reads `.control_plane` files only and writes optional adapter artifacts under `.sentient_ui/`.
+
+Examples:
+
+```bash
+python src/sentient_ui/cli.py --print
+python src/sentient_ui/cli.py --export
+python src/sentient_ui/cli.py --export-jsonl
+```
+
+See `docs/sentient-ui-adapter.md` for contracts, trends, panel builders, and exporter behavior.
+
+## Schema Versioning and Migration Dry-Run MVP
+
+Phase 10 adds schema manifests, compatibility check tooling, and migration planning stubs for `.control_plane` and `.sentient_ui` artifacts.
+
+It does not rewrite existing artifacts. Migration remains dry-run only, and reports are written only under `.schema_migrations/`.
+
+Examples:
+
+```bash
+python src/schema_versioning/cli.py --check-control-plane
+python src/schema_versioning/cli.py --check-sentient-ui
+python src/schema_versioning/cli.py --check-file ".control_plane/snapshot.json" --artifact-type control_plane_snapshot
+python src/schema_versioning/cli.py --plan-migration ".sentient_ui/view_model.json" --artifact-type sentient_ui_view_model --dry-run
+```
+
+See `docs/schema-versioning.md` for manifests, checker behavior, and dry-run migration planning constraints.
+
+## Release Readiness Drift and Reporting MVP
+
+Phase 11 adds read-only contract drift analyzers and release-readiness scoring for control-plane and Sentient UI artifacts.
+
+Reports are advisory only and do not enforce runtime gates in this phase. Report outputs can be written under `.release_reports/`.
+
+Examples:
+
+```bash
+python src/release_readiness/cli.py --print
+python src/release_readiness/cli.py --export
+python src/release_readiness/cli.py --export-jsonl
+python src/release_readiness/cli.py --check-file ".control_plane/snapshot.json" --artifact-type control_plane_snapshot
+```
+
+See `docs/release-readiness.md` for drift finding types, scoring behavior, and report boundaries.
+
+## Advisory Release Gates MVP
+
+Phase 12 adds configurable advisory gate simulation over release-readiness reports.
+
+This phase does not enforce gates at runtime and does not block mission execution. Optional gate traces are written under `.release_reports/`.
+
+Examples:
+
+```bash
+python src/release_gates/cli.py --list-policies
+python src/release_gates/cli.py --policy default_gate_policy --print
+python src/release_gates/cli.py --policy strict_gate_policy --export
+python src/release_gates/cli.py --policy experimental_gate_policy --export-jsonl
+```
+
+See `docs/release-gates.md` for policy profile behavior, simulation rules, and trace boundaries.
+
+## Advisory Multi-Policy Scenario Comparison MVP
+
+Phase 13 adds advisory scenario packs for comparing multiple gate policies against the same release-readiness report.
+
+This phase does not enforce release gates and does not block runtime or mission execution. Optional scenario comparison artifacts are written only under `.release_reports/`.
+
+Examples:
+
+```bash
+python src/release_gates/cli.py --list-scenarios
+python src/release_gates/cli.py --scenario-pack default_release_scenarios --compare --print
+python src/release_gates/cli.py --scenario-pack production_release_scenarios --compare --export
+python src/release_gates/cli.py --scenario-pack experimental_release_scenarios --compare --export-jsonl
+```
+
+See `docs/release-gate-scenarios.md` for strategy behavior, report shape, and comparison boundaries.
+
+## Advisory Release Promotion Planner MVP
+
+Phase 14 adds advisory staged promotion planning for `dev`, `staging`, and `production` using scenario comparison artifacts.
+
+This phase does not deploy, does not enforce gates, does not run CI, and does not run git operations. Optional promotion planning outputs are written only under `.release_reports/`.
+
+Examples:
+
+```bash
+python src/release_gates/cli.py --list-promotion-profiles
+python src/release_gates/cli.py --profile dev_promotion_profile --plan-promotion --print
+python src/release_gates/cli.py --profile staging_promotion_profile --plan-promotion --export
+python src/release_gates/cli.py --profile production_promotion_profile --plan-promotion --export-jsonl
+python src/release_gates/cli.py --plan-all-promotions --print
+```
+
+See `docs/release-promotion-planner.md` for profile thresholds, recommendation behavior, rollback precheck metadata, and CI handoff metadata.
+
+## Advisory Release Center Timeline MVP
+
+Phase 15 adds advisory timeline and milestone synthesis that merges readiness, gate trace, scenario comparison, and promotion recommendation artifacts into a chronological release narrative.
+
+This phase does not enforce gates, does not deploy, does not run CI, does not run git commands, and does not mutate runtime source state. Optional timeline artifacts are written only under `.release_reports/`.
+
+Examples:
+
+```bash
+python src/release_center/cli.py --print
+python src/release_center/cli.py --export
+python src/release_center/cli.py --export-jsonl
+python src/release_center/cli.py --label "sentient-os-local-release" --export
+```
+
+See `docs/release-center-timeline.md` for event contracts, milestone synthesis, and escalation hint behavior.
+
+## Advisory Capability Matrix and Lifecycle Manager MVP
+
+Phase 16 adds an advisory capability and lifecycle foundation for large-scale agent modeling across repositories.
+
+This phase does not execute agents, does not change runtime behavior, and does not change queue behavior. Optional lifecycle artifacts are written only under `.lifecycle/`.
+
+See `docs/agent-capability-matrix.md` and `docs/lifecycle-manager.md`.
+
+## Advisory Control Plane Orchestration Layer (CPOL)
+
+Phase 17 adds an advisory orchestration layer that links existing control-plane systems in one ordered planning flow:
+
+`mission -> scheduler -> tool_router -> governance -> memory_graph -> release_readiness -> release_gates -> release_center -> lifecycle -> snapshot -> sentient_ui`
+
+This phase does not replace `platform_engine.py`, does not replace `.platform_queue/next_task.json`, and does not enforce gates. It reads advisory artifacts and writes optional orchestration reports only under `.control_plane/orchestration/`.
+
+Examples:
+
+```bash
+python src/control_plane/orchestrator_cli.py --print
+python src/control_plane/orchestrator_cli.py --export
+python src/control_plane/orchestrator_cli.py --export-jsonl
+python src/control_plane/orchestrator_cli.py --mission-id "mission_123" --trigger-source manual --print
+```
+
+Optional passthrough:
+
+```bash
+python src/control_plane/cli.py --run-orchestration --print
+```
+
+See `docs/control-plane-orchestration-layer.md`.
+
+## Runtime Contracts
+
+See `docs/runtime-contracts.md` for the Phase 0 contracts covering:
+- `.platform_queue/next_task.json`
+- `.platform_queue/processing.lock`
+- `.platform_queue/failed/`
+- gateway HTTP and WebSocket endpoints
+- `config/agent_registry.json`
+- `config/platform_mcp_tools.json`
+- twin consensus approval flow
+
+## Roadmap and Decisions
+
+- `docs/architecture-roadmap.md` records the current Phase 0 boundary and later planned phases.
+- `docs/decisions.md` records Phase 0 architecture decisions.
+- `docs/registry-architecture.md` records the Phase 1 registry structure.
+- `docs/mission-engine.md` records the Phase 2 and Phase 3 mission state boundary.
+- `docs/semantic-memory-graph.md` records the Phase 4 optional graph memory boundary.
+- `docs/tool-routing-framework.md` records the Phase 5 route planning boundary.
+- `docs/scheduler-worker-leases.md` records the Phase 6 scheduler metadata boundary.
+- `docs/repository-governance.md` records the Phase 7 governance metadata boundary.
+- `docs/control-plane-exporters.md` records the Phase 8 control-plane export boundary.
+- `docs/sentient-ui-adapter.md` records the Phase 9 Sentient UI adapter boundary.
+- `docs/schema-versioning.md` records the Phase 10 schema compatibility and dry-run migration boundary.
+- `docs/release-readiness.md` records the Phase 11 advisory release-readiness boundary.
+- `docs/release-gates.md` records the Phase 12 advisory gate simulation boundary.
+- `docs/release-gate-scenarios.md` records the Phase 13 advisory multi-policy comparison boundary.
+- `docs/release-promotion-planner.md` records the Phase 14 advisory staged promotion planning boundary.
+- `docs/release-center-timeline.md` records the Phase 15 advisory timeline synthesis boundary.
+- `docs/agent-capability-matrix.md` and `docs/lifecycle-manager.md` record the Phase 16 advisory lifecycle and capability matrix boundary.
+- `docs/control-plane-orchestration-layer.md` records the Phase 17 advisory orchestration boundary.
 
 ## Additional Repository Components
 

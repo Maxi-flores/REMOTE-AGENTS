@@ -1,0 +1,19 @@
+{
+  "agents": {},
+  "approvals": {},
+  "consensus": {},
+  "generated_utc": "2026-05-30T22:50:40Z",
+  "memory_graph": {},
+  "metadata": {
+    "bootstrap": true
+  },
+  "missions": {},
+  "observability": {},
+  "queue": {},
+  "repositories": {},
+  "runtime": {},
+  "scheduler": {},
+  "schema_version": 1,
+  "snapshot_id": "cp_snapshot_bootstrap_52af532d244940f1a31d341632ce8950",
+  "tools": {}
+}

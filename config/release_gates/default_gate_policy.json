@@ -1,0 +1,21 @@
+{
+  "policy_id": "default_gate_policy",
+  "display_name": "Default Advisory Gate",
+  "description": "Balanced advisory threshold for regular release checks.",
+  "minimum_readiness_score": 80,
+  "block_on_critical_findings": true,
+  "block_on_malformed_artifacts": true,
+  "block_on_missing_artifacts": true,
+  "block_on_unsupported_versions": true,
+  "max_warning_count": 12,
+  "max_error_count": 3,
+  "required_artifacts": [
+    "control_plane_snapshot",
+    "sentient_ui_view_model"
+  ],
+  "advisory_only": true,
+  "metadata": {
+    "phase": 12,
+    "profile_tier": "balanced"
+  }
+}

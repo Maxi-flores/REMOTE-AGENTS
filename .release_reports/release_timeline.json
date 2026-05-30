@@ -1,0 +1,16 @@
+{
+  "advisory_only": true,
+  "escalation_hints": [],
+  "generated_utc": "2026-05-30T22:50:40Z",
+  "metadata": {
+    "bootstrap": true
+  },
+  "milestones": [],
+  "release_label": "bootstrap",
+  "report_id": "release_timeline_bootstrap",
+  "summary": {
+    "event_count": 0,
+    "milestone_count": 0
+  },
+  "timeline_events": []
+}

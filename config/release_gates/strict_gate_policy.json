@@ -1,0 +1,23 @@
+{
+  "policy_id": "strict_gate_policy",
+  "display_name": "Strict Advisory Gate",
+  "description": "High-sensitivity advisory threshold for production readiness review.",
+  "minimum_readiness_score": 95,
+  "block_on_critical_findings": true,
+  "block_on_malformed_artifacts": true,
+  "block_on_missing_artifacts": true,
+  "block_on_unsupported_versions": true,
+  "max_warning_count": 2,
+  "max_error_count": 0,
+  "required_artifacts": [
+    "control_plane_snapshot",
+    "control_plane_snapshot_jsonl",
+    "sentient_ui_view_model",
+    "sentient_ui_view_model_jsonl"
+  ],
+  "advisory_only": true,
+  "metadata": {
+    "phase": 12,
+    "profile_tier": "strict"
+  }
+}

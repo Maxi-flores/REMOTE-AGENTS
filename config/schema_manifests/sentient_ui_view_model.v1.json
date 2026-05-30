@@ -1,0 +1,36 @@
+{
+  "schema_id": "sentient_ui_view_model.v1",
+  "artifact_type": "sentient_ui_view_model",
+  "current_version": 1,
+  "supported_versions": [1],
+  "deprecated_versions": [],
+  "required_fields": [
+    "view_model_id",
+    "generated_utc",
+    "source_snapshot_id",
+    "schema_version",
+    "runtime_panel",
+    "mission_panel",
+    "agent_panel",
+    "repository_panel",
+    "tool_panel",
+    "scheduler_panel",
+    "memory_panel",
+    "approval_panel",
+    "consensus_panel",
+    "observability_panel",
+    "alerts",
+    "metadata"
+  ],
+  "optional_fields": [],
+  "compatibility_notes": [
+    "Phase 9 and later Sentient UI envelopes are expected to use schema_version=1.",
+    "Unknown panel metadata fields are tolerated for forward compatibility."
+  ],
+  "created_utc": "2026-05-29T00:00:00Z",
+  "updated_utc": "2026-05-29T00:00:00Z",
+  "metadata": {
+    "owner": "REMOTE-AGENTS",
+    "phase": 10
+  }
+}

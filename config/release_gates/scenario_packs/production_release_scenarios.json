@@ -1,0 +1,14 @@
+{
+  "scenario_pack_id": "production_release_scenarios",
+  "display_name": "Production Candidate Scenario Pack",
+  "description": "Compares default and strict policies for production candidate guidance.",
+  "policy_names": [
+    "default_gate_policy",
+    "strict_gate_policy"
+  ],
+  "comparison_strategy": "production_candidate",
+  "advisory_only": true,
+  "metadata": {
+    "phase": 13
+  }
+}

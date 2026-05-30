@@ -1,0 +1,21 @@
+{
+  "profile_id": "dev_promotion_profile",
+  "display_name": "Development Promotion Profile",
+  "target_environment": "dev",
+  "required_scenario_pack": "default_release_scenarios",
+  "minimum_aggregate_status": "review_required",
+  "allowed_aggregate_decisions": [
+    "pass",
+    "pass_with_warnings",
+    "mixed"
+  ],
+  "require_no_blockers": false,
+  "require_rollback_plan": false,
+  "require_ci_handoff": false,
+  "max_warning_count": 100,
+  "max_error_count": 10,
+  "advisory_only": true,
+  "metadata": {
+    "phase": 14
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "scenario_pack_id": "default_release_scenarios",
+  "display_name": "Default Release Scenario Pack",
+  "description": "Compares default, strict, and experimental advisory gate policies.",
+  "policy_names": [
+    "default_gate_policy",
+    "strict_gate_policy",
+    "experimental_gate_policy"
+  ],
+  "comparison_strategy": "compare_all",
+  "advisory_only": true,
+  "metadata": {
+    "phase": 13
+  }
+}

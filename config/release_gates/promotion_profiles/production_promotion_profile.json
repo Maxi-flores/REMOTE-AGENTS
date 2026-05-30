@@ -1,0 +1,19 @@
+{
+  "profile_id": "production_promotion_profile",
+  "display_name": "Production Promotion Profile",
+  "target_environment": "production",
+  "required_scenario_pack": "production_release_scenarios",
+  "minimum_aggregate_status": "ready",
+  "allowed_aggregate_decisions": [
+    "pass"
+  ],
+  "require_no_blockers": true,
+  "require_rollback_plan": true,
+  "require_ci_handoff": true,
+  "max_warning_count": 0,
+  "max_error_count": 0,
+  "advisory_only": true,
+  "metadata": {
+    "phase": 14
+  }
+}

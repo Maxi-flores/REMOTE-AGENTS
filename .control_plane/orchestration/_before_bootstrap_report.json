@@ -1,0 +1,286 @@
+{
+  "report": {
+    "advisory_only": true,
+    "cross_stage_findings": [
+      "mission:not_run",
+      "scheduler:not_run",
+      "governance:not_run",
+      "memory_graph:not_run",
+      "release_readiness:not_run",
+      "release_gates:not_run",
+      "release_center:not_run",
+      "lifecycle:not_run",
+      "snapshot:not_run",
+      "sentient_ui:not_run"
+    ],
+    "generated_utc": "2026-05-30T22:48:27Z",
+    "metadata": {
+      "advisory_only": true,
+      "base_dir": ".",
+      "runtime_unchanged": true,
+      "stage_order": [
+        "mission",
+        "scheduler",
+        "tool_router",
+        "governance",
+        "memory_graph",
+        "release_readiness",
+        "release_gates",
+        "release_center",
+        "lifecycle",
+        "snapshot",
+        "sentient_ui"
+      ]
+    },
+    "orchestration_id": "cpo_1c809966f7a24966ac26872d0ac601a0",
+    "pipeline_status": "ok",
+    "recommended_next_actions": [
+      "Generate missing advisory artifacts for stage 'mission'.",
+      "Generate missing advisory artifacts for stage 'scheduler'.",
+      "Generate missing advisory artifacts for stage 'governance'.",
+      "Generate missing advisory artifacts for stage 'memory_graph'.",
+      "Generate missing advisory artifacts for stage 'release_readiness'.",
+      "Generate missing advisory artifacts for stage 'release_gates'.",
+      "Generate missing advisory artifacts for stage 'release_center'.",
+      "Generate missing advisory artifacts for stage 'lifecycle'.",
+      "Generate missing advisory artifacts for stage 'snapshot'.",
+      "Generate missing advisory artifacts for stage 'sentient_ui'."
+    ],
+    "report_id": "cpo_report_9ad736d0d5fd47b59f67b46ab3e10302",
+    "stage_results": [
+      {
+        "advisory_only": true,
+        "blockers": [],
+        "completed_utc": "2026-05-30T22:48:27Z",
+        "input_refs": [
+          ".missions"
+        ],
+        "metadata": {
+          "advisory_only": true
+        },
+        "output_refs": [],
+        "stage_name": "mission",
+        "status": "not_run",
+        "summary": {
+          "existing_inputs": 0,
+          "expected_inputs": 1
+        },
+        "warnings": [
+          "Required advisory inputs missing"
+        ]
+      },
+      {
+        "advisory_only": true,
+        "blockers": [],
+        "completed_utc": "2026-05-30T22:48:27Z",
+        "input_refs": [
+          ".scheduler\\state.json"
+        ],
+        "metadata": {
+          "advisory_only": true
+        },
+        "output_refs": [],
+        "stage_name": "scheduler",
+        "status": "not_run",
+        "summary": {
+          "existing_inputs": 0,
+          "expected_inputs": 1
+        },
+        "warnings": [
+          "Required advisory inputs missing"
+        ]
+      },
+      {
+        "advisory_only": true,
+        "blockers": [],
+        "completed_utc": "2026-05-30T22:48:27Z",
+        "input_refs": [
+          "config\\registries\\tools.json",
+          "config\\platform_mcp_tools.json"
+        ],
+        "metadata": {
+          "advisory_only": true
+        },
+        "output_refs": [
+          "config\\registries\\tools.json",
+          "config\\platform_mcp_tools.json"
+        ],
+        "stage_name": "tool_router",
+        "status": "ok",
+        "summary": {
+          "existing_inputs": 2,
+          "expected_inputs": 2
+        },
+        "warnings": []
+      },
+      {
+        "advisory_only": true,
+        "blockers": [],
+        "completed_utc": "2026-05-30T22:48:27Z",
+        "input_refs": [
+          ".governance\\repositories.json"
+        ],
+        "metadata": {
+          "advisory_only": true
+        },
+        "output_refs": [],
+        "stage_name": "governance",
+        "status": "not_run",
+        "summary": {
+          "existing_inputs": 0,
+          "expected_inputs": 1
+        },
+        "warnings": [
+          "Required advisory inputs missing"
+        ]
+      },
+      {
+        "advisory_only": true,
+        "blockers": [],
+        "completed_utc": "2026-05-30T22:48:27Z",
+        "input_refs": [
+          ".memory\\graph.json"
+        ],
+        "metadata": {
+          "advisory_only": true
+        },
+        "output_refs": [],
+        "stage_name": "memory_graph",
+        "status": "not_run",
+        "summary": {
+          "existing_inputs": 0,
+          "expected_inputs": 1
+        },
+        "warnings": [
+          "Required advisory inputs missing"
+        ]
+      },
+      {
+        "advisory_only": true,
+        "blockers": [],
+        "completed_utc": "2026-05-30T22:48:27Z",
+        "input_refs": [
+          ".release_reports\\release_readiness.json"
+        ],
+        "metadata": {
+          "advisory_only": true
+        },
+        "output_refs": [],
+        "stage_name": "release_readiness",
+        "status": "not_run",
+        "summary": {
+          "existing_inputs": 0,
+          "expected_inputs": 1
+        },
+        "warnings": [
+          "Required advisory inputs missing"
+        ]
+      },
+      {
+        "advisory_only": true,
+        "blockers": [],
+        "completed_utc": "2026-05-30T22:48:27Z",
+        "input_refs": [
+          ".release_reports\\gate_trace.json"
+        ],
+        "metadata": {
+          "advisory_only": true
+        },
+        "output_refs": [],
+        "stage_name": "release_gates",
+        "status": "not_run",
+        "summary": {
+          "existing_inputs": 0,
+          "expected_inputs": 1
+        },
+        "warnings": [
+          "Required advisory inputs missing"
+        ]
+      },
+      {
+        "advisory_only": true,
+        "blockers": [],
+        "completed_utc": "2026-05-30T22:48:27Z",
+        "input_refs": [
+          ".release_reports\\release_timeline.json"
+        ],
+        "metadata": {
+          "advisory_only": true
+        },
+        "output_refs": [],
+        "stage_name": "release_center",
+        "status": "not_run",
+        "summary": {
+          "existing_inputs": 0,
+          "expected_inputs": 1
+        },
+        "warnings": [
+          "Required advisory inputs missing"
+        ]
+      },
+      {
+        "advisory_only": true,
+        "blockers": [],
+        "completed_utc": "2026-05-30T22:48:27Z",
+        "input_refs": [
+          ".lifecycle\\agents.json"
+        ],
+        "metadata": {
+          "advisory_only": true
+        },
+        "output_refs": [],
+        "stage_name": "lifecycle",
+        "status": "not_run",
+        "summary": {
+          "existing_inputs": 0,
+          "expected_inputs": 1
+        },
+        "warnings": [
+          "Required advisory inputs missing"
+        ]
+      },
+      {
+        "advisory_only": true,
+        "blockers": [],
+        "completed_utc": "2026-05-30T22:48:27Z",
+        "input_refs": [
+          ".control_plane\\snapshot.json"
+        ],
+        "metadata": {
+          "advisory_only": true
+        },
+        "output_refs": [],
+        "stage_name": "snapshot",
+        "status": "not_run",
+        "summary": {
+          "existing_inputs": 0,
+          "expected_inputs": 1
+        },
+        "warnings": [
+          "Required advisory inputs missing"
+        ]
+      },
+      {
+        "advisory_only": true,
+        "blockers": [],
+        "completed_utc": "2026-05-30T22:48:27Z",
+        "input_refs": [
+          ".sentient_ui\\view_model.json"
+        ],
+        "metadata": {
+          "advisory_only": true
+        },
+        "output_refs": [],
+        "stage_name": "sentient_ui",
+        "status": "not_run",
+        "summary": {
+          "existing_inputs": 0,
+          "expected_inputs": 1
+        },
+        "warnings": [
+          "Required advisory inputs missing"
+        ]
+      }
+    ]
+  }
+}

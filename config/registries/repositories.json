@@ -1,0 +1,276 @@
+{
+  "schema_version": 1,
+  "description": "Canonical seed registry of governed repositories. Runtime routing still uses config/agent_registry.json in Phase 1.",
+  "repositories": [
+    {
+      "name": "ConceptSHOP",
+      "group": "spa_ui_frontends_vite_react",
+      "category": "Retail",
+      "detected_class": "#Retail",
+      "primary_agent_class": "ViteReactPrimaryAgent",
+      "twin_agent_class": "ViteReactTwinAgent",
+      "status": "Ready for Training",
+      "core_objective": "Govern ConceptSHOP through React/Vite frontend execution with Firebase/cloud validation to prevent regressions and secret leaks.",
+      "structural_health_indicators": [
+        "Vite + React 18 SPA backed by a client-side Firebase infrastructure layer",
+        "Client-side AWS SDK usage leaks VITE_ environment parameters inside browser scopes",
+        "ESLint scripts fail due to an absent linter configuration file mapping"
+      ]
+    },
+    {
+      "name": "Mucho3D",
+      "group": "three_d_and_game_tools",
+      "category": "3D",
+      "detected_class": null,
+      "primary_agent_class": "3DSceneOrchestratorAgent",
+      "twin_agent_class": "WebGLComplianceAuditor",
+      "status": "Pending Implementation",
+      "core_objective": "Govern Mucho3D through runtime diagnostic and web audit tasks with environment health validation.",
+      "structural_health_indicators": []
+    },
+    {
+      "name": "PF-WAI",
+      "group": "ml_and_metadata_pipelines",
+      "category": "ML metadata pipeline",
+      "detected_class": null,
+      "primary_agent_class": "NeuralNetworkModelAdapter",
+      "twin_agent_class": "TensorGraphTwinVerifier",
+      "status": "Pending Definition/Training",
+      "core_objective": "Define and govern PF-WAI through ML metadata and tensor graph validation.",
+      "structural_health_indicators": []
+    },
+    {
+      "name": "Dealinstinct Frontend",
+      "group": "full_stack_frameworks_nextjs",
+      "category": "Web tool",
+      "detected_class": "#Web tool",
+      "primary_agent_class": "NextJsPrimaryAgent",
+      "twin_agent_class": "NextJsTwinAgent",
+      "status": "Ready for Training",
+      "core_objective": "Govern Dealinstinct Frontend through Next.js App Router and Plasmic integration with security hygiene validation.",
+      "structural_health_indicators": [
+        "Next.js 14 App Router project with Plasmic loader integration",
+        "Secret risk: scripts/setup-plasmic.sh contains a hardcoded Plasmic token string",
+        "Next.js routing risk: both app/layout.js and app/layout.jsx exist",
+        "RSC boundary risk: lib/plasmic-server.js breaks server imports via client tags"
+      ]
+    },
+    {
+      "name": "Dealinstinct V2",
+      "group": "full_stack_frameworks_nextjs",
+      "category": "Web tool",
+      "detected_class": "#Web tool",
+      "primary_agent_class": "NextJsPrimaryAgent",
+      "twin_agent_class": "NextJsTwinAgent",
+      "status": "Ready for Training",
+      "core_objective": "Govern Dealinstinct V2 through Next.js App Router and Plasmic integration with security hygiene validation.",
+      "structural_health_indicators": [
+        "Next.js 14 App Router project with Plasmic loader integration",
+        "Secret risk: scripts/setup-plasmic.sh contains a hardcoded Plasmic token string",
+        "Next.js routing risk: both app/layout.js and app/layout.jsx exist",
+        "RSC boundary risk: lib/plasmic-server.js breaks server imports via client tags"
+      ]
+    },
+    {
+      "name": "Powerframe",
+      "group": "monorepos_and_hubs",
+      "category": "Orchestrator",
+      "detected_class": "#Orchestrator",
+      "primary_agent_class": "MonorepoHubPrimaryAgent",
+      "twin_agent_class": "MonorepoHubTwinAgent",
+      "status": "Ready for Training",
+      "core_objective": "Govern Powerframe as an ecosystem hub with frontend SPA and serverless auth/API validation.",
+      "structural_health_indicators": [
+        "Single-package React 18 + Vite + Tailwind SPA",
+        "Acts as an ecosystem hub/launcher via src/config/apps.js",
+        "Vercel deployment routing present",
+        "Auth implementation contains hardcoded JWT secret fallback strings",
+        "Naming drift: package.json name is bms-dashboard while repo is Powerframe Hub"
+      ]
+    },
+    {
+      "name": "Powerframe-CRM",
+      "group": "spa_ui_frontends_vite_react",
+      "category": "Web tool",
+      "detected_class": "#Web tool",
+      "primary_agent_class": "ViteReactPrimaryAgent",
+      "twin_agent_class": "ViteReactTwinAgent",
+      "status": "Ready for Training",
+      "core_objective": "Govern Powerframe-CRM through React/Vite dashboard execution with Firebase and GMS telemetry validation.",
+      "structural_health_indicators": [
+        "Vite + React app web dashboard UI using Firebase Auth/Firestore",
+        "No env.example/sample exists for required VITE_ environment variables",
+        "Contains parallel/duplicated module structures between root and sub-packages"
+      ]
+    },
+    {
+      "name": "Powerframe-GMS",
+      "group": "data_pipelines_and_workers",
+      "category": "Web tool",
+      "detected_class": "#Web tool",
+      "primary_agent_class": "PipelineWorkerPrimaryAgent",
+      "twin_agent_class": "PipelineWorkerTwinAgent",
+      "status": "Ready for Training",
+      "core_objective": "Govern Powerframe-GMS through Vite/React web app execution with Unity bridge validation.",
+      "structural_health_indicators": [
+        "Vite + React SPA with Vercel-style api handlers and deployment configurations",
+        "Firebase configuration contains placeholder-only REPLACE_ME values",
+        "JWT secret has an insecure dev fallback string left in production logic"
+      ]
+    },
+    {
+      "name": "Powerframe-TPR",
+      "group": "data_pipelines_and_workers",
+      "category": "Web tool",
+      "detected_class": "#Web tool",
+      "primary_agent_class": "PipelineWorkerPrimaryAgent",
+      "twin_agent_class": "PipelineWorkerTwinAgent",
+      "status": "Ready for Training",
+      "core_objective": "Govern Powerframe-TPR through static dashboard maintenance with Node data-pipeline validation.",
+      "structural_health_indicators": [
+        "Node/Vite monorepo: root builds static apps to dist/",
+        "Data-generation pipeline centralized in root scripts/ emitting raw JSON files",
+        "Potential drift risk: multiple package.json manifests with mismatched Vite versions"
+      ]
+    },
+    {
+      "name": "Powerframe-WMS",
+      "group": "data_pipelines_and_workers",
+      "category": "Web tool",
+      "detected_class": "#Web tool",
+      "primary_agent_class": "PipelineWorkerPrimaryAgent",
+      "twin_agent_class": "PipelineWorkerTwinAgent",
+      "status": "Ready for Training",
+      "core_objective": "Govern Powerframe-WMS through React/Vite and Node data generation with JSON-schema contract validation.",
+      "structural_health_indicators": [
+        "Single React app with a deterministic Node.js data pipeline engine",
+        "Bridge surface defined as a JSON schema configuration file at root",
+        "Documentation drift risk: specs describe a larger system tree than implemented"
+      ]
+    },
+    {
+      "name": "PowerStarter",
+      "group": "monorepos_and_hubs",
+      "category": "Orchestrator",
+      "detected_class": "#Orchestrator",
+      "primary_agent_class": "MonorepoHubPrimaryAgent",
+      "twin_agent_class": "MonorepoHubTwinAgent",
+      "status": "Ready for Training",
+      "core_objective": "Govern PowerStarter through TypeScript/React monorepo build execution with DevOps and Caddy infrastructure validation.",
+      "structural_health_indicators": [
+        "pnpm monorepo workspace structure controlled via root yaml and lockfile",
+        "Three separate React 18/19 + Vite 5 frontend applications inside /apps",
+        "Structural regression: docker-compose references non-existent paths",
+        "Incomplete build containers: Dockerfile contexts are omitted from active subdirs"
+      ]
+    },
+    {
+      "name": "TheRocketTree-App",
+      "group": "monorepos_and_hubs",
+      "category": "Orchestrator",
+      "detected_class": "#Orchestrator",
+      "primary_agent_class": "MonorepoHubPrimaryAgent",
+      "twin_agent_class": "MonorepoHubTwinAgent",
+      "status": "Ready for Training",
+      "core_objective": "Govern TheRocketTree-App through pnpm/Turborepo/Prisma execution with bridge-chain and Unity adapter validation.",
+      "structural_health_indicators": [
+        "TypeScript monorepo using pnpm workspaces + Turborepo task graph",
+        "Primary runtime apps are Next.js 15 + React 19 using /app router",
+        "Shared packages include Zod contracts, semantic engine logic, and Prisma db",
+        "Build-time bridge-chain contract exists: apps/gms generates layout artifacts",
+        "Unity integration exists via @trt/unity-adapter package"
+      ]
+    },
+    {
+      "name": "TheRocketTree-Web",
+      "group": "spa_ui_frontends_vite_react",
+      "category": "Web tool",
+      "detected_class": "#Web tool",
+      "primary_agent_class": "ViteReactPrimaryAgent",
+      "twin_agent_class": "ViteReactTwinAgent",
+      "status": "Ready for Training",
+      "core_objective": "Govern TheRocketTree-Web through React/Vite/Tailwind UI execution with docs/governance validation.",
+      "structural_health_indicators": [
+        "Vite + React 18 single-page app targeting clean static hosting",
+        "Index.html loads thin mount points and imports layout data from external CDNs",
+        "No continuous integration or code lint/format configurations present"
+      ]
+    },
+    {
+      "name": "TheRocketTreeUnity",
+      "group": "three_d_and_game_tools",
+      "category": "Game tool",
+      "detected_class": "#Game tool",
+      "primary_agent_class": "ThreeDToolsPrimaryAgent",
+      "twin_agent_class": "ThreeDToolsTwinAgent",
+      "status": "Ready for Training",
+      "core_objective": "Govern TheRocketTreeUnity through Unity/C# gameplay systems execution with Firebase Cloud Functions backend validation.",
+      "structural_health_indicators": [
+        "Unity project layout pinned explicitly to runtime version 6000.3.2f1",
+        "Functions directory lacks package/tsconfig manifests, rendering it unbuildable",
+        "Model Context Protocol server configuration points to non-existent packages"
+      ]
+    },
+    {
+      "name": "Sapient KB",
+      "group": "three_d_and_game_tools",
+      "category": "Web tool",
+      "detected_class": "#Web tool",
+      "primary_agent_class": "ThreeDToolsPrimaryAgent",
+      "twin_agent_class": "ThreeDToolsTwinAgent",
+      "status": "Ready for Training",
+      "core_objective": "Govern Sapient KB through Next.js and React-Three-Fiber tooling with Vercel serverless and monorepo pipeline validation.",
+      "structural_health_indicators": [
+        "pnpm monorepo workspace tracking Next.js 14 with a Next.js 15 upgrade target ADR",
+        "Integrates 3D rendering canvases using react-three-fiber and drei libraries",
+        "Workspace execution scripts fail due to missing build paths in micro-packages"
+      ]
+    },
+    {
+      "name": "Bikerinstinct",
+      "group": "full_stack_frameworks_nextjs",
+      "category": "Web tool",
+      "detected_class": "#Web tool",
+      "primary_agent_class": "NextJsPrimaryAgent",
+      "twin_agent_class": "NextJsTwinAgent",
+      "status": "Ready for Training",
+      "core_objective": "Govern Bikerinstinct through Next.js App Router and CMS execution with Plasmic/cloud security validation.",
+      "structural_health_indicators": [
+        "Next.js 14 project containing a hardcoded projectApiToken inside plasmic.json",
+        "Routing clash: duplicate layout extensions bypass providers",
+        "Compilation error: local absolute host symlinks pointing to hardcoded user paths"
+      ]
+    },
+    {
+      "name": "WOMmedia",
+      "group": "full_stack_frameworks_nextjs",
+      "category": "Web tool",
+      "detected_class": "#Web tool",
+      "primary_agent_class": "NextJsPrimaryAgent",
+      "twin_agent_class": "NextJsTwinAgent",
+      "status": "Ready for Training",
+      "core_objective": "Govern WOMmedia through Next.js frontend execution with UI/UX and Tailwind v4 theme-token validation.",
+      "structural_health_indicators": [
+        "Next.js 15 App Router using Tailwind CSS v4 via experimental import tokens",
+        "Site content is hardcoded in /lib/site-data.js; zero backend systems detected",
+        "No infrastructure files, GitHub actions workflows, or root READMEs exist"
+      ]
+    },
+    {
+      "name": "Trade Agent \u2013 V1",
+      "group": "data_pipelines_and_workers",
+      "category": "Orchestrator",
+      "detected_class": "#Orchestrator",
+      "primary_agent_class": "PipelineWorkerPrimaryAgent",
+      "twin_agent_class": "PipelineWorkerTwinAgent",
+      "status": "Ready for Training",
+      "core_objective": "Govern Trade Agent V1 through Node/Express event-driven workflows with React/Vite dashboard and autonomy compliance validation.",
+      "structural_health_indicators": [
+        "Node.js ESM backend using Express + better-sqlite3",
+        "Local state persistence using SQLite with in-process schema migrations",
+        "Integrated Human-in-the-Loop workflow via TradingView webhooks",
+        "Total absence of Dockerfiles or automated CI/CD configurations"
+      ]
+    }
+  ]
+}

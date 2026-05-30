@@ -1,0 +1,287 @@
+{
+  "schema_version": 1,
+  "description": "Canonical seed registry of agent classes for the future Agent Operating System. Runtime routing still uses config/agent_registry.json in Phase 1.",
+  "default_constraints": {
+    "num_thread": 4,
+    "quantization_preference": "Q5_K_M",
+    "max_context_chars": 12000
+  },
+  "agents": [
+    {
+      "agent_class_id": "RuntimeDiagnosticAgent",
+      "display_name": "Runtime Diagnostic Agent",
+      "role": "Fallback runtime troubleshooter",
+      "crew_family": "system_diagnostic",
+      "agent_type": "primary",
+      "default_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      },
+      "recommended_use_cases": [
+        "Unknown repository fallback",
+        "Corrupted or incomplete task payloads",
+        "Read-only local diagnostics"
+      ]
+    },
+    {
+      "agent_class_id": "RuntimeDiagnosticTwinAgent",
+      "display_name": "Runtime Diagnostic Twin Agent",
+      "role": "Fallback safety reviewer",
+      "crew_family": "system_diagnostic",
+      "agent_type": "twin",
+      "default_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      },
+      "recommended_use_cases": [
+        "Low-privilege safety review",
+        "Default diagnostic fallback",
+        "Network and write denial enforcement"
+      ]
+    },
+    {
+      "agent_class_id": "ViteReactPrimaryAgent",
+      "display_name": "Vite React Primary Agent",
+      "role": "React/Vite frontend execution specialist",
+      "crew_family": "full_stack_ecosystem",
+      "agent_type": "primary",
+      "default_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      },
+      "recommended_use_cases": [
+        "React Router and Vite SPA changes",
+        "Tailwind UI surface maintenance",
+        "Frontend build and routing diagnostics"
+      ]
+    },
+    {
+      "agent_class_id": "ViteReactTwinAgent",
+      "display_name": "Vite React Twin Agent",
+      "role": "Frontend framework and UX compliance auditor",
+      "crew_family": "full_stack_ecosystem",
+      "agent_type": "twin",
+      "default_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      },
+      "recommended_use_cases": [
+        "Routing consistency review",
+        "Layout regression detection",
+        "Secret and environment exposure checks"
+      ]
+    },
+    {
+      "agent_class_id": "NextJsPrimaryAgent",
+      "display_name": "Next.js Primary Agent",
+      "role": "Next.js App Router execution specialist",
+      "crew_family": "full_stack_ecosystem",
+      "agent_type": "primary",
+      "default_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      },
+      "recommended_use_cases": [
+        "Next.js App Router fixes",
+        "Plasmic integration maintenance",
+        "React server/client boundary diagnostics"
+      ]
+    },
+    {
+      "agent_class_id": "NextJsTwinAgent",
+      "display_name": "Next.js Twin Agent",
+      "role": "Next.js security and framework compliance auditor",
+      "crew_family": "full_stack_ecosystem",
+      "agent_type": "twin",
+      "default_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      },
+      "recommended_use_cases": [
+        "App Router conflict review",
+        "Hardcoded token detection",
+        "Server/client import boundary checks"
+      ]
+    },
+    {
+      "agent_class_id": "MonorepoHubPrimaryAgent",
+      "display_name": "Monorepo Hub Primary Agent",
+      "role": "TypeScript/React monorepo and hub execution specialist",
+      "crew_family": "data_core_infrastructure",
+      "agent_type": "primary",
+      "default_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      },
+      "recommended_use_cases": [
+        "Workspace build graph maintenance",
+        "Hub launcher integration",
+        "Package and script drift diagnostics"
+      ]
+    },
+    {
+      "agent_class_id": "MonorepoHubTwinAgent",
+      "display_name": "Monorepo Hub Twin Agent",
+      "role": "Monorepo governance and infrastructure auditor",
+      "crew_family": "data_core_infrastructure",
+      "agent_type": "twin",
+      "default_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      },
+      "recommended_use_cases": [
+        "Docker and workspace path validation",
+        "Build container completeness review",
+        "Cross-package regression checks"
+      ]
+    },
+    {
+      "agent_class_id": "PipelineWorkerPrimaryAgent",
+      "display_name": "Pipeline Worker Primary Agent",
+      "role": "Data pipeline and worker execution specialist",
+      "crew_family": "data_core_infrastructure",
+      "agent_type": "primary",
+      "default_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      },
+      "recommended_use_cases": [
+        "Node data generation pipelines",
+        "Serverless API and webhook workflows",
+        "Schema-driven worker maintenance"
+      ]
+    },
+    {
+      "agent_class_id": "PipelineWorkerTwinAgent",
+      "display_name": "Pipeline Worker Twin Agent",
+      "role": "Security, schema, and edge-case validator",
+      "crew_family": "data_core_infrastructure",
+      "agent_type": "twin",
+      "default_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      },
+      "recommended_use_cases": [
+        "Input serialization review",
+        "Schema contract validation",
+        "Data leakage and injection checks"
+      ]
+    },
+    {
+      "agent_class_id": "ThreeDToolsPrimaryAgent",
+      "display_name": "3D Tools Primary Agent",
+      "role": "3D, game, and spatial pipeline execution specialist",
+      "crew_family": "three_d_graphics_neural_pipeline",
+      "agent_type": "primary",
+      "default_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      },
+      "recommended_use_cases": [
+        "React Three Fiber and WebGL diagnostics",
+        "Unity bridge and C# gameplay surface review",
+        "Spatial metadata and transform processing"
+      ]
+    },
+    {
+      "agent_class_id": "ThreeDToolsTwinAgent",
+      "display_name": "3D Tools Twin Agent",
+      "role": "Finite-number and sandbox security sentinel",
+      "crew_family": "three_d_graphics_neural_pipeline",
+      "agent_type": "twin",
+      "default_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      },
+      "recommended_use_cases": [
+        "NaN and Inf detection",
+        "Transform math safety review",
+        "Sandbox boundary checks"
+      ]
+    },
+    {
+      "agent_class_id": "3DSceneOrchestratorAgent",
+      "display_name": "3D Scene Orchestrator Agent",
+      "role": "Runtime diagnostic and web audit specialist for 3D scenes",
+      "crew_family": "three_d_graphics_neural_pipeline",
+      "agent_type": "primary",
+      "default_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 16000
+      },
+      "recommended_use_cases": [
+        "3D scene runtime diagnostics",
+        "WebGL canvas validation",
+        "Asset compilation tracing"
+      ]
+    },
+    {
+      "agent_class_id": "WebGLComplianceAuditor",
+      "display_name": "WebGL Compliance Auditor",
+      "role": "3D/web graphics compliance twin",
+      "crew_family": "three_d_graphics_neural_pipeline",
+      "agent_type": "twin",
+      "default_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 16000
+      },
+      "recommended_use_cases": [
+        "WebGL runtime safety review",
+        "Canvas rendering diagnostics",
+        "3D environment compliance checks"
+      ]
+    },
+    {
+      "agent_class_id": "NeuralNetworkModelAdapter",
+      "display_name": "Neural Network Model Adapter",
+      "role": "ML metadata and tensor graph adapter",
+      "crew_family": "three_d_graphics_neural_pipeline",
+      "agent_type": "primary",
+      "default_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000,
+        "execute_isolated_task_readonly": true,
+        "allowed_write_path_prefixes": [
+          ".pfwai_output"
+        ]
+      },
+      "recommended_use_cases": [
+        "ML metadata inspection",
+        "Tensor graph adaptation",
+        "Read-only neural pipeline diagnostics"
+      ]
+    },
+    {
+      "agent_class_id": "TensorGraphTwinVerifier",
+      "display_name": "Tensor Graph Twin Verifier",
+      "role": "Tensor graph and finite-number validation twin",
+      "crew_family": "three_d_graphics_neural_pipeline",
+      "agent_type": "twin",
+      "default_constraints": {
+        "num_thread": 4,
+        "quantization_preference": "Q5_K_M",
+        "max_context_chars": 12000
+      },
+      "recommended_use_cases": [
+        "Tensor shape and finite-number checks",
+        "Read-only execution enforcement",
+        "Model metadata safety review"
+      ]
+    }
+  ]
+}

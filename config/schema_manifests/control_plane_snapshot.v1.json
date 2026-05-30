@@ -1,0 +1,35 @@
+{
+  "schema_id": "control_plane_snapshot.v1",
+  "artifact_type": "control_plane_snapshot",
+  "current_version": 1,
+  "supported_versions": [1],
+  "deprecated_versions": [],
+  "required_fields": [
+    "snapshot_id",
+    "generated_utc",
+    "schema_version",
+    "runtime",
+    "missions",
+    "agents",
+    "repositories",
+    "tools",
+    "scheduler",
+    "memory_graph",
+    "approvals",
+    "consensus",
+    "queue",
+    "observability",
+    "metadata"
+  ],
+  "optional_fields": [],
+  "compatibility_notes": [
+    "Phase 8 and later snapshots are expected to use schema_version=1.",
+    "Unknown top-level fields are tolerated for forward compatibility."
+  ],
+  "created_utc": "2026-05-29T00:00:00Z",
+  "updated_utc": "2026-05-29T00:00:00Z",
+  "metadata": {
+    "owner": "REMOTE-AGENTS",
+    "phase": 10
+  }
+}

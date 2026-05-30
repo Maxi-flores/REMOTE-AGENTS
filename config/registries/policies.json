@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "description": "Canonical seed registry for runtime policies. Phase 1 documents current behavior and does not introduce a new policy engine.",
+  "policies": [
+    {
+      "policy_id": "write_approval_required",
+      "display_name": "Write Approval Required",
+      "current_behavior": "workspace_file_router writes require twin approval before writing content to disk.",
+      "enforcement_status": "implemented"
+    },
+    {
+      "policy_id": "network_default_deny",
+      "display_name": "Network Default Deny",
+      "current_behavior": "network_data_fetch is blocked when the default diagnostic profile is active.",
+      "enforcement_status": "implemented"
+    },
+    {
+      "policy_id": "path_traversal_protection",
+      "display_name": "Path Traversal Protection",
+      "current_behavior": "Repo-relative paths are resolved through workspace_mounter and rejected if they escape the repository root.",
+      "enforcement_status": "implemented"
+    },
+    {
+      "policy_id": "max_loop_count",
+      "display_name": "Maximum Agent Loop Count",
+      "current_behavior": "The platform worker limits a task to 5 model/tool loops before failing and archiving the payload.",
+      "value": 5,
+      "enforcement_status": "implemented"
+    },
+    {
+      "policy_id": "local_first_execution",
+      "display_name": "Local-First Execution",
+      "current_behavior": "The runtime uses local queues, local filesystem state, and an Ollama-compatible local model endpoint by default.",
+      "enforcement_status": "documented"
+    },
+    {
+      "policy_id": "default_diagnostic_fallback",
+      "display_name": "Default Diagnostic Fallback",
+      "current_behavior": "Unknown, missing, disabled, or incomplete repository profiles fall back to RuntimeDiagnosticAgent and RuntimeDiagnosticTwinAgent.",
+      "enforcement_status": "implemented"
+    }
+  ]
+}

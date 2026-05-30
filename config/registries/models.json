@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "description": "Canonical seed registry for model routing. Phase 1 documents model intent only; runtime still reads existing environment defaults.",
+  "default_thread_budget": 4,
+  "models": [
+    {
+      "model_id": "qwen2.5-coder:3b",
+      "provider": "ollama",
+      "role": "primary_reasoning_and_coding",
+      "default_thread_budget": 4,
+      "max_recommended_memory_footprint": "under_8gb",
+      "intended_use": [
+        "Local code synthesis",
+        "Twin consensus audit",
+        "Runtime diagnostics under Meteor Lake P-Core constraints"
+      ],
+      "status": "active_default"
+    },
+    {
+      "model_id": "phi3:mini",
+      "provider": "ollama",
+      "role": "optional_router_gatekeeper",
+      "default_thread_budget": 4,
+      "max_recommended_memory_footprint": "under_8gb",
+      "intended_use": [
+        "Task triage",
+        "Initial filtering",
+        "Low-cost routing decisions"
+      ],
+      "status": "optional"
+    },
+    {
+      "model_id": "llama3:8b",
+      "provider": "ollama",
+      "role": "optional_router_gatekeeper",
+      "default_thread_budget": 4,
+      "max_recommended_memory_footprint": "under_8gb",
+      "intended_use": [
+        "Task triage",
+        "Initial filtering",
+        "Higher-capacity local routing where memory allows"
+      ],
+      "status": "optional",
+      "quantization_preference": "Q5_K_M"
+    }
+  ]
+}

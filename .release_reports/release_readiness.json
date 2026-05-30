@@ -1,0 +1,18 @@
+{
+  "blockers": [],
+  "checked_artifacts": [],
+  "findings": [],
+  "generated_utc": "2026-05-30T22:50:40Z",
+  "metadata": {
+    "advisory_only": true,
+    "bootstrap": true
+  },
+  "readiness_score": 100.0,
+  "readiness_status": "ready",
+  "report_id": "release_readiness_bootstrap",
+  "scope": "sentient-control-plane",
+  "summary": {
+    "note": "bootstrap-minimal"
+  },
+  "warnings": []
+}

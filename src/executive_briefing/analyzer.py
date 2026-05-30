@@ -27,7 +27,10 @@ def analyze_artifacts(
     release_timeline: Dict[str, Any] | None = None,
     lifecycle_state: Dict[str, Any] | None = None,
     sentient_view_model: Dict[str, Any] | None = None,
+    repository_intelligence_report: Dict[str, Any] | None = None,
 ) -> Dict[str, Any]:
+    if repository_intelligence_report is None:
+        repository_intelligence_report = load_json_file(".control_plane/repository_intelligence/repository_intelligence_report.json")
     findings: List[Dict[str, Any]] = []
     findings.extend(_from_orchestration(orchestration_report or {}))
     findings.extend(_from_release_readiness(release_readiness_report or {}))
@@ -36,6 +39,7 @@ def analyze_artifacts(
     findings.extend(_from_lifecycle_state(lifecycle_state or {}))
     findings.extend(_from_governance_snapshot(control_plane_snapshot or {}))
     findings.extend(_from_sentient_view_model(sentient_view_model or {}))
+    findings.extend(_from_repository_intelligence(repository_intelligence_report or {}))
 
     blockers = [f for f in findings if f.get("severity") == "critical"]
     risks = [f for f in findings if f.get("severity") in {"high", "critical", "medium"}]
@@ -244,6 +248,35 @@ def _from_sentient_view_model(view_model: Dict[str, Any]) -> List[Dict[str, Any]
             recommended_action="Review dashboard alerts and verify advisory status alignment.",
         ).to_dict()
     ]
+
+
+def _from_repository_intelligence(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    findings = report.get("findings")
+    if not isinstance(findings, list):
+        return []
+    out: List[Dict[str, Any]] = []
+    for finding in findings:
+        if not isinstance(finding, dict):
+            continue
+        severity = str(finding.get("severity") or "info").lower()
+        if severity not in {"high", "critical"}:
+            continue
+        out.append(
+            ExecutiveFinding(
+                finding_id=new_id("finding_repo_intel"),
+                severity="high" if severity == "high" else "critical",
+                category="repository",
+                title=str(finding.get("title") or "Repository intelligence risk"),
+                description=str(finding.get("description") or "High-severity repository intelligence finding."),
+                recommended_action=str(
+                    finding.get("recommended_action")
+                    or "Review repository intelligence findings and schedule remediation missions."
+                ),
+            ).to_dict()
+        )
+    return out
 
 
 def _release_summary(readiness: Dict[str, Any], gate_trace: Dict[str, Any], timeline: Dict[str, Any]) -> Dict[str, Any]:

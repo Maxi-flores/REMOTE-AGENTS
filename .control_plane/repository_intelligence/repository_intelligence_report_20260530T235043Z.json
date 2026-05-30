@@ -1,0 +1,470 @@
+{
+  "advisory_only": true,
+  "findings": [
+    {
+      "advisory_only": true,
+      "category": "documentation",
+      "description": "No docs/*.md filename appears to map directly to module 'executive_briefing'.",
+      "finding_id": "repo_finding_65aaea3929844b3ab1618f953e8393d1",
+      "metadata": {
+        "advisory_only": true
+      },
+      "path_refs": [
+        "src/executive_briefing"
+      ],
+      "recommended_action": "Add or update docs coverage for 'executive_briefing'.",
+      "severity": "low",
+      "title": "Source module without subsystem docs: executive_briefing"
+    },
+    {
+      "advisory_only": true,
+      "category": "testing",
+      "description": "Module 'src/mission_engine' has no direct test file pattern match in tests/test_mission_engine*.py.",
+      "finding_id": "repo_finding_62f8d1cb2e824824a01f37c8d3d35706",
+      "metadata": {
+        "advisory_only": true
+      },
+      "path_refs": [
+        "src/mission_engine"
+      ],
+      "recommended_action": "Add targeted tests for module 'mission_engine'.",
+      "severity": "medium",
+      "title": "Source module without direct tests: mission_engine"
+    },
+    {
+      "advisory_only": true,
+      "category": "testing",
+      "description": "Module 'src/orchastrator' has no direct test file pattern match in tests/test_orchastrator*.py.",
+      "finding_id": "repo_finding_7ffaa9c672184ac7abca8853fd2e0976",
+      "metadata": {
+        "advisory_only": true
+      },
+      "path_refs": [
+        "src/orchastrator"
+      ],
+      "recommended_action": "Add targeted tests for module 'orchastrator'.",
+      "severity": "medium",
+      "title": "Source module without direct tests: orchastrator"
+    },
+    {
+      "advisory_only": true,
+      "category": "documentation",
+      "description": "No docs/*.md filename appears to map directly to module 'orchastrator'.",
+      "finding_id": "repo_finding_fc6123e47e6947c889193ed9210ecc5e",
+      "metadata": {
+        "advisory_only": true
+      },
+      "path_refs": [
+        "src/orchastrator"
+      ],
+      "recommended_action": "Add or update docs coverage for 'orchastrator'.",
+      "severity": "low",
+      "title": "Source module without subsystem docs: orchastrator"
+    },
+    {
+      "advisory_only": true,
+      "category": "testing",
+      "description": "Module 'src/orchestrator' has no direct test file pattern match in tests/test_orchestrator*.py.",
+      "finding_id": "repo_finding_04f1475dcf2445f9a64f01a2c3055ee2",
+      "metadata": {
+        "advisory_only": true
+      },
+      "path_refs": [
+        "src/orchestrator"
+      ],
+      "recommended_action": "Add targeted tests for module 'orchestrator'.",
+      "severity": "medium",
+      "title": "Source module without direct tests: orchestrator"
+    },
+    {
+      "advisory_only": true,
+      "category": "documentation",
+      "description": "No docs/*.md filename appears to map directly to module 'orchestrator'.",
+      "finding_id": "repo_finding_2d9e36403e1f479cb839f6e3da3739c3",
+      "metadata": {
+        "advisory_only": true
+      },
+      "path_refs": [
+        "src/orchestrator"
+      ],
+      "recommended_action": "Add or update docs coverage for 'orchestrator'.",
+      "severity": "low",
+      "title": "Source module without subsystem docs: orchestrator"
+    },
+    {
+      "advisory_only": true,
+      "category": "documentation",
+      "description": "No docs/*.md filename appears to map directly to module 'repository_intelligence'.",
+      "finding_id": "repo_finding_f531112000dd4a4b899a95bfee86db0b",
+      "metadata": {
+        "advisory_only": true
+      },
+      "path_refs": [
+        "src/repository_intelligence"
+      ],
+      "recommended_action": "Add or update docs coverage for 'repository_intelligence'.",
+      "severity": "low",
+      "title": "Source module without subsystem docs: repository_intelligence"
+    },
+    {
+      "advisory_only": true,
+      "category": "testing",
+      "description": "Module 'src/routers' has no direct test file pattern match in tests/test_routers*.py.",
+      "finding_id": "repo_finding_40ca5bf3f01d4421b6bade39c3e36669",
+      "metadata": {
+        "advisory_only": true
+      },
+      "path_refs": [
+        "src/routers"
+      ],
+      "recommended_action": "Add targeted tests for module 'routers'.",
+      "severity": "medium",
+      "title": "Source module without direct tests: routers"
+    },
+    {
+      "advisory_only": true,
+      "category": "documentation",
+      "description": "No docs/*.md filename appears to map directly to module 'routers'.",
+      "finding_id": "repo_finding_8baabc7c758e4e40a78909317f6a88b2",
+      "metadata": {
+        "advisory_only": true
+      },
+      "path_refs": [
+        "src/routers"
+      ],
+      "recommended_action": "Add or update docs coverage for 'routers'.",
+      "severity": "low",
+      "title": "Source module without subsystem docs: routers"
+    },
+    {
+      "advisory_only": true,
+      "category": "documentation",
+      "description": "No docs/*.md filename appears to map directly to module 'strategic_missions'.",
+      "finding_id": "repo_finding_a42c7133223047a79df97c903e4758cd",
+      "metadata": {
+        "advisory_only": true
+      },
+      "path_refs": [
+        "src/strategic_missions"
+      ],
+      "recommended_action": "Add or update docs coverage for 'strategic_missions'.",
+      "severity": "low",
+      "title": "Source module without subsystem docs: strategic_missions"
+    },
+    {
+      "advisory_only": true,
+      "category": "documentation",
+      "description": "No docs/*.md filename appears to map directly to module 'tool_router'.",
+      "finding_id": "repo_finding_862f71d518cc43958615e694650386fa",
+      "metadata": {
+        "advisory_only": true
+      },
+      "path_refs": [
+        "src/tool_router"
+      ],
+      "recommended_action": "Add or update docs coverage for 'tool_router'.",
+      "severity": "low",
+      "title": "Source module without subsystem docs: tool_router"
+    },
+    {
+      "advisory_only": true,
+      "category": "testing",
+      "description": "Module 'src/tools' has no direct test file pattern match in tests/test_tools*.py.",
+      "finding_id": "repo_finding_8ae67042998b440bac31f44a0cb98450",
+      "metadata": {
+        "advisory_only": true
+      },
+      "path_refs": [
+        "src/tools"
+      ],
+      "recommended_action": "Add targeted tests for module 'tools'.",
+      "severity": "medium",
+      "title": "Source module without direct tests: tools"
+    },
+    {
+      "advisory_only": true,
+      "category": "documentation",
+      "description": "No docs/*.md filename appears to map directly to module 'tools'.",
+      "finding_id": "repo_finding_3f0e53ca0b774da894cd5c579af00260",
+      "metadata": {
+        "advisory_only": true
+      },
+      "path_refs": [
+        "src/tools"
+      ],
+      "recommended_action": "Add or update docs coverage for 'tools'.",
+      "severity": "low",
+      "title": "Source module without subsystem docs: tools"
+    },
+    {
+      "advisory_only": true,
+      "category": "testing",
+      "description": "Module 'src/ui' has no direct test file pattern match in tests/test_ui*.py.",
+      "finding_id": "repo_finding_5023b04f187b4bfb927b7c604be2adfc",
+      "metadata": {
+        "advisory_only": true
+      },
+      "path_refs": [
+        "src/ui"
+      ],
+      "recommended_action": "Add targeted tests for module 'ui'.",
+      "severity": "medium",
+      "title": "Source module without direct tests: ui"
+    },
+    {
+      "advisory_only": true,
+      "category": "testing",
+      "description": "CLI entrypoint 'src/mission_engine/cli.py' has no matching tests/*cli* coverage.",
+      "finding_id": "repo_finding_8e8f51b35647430b8cdad042720e4bfb",
+      "metadata": {
+        "advisory_only": true
+      },
+      "path_refs": [
+        "src/mission_engine/cli.py"
+      ],
+      "recommended_action": "Add CLI tests for 'mission_engine'.",
+      "severity": "medium",
+      "title": "CLI without matching CLI test: mission_engine"
+    }
+  ],
+  "generated_utc": "2026-05-30T23:50:43Z",
+  "inventory": {
+    "advisory_only": true,
+    "config_files": [
+      "config/agent_registry.json",
+      "config/cluster_topology.json",
+      "config/manifests/build_orchestrator.json",
+      "config/manifests/intake_specialist.json",
+      "config/manifests/risk_compliance.json",
+      "config/manifests/software_architect.json",
+      "config/platform_mcp_tools.json",
+      "config/registries/agents.json",
+      "config/registries/models.json",
+      "config/registries/policies.json",
+      "config/registries/repositories.json",
+      "config/registries/tools.json",
+      "config/release_gates/default_gate_policy.json",
+      "config/release_gates/experimental_gate_policy.json",
+      "config/release_gates/promotion_profiles/dev_promotion_profile.json",
+      "config/release_gates/promotion_profiles/production_promotion_profile.json",
+      "config/release_gates/promotion_profiles/staging_promotion_profile.json",
+      "config/release_gates/scenario_packs/default_release_scenarios.json",
+      "config/release_gates/scenario_packs/experimental_release_scenarios.json",
+      "config/release_gates/scenario_packs/production_release_scenarios.json",
+      "config/release_gates/strict_gate_policy.json",
+      "config/schema_manifests/control_plane_snapshot.v1.json",
+      "config/schema_manifests/sentient_ui_view_model.v1.json"
+    ],
+    "documentation_files": [
+      "docs/agent-capability-matrix.md",
+      "docs/approval-consensus.md",
+      "docs/architecture-roadmap.md",
+      "docs/control-plane-exporters.md",
+      "docs/control-plane-orchestration-layer.md",
+      "docs/decisions.md",
+      "docs/lifecycle-manager.md",
+      "docs/mission-engine.md",
+      "docs/registry-architecture.md",
+      "docs/release-center-timeline.md",
+      "docs/release-gate-scenarios.md",
+      "docs/release-gates.md",
+      "docs/release-promotion-planner.md",
+      "docs/release-readiness.md",
+      "docs/repository-governance.md",
+      "docs/runtime-contracts.md",
+      "docs/scheduler-worker-leases.md",
+      "docs/schema-versioning.md",
+      "docs/semantic-memory-graph.md",
+      "docs/sentient-ui-adapter.md",
+      "docs/strategic-mission-generation.md",
+      "docs/tool-routing-framework.md"
+    ],
+    "generated_utc": "2026-05-30T23:50:43Z",
+    "inventory_id": "repo_inventory_3263bcde47d8417686fca6e12b91924c",
+    "metadata": {
+      "advisory_only": true
+    },
+    "package_files": [
+      "README.md",
+      "package.json",
+      "requirements.txt"
+    ],
+    "root_path": "C:\\shared_folder\\Web.instinct\\ProfoundProjects\\Agents\\REMOTE-AGENTS",
+    "runtime_entrypoints": [
+      "run_autonomous_office.py",
+      "src/control_plane/cli.py",
+      "src/executive_briefing/cli.py",
+      "src/mission_engine/cli.py",
+      "src/orchastrator/platform_engine.py",
+      "src/orchestrator/dispatcher.py",
+      "src/orchestrator/gateway.py",
+      "src/orchestrator/platform_engine.py",
+      "src/release_center/cli.py",
+      "src/release_gates/cli.py",
+      "src/release_readiness/cli.py",
+      "src/repository_intelligence/cli.py",
+      "src/schema_versioning/cli.py",
+      "src/sentient_ui/cli.py",
+      "src/strategic_missions/cli.py"
+    ],
+    "source_directories": [
+      "src/control_plane",
+      "src/executive_briefing",
+      "src/lifecycle_manager",
+      "src/memory_graph",
+      "src/mission_engine",
+      "src/orchastrator",
+      "src/orchestrator",
+      "src/release_center",
+      "src/release_gates",
+      "src/release_readiness",
+      "src/repository_governance",
+      "src/repository_intelligence",
+      "src/routers",
+      "src/scheduler",
+      "src/schema_versioning",
+      "src/sentient_ui",
+      "src/strategic_missions",
+      "src/tool_router",
+      "src/tools",
+      "src/ui"
+    ],
+    "test_files": [
+      "tests/test_3d_canvas_integration.py",
+      "tests/test_approval_contracts.py",
+      "tests/test_autonomous_office_rig.py",
+      "tests/test_bft_consensus_rig.py",
+      "tests/test_consensus_contracts.py",
+      "tests/test_consensus_fork_resolution.py",
+      "tests/test_control_plane_cli.py",
+      "tests/test_control_plane_collectors.py",
+      "tests/test_control_plane_contracts.py",
+      "tests/test_control_plane_orchestrator_bootstrap.py",
+      "tests/test_control_plane_orchestrator_cli.py",
+      "tests/test_control_plane_orchestrator_contracts.py",
+      "tests/test_control_plane_orchestrator_flow.py",
+      "tests/test_control_plane_orchestrator_reports.py",
+      "tests/test_control_plane_snapshot.py",
+      "tests/test_executive_briefing_analyzer.py",
+      "tests/test_executive_briefing_builder.py",
+      "tests/test_executive_briefing_cli.py",
+      "tests/test_executive_briefing_contracts.py",
+      "tests/test_executive_briefing_reports.py",
+      "tests/test_executive_sentient_ui_panels.py",
+      "tests/test_forensic_replay.py",
+      "tests/test_incremental_cache_rig.py",
+      "tests/test_lifecycle_bootstrap.py",
+      "tests/test_lifecycle_capability_contracts.py",
+      "tests/test_lifecycle_capability_registry.py",
+      "tests/test_lifecycle_health.py",
+      "tests/test_lifecycle_manager.py",
+      "tests/test_lifecycle_state_contracts.py",
+      "tests/test_lifecycle_store.py",
+      "tests/test_memory_graph_contracts.py",
+      "tests/test_memory_graph_mission_ingest.py",
+      "tests/test_memory_graph_query.py",
+      "tests/test_memory_graph_store.py",
+      "tests/test_mission_approval_consensus_store.py",
+      "tests/test_mission_contracts.py",
+      "tests/test_mission_planner.py",
+      "tests/test_mission_queue_adapter.py",
+      "tests/test_mission_store.py",
+      "tests/test_quorum_consensus.py",
+      "tests/test_reactive_dag_rig.py",
+      "tests/test_recovery_rig.py",
+      "tests/test_registry_contracts.py",
+      "tests/test_release_center_artifact_readers.py",
+      "tests/test_release_center_cli.py",
+      "tests/test_release_center_milestones.py",
+      "tests/test_release_center_reports.py",
+      "tests/test_release_center_timeline_contracts.py",
+      "tests/test_release_center_timeline_synthesizer.py",
+      "tests/test_release_gate_multi_simulator.py",
+      "tests/test_release_gate_scenario_contracts.py",
+      "tests/test_release_gate_scenario_loader.py",
+      "tests/test_release_gate_scenario_reports.py",
+      "tests/test_release_gates_cli.py",
+      "tests/test_release_gates_contracts.py",
+      "tests/test_release_gates_policy_loader.py",
+      "tests/test_release_gates_simulator.py",
+      "tests/test_release_gates_traces.py",
+      "tests/test_release_promotion_ci_handoff.py",
+      "tests/test_release_promotion_contracts.py",
+      "tests/test_release_promotion_loader.py",
+      "tests/test_release_promotion_planner.py",
+      "tests/test_release_promotion_reports.py",
+      "tests/test_release_promotion_rollback.py",
+      "tests/test_release_readiness_cli.py",
+      "tests/test_release_readiness_contracts.py",
+      "tests/test_release_readiness_drift.py",
+      "tests/test_release_readiness_reports.py",
+      "tests/test_release_readiness_scoring.py",
+      "tests/test_repo_governance_router.py",
+      "tests/test_repository_governance_contracts.py",
+      "tests/test_repository_governance_policies.py",
+      "tests/test_repository_governance_registry_import.py",
+      "tests/test_repository_governance_store.py",
+      "tests/test_repository_intelligence_analyzer.py",
+      "tests/test_repository_intelligence_cli.py",
+      "tests/test_repository_intelligence_contracts.py",
+      "tests/test_repository_intelligence_executive_integration.py",
+      "tests/test_repository_intelligence_no_queue_mutation.py",
+      "tests/test_repository_intelligence_reports.py",
+      "tests/test_repository_intelligence_scanner.py",
+      "tests/test_repository_intelligence_strategic_integration.py",
+      "tests/test_rollup_compression_rig.py",
+      "tests/test_runtime_compat_platform_engine_path.py",
+      "tests/test_runtime_compat_queue_payload_shape.py",
+      "tests/test_sandbox_starvation_rig.py",
+      "tests/test_scheduler_contracts.py",
+      "tests/test_scheduler_planner.py",
+      "tests/test_scheduler_queue_compat.py",
+      "tests/test_scheduler_store.py",
+      "tests/test_schema_versioning_checker.py",
+      "tests/test_schema_versioning_cli.py",
+      "tests/test_schema_versioning_contracts.py",
+      "tests/test_schema_versioning_migration_planner.py",
+      "tests/test_sentient_ui_cli.py",
+      "tests/test_sentient_ui_contracts.py",
+      "tests/test_sentient_ui_exporter.py",
+      "tests/test_sentient_ui_snapshot_reader.py",
+      "tests/test_sentient_ui_trends.py",
+      "tests/test_sentient_ui_view_models.py",
+      "tests/test_strategic_missions_cli.py",
+      "tests/test_strategic_missions_contracts.py",
+      "tests/test_strategic_missions_generator.py",
+      "tests/test_strategic_missions_no_queue_mutation.py",
+      "tests/test_strategic_missions_reports.py",
+      "tests/test_strategic_missions_scoring.py",
+      "tests/test_telemetry_strain_rig.py",
+      "tests/test_tool_route_contracts.py",
+      "tests/test_tool_router_audit.py",
+      "tests/test_tool_router_policies.py",
+      "tests/test_tool_router_resolution.py",
+      "tests/test_transaction_isolation.py"
+    ]
+  },
+  "metadata": {
+    "advisory_only": true
+  },
+  "overall_status": "warning",
+  "report_id": "repo_intel_report_411e7b634aaf46318e8d8f6a88aabc65",
+  "repository_name": "REMOTE-AGENTS",
+  "suggested_mission_opportunities": [
+    "Add or update docs coverage for 'executive_briefing'.",
+    "Add targeted tests for module 'mission_engine'.",
+    "Add targeted tests for module 'orchastrator'.",
+    "Add or update docs coverage for 'orchastrator'.",
+    "Add targeted tests for module 'orchestrator'.",
+    "Add or update docs coverage for 'orchestrator'.",
+    "Add or update docs coverage for 'repository_intelligence'.",
+    "Add targeted tests for module 'routers'.",
+    "Add or update docs coverage for 'routers'.",
+    "Add or update docs coverage for 'strategic_missions'.",
+    "Add or update docs coverage for 'tool_router'.",
+    "Add targeted tests for module 'tools'.",
+    "Add or update docs coverage for 'tools'.",
+    "Add targeted tests for module 'ui'.",
+    "Add CLI tests for 'mission_engine'."
+  ]
+}

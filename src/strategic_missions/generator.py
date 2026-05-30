@@ -27,13 +27,14 @@ def generate_strategic_mission_report(
     limit: int | None = None,
 ) -> Dict[str, Any]:
     root = Path(base_dir)
+    repo_intel = load_executive_briefing(root / ".control_plane" / "repository_intelligence" / "repository_intelligence_report.json")
     if briefing is None:
         source_path = Path(briefing_path) if briefing_path else (root / ".control_plane" / "executive" / "executive_briefing.json")
         briefing = load_executive_briefing(source_path)
     else:
         source_path = Path(briefing_path) if briefing_path else None
 
-    candidates = _candidates_from_briefing(briefing or {})
+    candidates = _candidates_from_briefing(briefing or {}, repository_intelligence_report=repo_intel)
     if limit is not None and isinstance(limit, int) and limit > 0:
         candidates = candidates[:limit]
 
@@ -77,15 +78,17 @@ def render_strategic_mission_report_text(report: Dict[str, Any]) -> str:
     return "\n".join(lines).strip() + "\n"
 
 
-def _candidates_from_briefing(briefing: Dict[str, Any]) -> List[Dict[str, Any]]:
+def _candidates_from_briefing(briefing: Dict[str, Any], *, repository_intelligence_report: Dict[str, Any] | None = None) -> List[Dict[str, Any]]:
     if not isinstance(briefing, dict):
         return _maintenance_candidates()
     findings = briefing.get("top_risks")
     actions = briefing.get("recommended_actions")
+    repo_candidates = _candidates_from_repo_intel(repository_intelligence_report or {})
     if isinstance(findings, list) and findings:
-        return _rank_candidates([_candidate_from_finding(f, actions) for f in findings if isinstance(f, dict)])
+        base = [_candidate_from_finding(f, actions) for f in findings if isinstance(f, dict)]
+        return _rank_candidates(base + repo_candidates)
     # healthy/no-risks => maintenance continuity recommendations
-    return _rank_candidates(_maintenance_candidates())
+    return _rank_candidates(_maintenance_candidates() + repo_candidates)
 
 
 def _candidate_from_finding(finding: Dict[str, Any], actions: Any) -> Dict[str, Any]:
@@ -171,6 +174,46 @@ def _maintenance_candidates() -> List[Dict[str, Any]]:
     return out
 
 
+def _candidates_from_repo_intel(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    findings = report.get("findings")
+    if not isinstance(findings, list):
+        return []
+    out: List[Dict[str, Any]] = []
+    for finding in findings:
+        if not isinstance(finding, dict):
+            continue
+        sev = str(finding.get("severity") or "info").lower()
+        if sev not in {"high", "critical", "medium"}:
+            continue
+        category = _safe_category(str(finding.get("category") or "repository"))
+        scores = score_finding({"severity": sev, "category": category})
+        priority = derive_priority(**scores)
+        title = str(finding.get("title") or "Repository intelligence improvement")
+        out.append(
+            StrategicMissionCandidate(
+                candidate_id=new_id("strategic_mission"),
+                title=title,
+                description=str(finding.get("description") or title),
+                source_finding_ids=[str(finding.get("finding_id") or new_id("finding_ref"))],
+                category=category,
+                priority=priority,
+                risk_reduction_score=scores["risk_reduction_score"],
+                effort_score=scores["effort_score"],
+                confidence_score=scores["confidence_score"],
+                recommended_repository=_repo_hint_from_paths(finding.get("path_refs")),
+                suggested_instruction=str(
+                    finding.get("recommended_action")
+                    or f"Address repository intelligence finding: {title}."
+                ),
+                advisory_only=True,
+                metadata={"source": "repository_intelligence", "severity": sev},
+            ).to_dict()
+        )
+    return out
+
+
 def _suggested_instruction(*, title: str, category: str, actions: Any) -> str:
     action_hint = ""
     if isinstance(actions, list):
@@ -200,6 +243,13 @@ def _repo_hint_from_text(text: str) -> str | None:
         if repo in lowered:
             return repo
     return None
+
+
+def _repo_hint_from_paths(path_refs: Any) -> str | None:
+    if not isinstance(path_refs, list):
+        return None
+    joined = " ".join(str(p) for p in path_refs if isinstance(p, str)).lower()
+    return _repo_hint_from_text(joined)
 
 
 def _rank_candidates(candidates: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -244,4 +294,3 @@ def _overall_status(candidates: List[Dict[str, Any]]) -> str:
     if any(str(c.get("priority")) == "P2" for c in candidates):
         return "warning"
     return "healthy"
-

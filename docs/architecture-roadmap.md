@@ -209,3 +209,15 @@ Status: complete.
 - Generate maintenance/continuity recommendations when executive status is healthy with no risks.
 - Export optional outputs under `.control_plane/strategic_missions/`.
 - Keep queue semantics unchanged and never auto-enqueue mission candidates.
+
+Phase 20: Repository Intelligence Engine (RIE).
+Status: complete.
+
+- Add `src/repository_intelligence/` contracts, scanner, analyzer, reports, and CLI.
+- Generate deterministic advisory repository intelligence reports from repository structure, docs, tests, config, runtime entrypoints, and contract/test coverage signals.
+- Write optional latest, timestamped, and JSONL outputs under `.control_plane/repository_intelligence/`.
+- Add optional integration:
+  - Executive Briefing ingests high/critical repository intelligence findings when report is present.
+  - Strategic Missions convert repository intelligence findings into additional mission candidates when report is present.
+- Keep RIE optional and non-blocking when no report exists.
+- Keep runtime/queue behavior unchanged and advisory-only.

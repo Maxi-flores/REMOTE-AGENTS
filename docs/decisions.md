@@ -428,3 +428,22 @@ Consequences:
 - `.platform_queue/next_task.json` semantics remain unchanged.
 - No execution, enforcement, deployment, git operations, or cloud behavior is introduced.
 - Outputs are planning artifacts only for future operator-driven mission selection.
+
+## ADR-0023: Add Advisory Repository Intelligence Engine (RIE)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/repository_intelligence/` with contracts, deterministic scanner/analyzer, report writers, and CLI.
+- Scan current repository structure only (source/tests/docs/config/runtime entrypoints) with strict ignore rules for generated/runtime output folders.
+- Export intelligence artifacts under `.control_plane/repository_intelligence/`.
+- Integrate optionally with executive briefing and strategic mission generation when a latest intelligence report exists.
+
+Reason:
+- Strategic planning quality improves when mission recommendations are grounded in observable repository coverage gaps, not only control-plane telemetry.
+
+Consequences:
+- Runtime execution remains unchanged.
+- Queue semantics remain unchanged.
+- No enforcement, deployment, cloud, git, or model-call behavior is introduced.
+- Repository intelligence remains advisory-only and optional.

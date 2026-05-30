@@ -351,6 +351,22 @@ python src/strategic_missions/cli.py --export-jsonl
 python src/strategic_missions/cli.py --from-briefing ".control_plane/executive/executive_briefing.json" --limit 5 --print
 ```
 
+## Repository Intelligence Engine (RIE)
+
+Phase 20 adds deterministic advisory repository intelligence based on actual repository structure and coverage signals.
+
+It scans source, tests, docs, config, runtime entrypoints, and CLI/test alignment, then emits coverage findings and suggested mission opportunities.
+
+Examples:
+
+```bash
+python src/repository_intelligence/cli.py --print
+python src/repository_intelligence/cli.py --export
+python src/repository_intelligence/cli.py --export-jsonl
+```
+
+RIE outputs are advisory only and are written under `.control_plane/repository_intelligence/`.
+
 ## Runtime Contracts
 
 See `docs/runtime-contracts.md` for the Phase 0 contracts covering:
@@ -382,6 +398,7 @@ See `docs/runtime-contracts.md` for the Phase 0 contracts covering:
 - `docs/release-center-timeline.md` records the Phase 15 advisory timeline synthesis boundary.
 - `docs/agent-capability-matrix.md` and `docs/lifecycle-manager.md` record the Phase 16 advisory lifecycle and capability matrix boundary.
 - `docs/control-plane-orchestration-layer.md` records the Phase 17 advisory orchestration boundary.
+- `docs/repository-intelligence-engine.md` records the Phase 20 advisory repository intelligence boundary.
 
 ## Additional Repository Components
 

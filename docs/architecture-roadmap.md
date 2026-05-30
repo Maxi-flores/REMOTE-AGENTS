@@ -200,3 +200,12 @@ Status: complete.
 - Export optional artifacts under `.control_plane/executive/`.
 - Add optional Sentient UI executive panels through `src/sentient_ui/executive_panels.py`.
 - Keep runtime execution, queue behavior, and enforcement unchanged.
+
+Phase 19: Strategic Mission Generation Engine (SMGE).
+Status: complete.
+
+- Add `src/strategic_missions/` contracts, deterministic scoring, candidate generator, report writers, and CLI.
+- Convert executive briefing findings and recommended actions into ranked advisory strategic mission candidates.
+- Generate maintenance/continuity recommendations when executive status is healthy with no risks.
+- Export optional outputs under `.control_plane/strategic_missions/`.
+- Keep queue semantics unchanged and never auto-enqueue mission candidates.

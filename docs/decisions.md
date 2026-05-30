@@ -409,3 +409,22 @@ Consequences:
 - Queue semantics remain unchanged.
 - No deployments, git operations, CI execution, or enforcement behavior is introduced.
 - Executive outputs are deterministic, advisory-only, and suitable for future Sentient OS executive views.
+
+## ADR-0022: Add Advisory Strategic Mission Generation Engine (SMGE)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/strategic_missions/` for deterministic strategic mission candidate generation from executive briefings.
+- Add explicit strategic mission contracts and scoring/priority mapping.
+- Add report export support under `.control_plane/strategic_missions/`.
+- Keep generation advisory-only, with no queue writes and no automatic mission enqueue.
+
+Reason:
+- Executive findings need a deterministic planning bridge into actionable mission recommendations while preserving runtime compatibility.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No execution, enforcement, deployment, git operations, or cloud behavior is introduced.
+- Outputs are planning artifacts only for future operator-driven mission selection.

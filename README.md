@@ -336,6 +336,21 @@ python src/executive_briefing/cli.py --export-jsonl
 python src/executive_briefing/cli.py --from-orchestration-report ".control_plane/orchestration/orchestration_report.json" --print
 ```
 
+## Strategic Mission Generation Engine (SMGE)
+
+Phase 19 adds deterministic advisory mission recommendation generation from executive briefing outputs.
+
+It reads executive findings and recommended actions, then produces ranked strategic mission candidates without execution or queue mutation.
+
+Examples:
+
+```bash
+python src/strategic_missions/cli.py --print
+python src/strategic_missions/cli.py --export
+python src/strategic_missions/cli.py --export-jsonl
+python src/strategic_missions/cli.py --from-briefing ".control_plane/executive/executive_briefing.json" --limit 5 --print
+```
+
 ## Runtime Contracts
 
 See `docs/runtime-contracts.md` for the Phase 0 contracts covering:

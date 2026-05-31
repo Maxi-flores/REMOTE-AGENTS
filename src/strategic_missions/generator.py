@@ -29,6 +29,7 @@ def generate_strategic_mission_report(
     root = Path(base_dir)
     repo_intel = load_executive_briefing(root / ".control_plane" / "repository_intelligence" / "repository_intelligence_report.json")
     remediation_plan = load_executive_briefing(root / ".control_plane" / "remediation_plans" / "remediation_plan_report.json")
+    remediation_handoff = load_executive_briefing(root / ".control_plane" / "remediation_handoffs" / "latest.json")
     if briefing is None:
         source_path = Path(briefing_path) if briefing_path else (root / ".control_plane" / "executive" / "executive_briefing.json")
         briefing = load_executive_briefing(source_path)
@@ -39,6 +40,7 @@ def generate_strategic_mission_report(
         briefing or {},
         repository_intelligence_report=repo_intel,
         remediation_plan_report=remediation_plan,
+        remediation_handoff_report=remediation_handoff,
     )
     if limit is not None and isinstance(limit, int) and limit > 0:
         candidates = candidates[:limit]
@@ -88,6 +90,7 @@ def _candidates_from_briefing(
     *,
     repository_intelligence_report: Dict[str, Any] | None = None,
     remediation_plan_report: Dict[str, Any] | None = None,
+    remediation_handoff_report: Dict[str, Any] | None = None,
 ) -> List[Dict[str, Any]]:
     if not isinstance(briefing, dict):
         return _maintenance_candidates()
@@ -95,11 +98,12 @@ def _candidates_from_briefing(
     actions = briefing.get("recommended_actions")
     repo_candidates = _candidates_from_repo_intel(repository_intelligence_report or {})
     remediation_candidates = _candidates_from_remediation(remediation_plan_report or {})
+    handoff_candidates = _candidates_from_handoffs(remediation_handoff_report or {})
     if isinstance(findings, list) and findings:
         base = [_candidate_from_finding(f, actions) for f in findings if isinstance(f, dict)]
-        return _rank_candidates(base + repo_candidates + remediation_candidates)
+        return _rank_candidates(base + repo_candidates + remediation_candidates + handoff_candidates)
     # healthy/no-risks => maintenance continuity recommendations
-    return _rank_candidates(_maintenance_candidates() + repo_candidates + remediation_candidates)
+    return _rank_candidates(_maintenance_candidates() + repo_candidates + remediation_candidates + handoff_candidates)
 
 
 def _candidate_from_finding(finding: Dict[str, Any], actions: Any) -> Dict[str, Any]:
@@ -254,6 +258,38 @@ def _candidates_from_remediation(report: Dict[str, Any]) -> List[Dict[str, Any]]
                 suggested_instruction=f"Create advisory mission for remediation batch '{title}' and track items: {', '.join(batch.get('item_ids', [])[:5])}.",
                 advisory_only=True,
                 metadata={"source": "remediation_plan"},
+            ).to_dict()
+        )
+    return out
+
+
+def _candidates_from_handoffs(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    packages = report.get("packages")
+    if not isinstance(packages, list):
+        return []
+    out: List[Dict[str, Any]] = []
+    for package in packages[:3]:
+        if not isinstance(package, dict):
+            continue
+        source_batch = str(package.get("source_batch_id") or "")
+        title = str(package.get("title") or "Implementation package")
+        out.append(
+            StrategicMissionCandidate(
+                candidate_id=new_id("strategic_mission"),
+                title=f"Review and execute package: {title}",
+                description="Move a prepared implementation package through human review and manual execution.",
+                source_finding_ids=[source_batch] if source_batch else [],
+                category="repository",
+                priority="P2",
+                risk_reduction_score=70,
+                effort_score=45,
+                confidence_score=85,
+                recommended_repository=str((package.get("metadata") or {}).get("repository") or "").strip() or None,
+                suggested_instruction=f"Review implementation package '{title}', validate scope, then execute manually after approval.",
+                advisory_only=True,
+                metadata={"source": "remediation_handoff"},
             ).to_dict()
         )
     return out

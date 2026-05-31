@@ -468,3 +468,22 @@ Consequences:
 - `.platform_queue/next_task.json` semantics remain unchanged.
 - No auto-enqueue, execution, enforcement, deployment, git, cloud, or model-call behavior is introduced.
 - Remediation planning remains advisory-only and optional.
+
+## ADR-0025: Add Advisory Remediation Batch Handoff Engine (RBHE)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/remediation_handoff/` for deterministic implementation package and prompt generation from remediation batches.
+- Generate advisory implementation packages only (no execution), including objective, target files, expected changes, validation commands, risks, and human review notes.
+- Export handoff artifacts under `.control_plane/remediation_handoffs/`.
+- Integrate optionally with strategic mission generation and executive briefing when handoff artifacts are present.
+
+Reason:
+- Remediation batches need a deterministic manual-execution handoff format before any runtime enforcement or automated execution exists.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No execution, enqueue, enforcement, deployment, git operations, repository mutation, or model invocation is introduced.
+- RBHE remains advisory-only.

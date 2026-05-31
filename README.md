@@ -384,6 +384,23 @@ python src/remediation_planner/cli.py --from-rie-report ".control_plane/reposito
 
 RRP outputs are advisory only and are written under `.control_plane/remediation_plans/`.
 
+## Remediation Batch Handoff Engine (RBHE)
+
+Phase 22 converts remediation batches into deterministic implementation packages and Codex-ready prompts for manual execution planning.
+
+It does not execute changes, does not enqueue tasks, and does not mutate `.platform_queue`.
+
+Examples:
+
+```bash
+python src/remediation_handoff/cli.py --print
+python src/remediation_handoff/cli.py --export
+python src/remediation_handoff/cli.py --export-jsonl
+python src/remediation_handoff/cli.py --limit 2 --print
+```
+
+RBHE outputs are advisory only and are written under `.control_plane/remediation_handoffs/`.
+
 ## Runtime Contracts
 
 See `docs/runtime-contracts.md` for the Phase 0 contracts covering:
@@ -417,6 +434,7 @@ See `docs/runtime-contracts.md` for the Phase 0 contracts covering:
 - `docs/control-plane-orchestration-layer.md` records the Phase 17 advisory orchestration boundary.
 - `docs/repository-intelligence-engine.md` records the Phase 20 advisory repository intelligence boundary.
 - `docs/repository-remediation-planner.md` records the Phase 21 advisory remediation planning boundary.
+- `docs/remediation-batch-handoff-engine.md` records the Phase 22 advisory remediation handoff boundary.
 
 ## Additional Repository Components
 

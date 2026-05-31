@@ -229,6 +229,17 @@ Status: complete.
   - Strategic Missions can convert top remediation batches into advisory mission candidates.
   - Executive Briefing can surface high-priority remediation backlog risks when report is present.
 - Keep queue semantics and runtime behavior unchanged with no auto-enqueue or execution.
+
+Phase 22: Remediation Batch Handoff Engine (RBHE).
+Status: complete.
+
+- Add `src/remediation_handoff/` contracts, deterministic package generator, codex prompt builder, report writers, and CLI.
+- Convert remediation batches into implementation packages with objective, file scope, validation commands, risk notes, and human review notes.
+- Export optional artifacts under `.control_plane/remediation_handoffs/`.
+- Add optional integrations:
+  - Strategic missions can reference generated implementation packages.
+  - Executive briefing can report remediation handoff readiness when artifacts are present.
+- Keep queue semantics and runtime behavior unchanged with no execution, enqueue, or enforcement.
   - Strategic Missions convert repository intelligence findings into additional mission candidates when report is present.
 - Keep RIE optional and non-blocking when no report exists.
 - Keep runtime/queue behavior unchanged and advisory-only.

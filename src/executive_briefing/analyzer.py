@@ -29,11 +29,14 @@ def analyze_artifacts(
     sentient_view_model: Dict[str, Any] | None = None,
     repository_intelligence_report: Dict[str, Any] | None = None,
     remediation_plan_report: Dict[str, Any] | None = None,
+    remediation_handoff_report: Dict[str, Any] | None = None,
 ) -> Dict[str, Any]:
     if repository_intelligence_report is None:
         repository_intelligence_report = load_json_file(".control_plane/repository_intelligence/repository_intelligence_report.json")
     if remediation_plan_report is None:
         remediation_plan_report = load_json_file(".control_plane/remediation_plans/remediation_plan_report.json")
+    if remediation_handoff_report is None:
+        remediation_handoff_report = load_json_file(".control_plane/remediation_handoffs/latest.json")
     findings: List[Dict[str, Any]] = []
     findings.extend(_from_orchestration(orchestration_report or {}))
     findings.extend(_from_release_readiness(release_readiness_report or {}))
@@ -44,6 +47,7 @@ def analyze_artifacts(
     findings.extend(_from_sentient_view_model(sentient_view_model or {}))
     findings.extend(_from_repository_intelligence(repository_intelligence_report or {}))
     findings.extend(_from_remediation_plan(remediation_plan_report or {}))
+    findings.extend(_from_remediation_handoffs(remediation_handoff_report or {}, remediation_plan_report or {}))
 
     blockers = [f for f in findings if f.get("severity") == "critical"]
     risks = [f for f in findings if f.get("severity") in {"high", "critical", "medium"}]
@@ -304,6 +308,41 @@ def _from_remediation_plan(report: Dict[str, Any]) -> List[Dict[str, Any]]:
             recommended_action="Prioritize high-risk remediation batches and convert them into tracked strategic missions.",
         ).to_dict()
     ]
+
+
+def _from_remediation_handoffs(
+    handoff_report: Dict[str, Any],
+    remediation_plan_report: Dict[str, Any],
+) -> List[Dict[str, Any]]:
+    if not isinstance(handoff_report, dict) or not handoff_report:
+        return []
+    packages = handoff_report.get("packages")
+    if not isinstance(packages, list):
+        return []
+    planned_batches = remediation_plan_report.get("batches", []) if isinstance(remediation_plan_report, dict) else []
+    package_count = len([pkg for pkg in packages if isinstance(pkg, dict)])
+    findings: List[Dict[str, Any]] = [
+        ExecutiveFinding(
+            finding_id=new_id("finding_handoff"),
+            severity="low",
+            category="repository",
+            title="Remediation handoff packages generated",
+            description=f"{package_count} implementation package(s) are available for human review.",
+            recommended_action="Select reviewed packages for manual execution planning.",
+        ).to_dict()
+    ]
+    if isinstance(planned_batches, list) and package_count < len(planned_batches):
+        findings.append(
+            ExecutiveFinding(
+                finding_id=new_id("finding_handoff"),
+                severity="medium",
+                category="repository",
+                title="Remediation handoff coverage incomplete",
+                description=f"Generated packages ({package_count}) are fewer than remediation batches ({len(planned_batches)}).",
+                recommended_action="Generate additional handoff packages for remaining remediation batches.",
+            ).to_dict()
+        )
+    return findings
 
 
 def _release_summary(readiness: Dict[str, Any], gate_trace: Dict[str, Any], timeline: Dict[str, Any]) -> Dict[str, Any]:

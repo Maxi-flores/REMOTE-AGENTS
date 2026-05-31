@@ -367,6 +367,23 @@ python src/repository_intelligence/cli.py --export-jsonl
 
 RIE outputs are advisory only and are written under `.control_plane/repository_intelligence/`.
 
+## Repository Remediation Planner (RRP)
+
+Phase 21 converts repository intelligence findings into deterministic advisory remediation items and batches.
+
+It does not execute tasks, does not enqueue anything, and does not mutate `.platform_queue/next_task.json`.
+
+Examples:
+
+```bash
+python src/remediation_planner/cli.py --print
+python src/remediation_planner/cli.py --export
+python src/remediation_planner/cli.py --export-jsonl
+python src/remediation_planner/cli.py --from-rie-report ".control_plane/repository_intelligence/repository_intelligence_report.json" --limit 10 --print
+```
+
+RRP outputs are advisory only and are written under `.control_plane/remediation_plans/`.
+
 ## Runtime Contracts
 
 See `docs/runtime-contracts.md` for the Phase 0 contracts covering:
@@ -399,6 +416,7 @@ See `docs/runtime-contracts.md` for the Phase 0 contracts covering:
 - `docs/agent-capability-matrix.md` and `docs/lifecycle-manager.md` record the Phase 16 advisory lifecycle and capability matrix boundary.
 - `docs/control-plane-orchestration-layer.md` records the Phase 17 advisory orchestration boundary.
 - `docs/repository-intelligence-engine.md` records the Phase 20 advisory repository intelligence boundary.
+- `docs/repository-remediation-planner.md` records the Phase 21 advisory remediation planning boundary.
 
 ## Additional Repository Components
 

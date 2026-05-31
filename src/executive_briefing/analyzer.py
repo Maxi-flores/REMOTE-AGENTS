@@ -28,9 +28,12 @@ def analyze_artifacts(
     lifecycle_state: Dict[str, Any] | None = None,
     sentient_view_model: Dict[str, Any] | None = None,
     repository_intelligence_report: Dict[str, Any] | None = None,
+    remediation_plan_report: Dict[str, Any] | None = None,
 ) -> Dict[str, Any]:
     if repository_intelligence_report is None:
         repository_intelligence_report = load_json_file(".control_plane/repository_intelligence/repository_intelligence_report.json")
+    if remediation_plan_report is None:
+        remediation_plan_report = load_json_file(".control_plane/remediation_plans/remediation_plan_report.json")
     findings: List[Dict[str, Any]] = []
     findings.extend(_from_orchestration(orchestration_report or {}))
     findings.extend(_from_release_readiness(release_readiness_report or {}))
@@ -40,6 +43,7 @@ def analyze_artifacts(
     findings.extend(_from_governance_snapshot(control_plane_snapshot or {}))
     findings.extend(_from_sentient_view_model(sentient_view_model or {}))
     findings.extend(_from_repository_intelligence(repository_intelligence_report or {}))
+    findings.extend(_from_remediation_plan(remediation_plan_report or {}))
 
     blockers = [f for f in findings if f.get("severity") == "critical"]
     risks = [f for f in findings if f.get("severity") in {"high", "critical", "medium"}]
@@ -277,6 +281,29 @@ def _from_repository_intelligence(report: Dict[str, Any]) -> List[Dict[str, Any]
             ).to_dict()
         )
     return out
+
+
+def _from_remediation_plan(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    items = report.get("items")
+    if not isinstance(items, list):
+        return []
+    high_or_critical = [
+        item for item in items if isinstance(item, dict) and str(item.get("priority") or "P4") in {"P0", "P1"}
+    ]
+    if not high_or_critical:
+        return []
+    return [
+        ExecutiveFinding(
+            finding_id=new_id("finding_remediation"),
+            severity="high",
+            category="repository",
+            title="High-priority remediation backlog present",
+            description=f"Remediation planner reports {len(high_or_critical)} P0/P1 item(s).",
+            recommended_action="Prioritize high-risk remediation batches and convert them into tracked strategic missions.",
+        ).to_dict()
+    ]
 
 
 def _release_summary(readiness: Dict[str, Any], gate_trace: Dict[str, Any], timeline: Dict[str, Any]) -> Dict[str, Any]:

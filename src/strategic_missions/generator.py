@@ -28,13 +28,18 @@ def generate_strategic_mission_report(
 ) -> Dict[str, Any]:
     root = Path(base_dir)
     repo_intel = load_executive_briefing(root / ".control_plane" / "repository_intelligence" / "repository_intelligence_report.json")
+    remediation_plan = load_executive_briefing(root / ".control_plane" / "remediation_plans" / "remediation_plan_report.json")
     if briefing is None:
         source_path = Path(briefing_path) if briefing_path else (root / ".control_plane" / "executive" / "executive_briefing.json")
         briefing = load_executive_briefing(source_path)
     else:
         source_path = Path(briefing_path) if briefing_path else None
 
-    candidates = _candidates_from_briefing(briefing or {}, repository_intelligence_report=repo_intel)
+    candidates = _candidates_from_briefing(
+        briefing or {},
+        repository_intelligence_report=repo_intel,
+        remediation_plan_report=remediation_plan,
+    )
     if limit is not None and isinstance(limit, int) and limit > 0:
         candidates = candidates[:limit]
 
@@ -78,17 +83,23 @@ def render_strategic_mission_report_text(report: Dict[str, Any]) -> str:
     return "\n".join(lines).strip() + "\n"
 
 
-def _candidates_from_briefing(briefing: Dict[str, Any], *, repository_intelligence_report: Dict[str, Any] | None = None) -> List[Dict[str, Any]]:
+def _candidates_from_briefing(
+    briefing: Dict[str, Any],
+    *,
+    repository_intelligence_report: Dict[str, Any] | None = None,
+    remediation_plan_report: Dict[str, Any] | None = None,
+) -> List[Dict[str, Any]]:
     if not isinstance(briefing, dict):
         return _maintenance_candidates()
     findings = briefing.get("top_risks")
     actions = briefing.get("recommended_actions")
     repo_candidates = _candidates_from_repo_intel(repository_intelligence_report or {})
+    remediation_candidates = _candidates_from_remediation(remediation_plan_report or {})
     if isinstance(findings, list) and findings:
         base = [_candidate_from_finding(f, actions) for f in findings if isinstance(f, dict)]
-        return _rank_candidates(base + repo_candidates)
+        return _rank_candidates(base + repo_candidates + remediation_candidates)
     # healthy/no-risks => maintenance continuity recommendations
-    return _rank_candidates(_maintenance_candidates() + repo_candidates)
+    return _rank_candidates(_maintenance_candidates() + repo_candidates + remediation_candidates)
 
 
 def _candidate_from_finding(finding: Dict[str, Any], actions: Any) -> Dict[str, Any]:
@@ -209,6 +220,40 @@ def _candidates_from_repo_intel(report: Dict[str, Any]) -> List[Dict[str, Any]]:
                 ),
                 advisory_only=True,
                 metadata={"source": "repository_intelligence", "severity": sev},
+            ).to_dict()
+        )
+    return out
+
+
+def _candidates_from_remediation(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    batches = report.get("batches")
+    if not isinstance(batches, list):
+        return []
+    out: List[Dict[str, Any]] = []
+    for batch in batches[:3]:
+        if not isinstance(batch, dict):
+            continue
+        priority = str(batch.get("priority") or "P4")
+        if priority not in {"P0", "P1", "P2"}:
+            continue
+        title = str(batch.get("name") or "Remediation batch")
+        out.append(
+            StrategicMissionCandidate(
+                candidate_id=new_id("strategic_mission"),
+                title=f"Execute advisory {title}",
+                description=f"Convert remediation batch '{title}' into tracked strategic mission work.",
+                source_finding_ids=[str(batch.get("batch_id") or new_id("batch_ref"))],
+                category="repository",
+                priority=priority,
+                risk_reduction_score=min(95, int(batch.get("expected_risk_reduction") or 60)),
+                effort_score=min(90, int(batch.get("estimated_total_effort") or 45)),
+                confidence_score=85,
+                recommended_repository=(str(batch.get("repository") or "").strip() or None),
+                suggested_instruction=f"Create advisory mission for remediation batch '{title}' and track items: {', '.join(batch.get('item_ids', [])[:5])}.",
+                advisory_only=True,
+                metadata={"source": "remediation_plan"},
             ).to_dict()
         )
     return out

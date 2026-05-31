@@ -218,6 +218,17 @@ Status: complete.
 - Write optional latest, timestamped, and JSONL outputs under `.control_plane/repository_intelligence/`.
 - Add optional integration:
   - Executive Briefing ingests high/critical repository intelligence findings when report is present.
+
+Phase 21: Repository Remediation Planner (RRP).
+Status: complete.
+
+- Add `src/remediation_planner/` contracts, deterministic scoring, planning, report writers, and CLI.
+- Convert repository intelligence findings into advisory remediation items and remediation batches.
+- Export optional latest, timestamped, and JSONL outputs under `.control_plane/remediation_plans/`.
+- Add optional integrations:
+  - Strategic Missions can convert top remediation batches into advisory mission candidates.
+  - Executive Briefing can surface high-priority remediation backlog risks when report is present.
+- Keep queue semantics and runtime behavior unchanged with no auto-enqueue or execution.
   - Strategic Missions convert repository intelligence findings into additional mission candidates when report is present.
 - Keep RIE optional and non-blocking when no report exists.
 - Keep runtime/queue behavior unchanged and advisory-only.

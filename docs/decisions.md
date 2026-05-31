@@ -447,3 +447,24 @@ Consequences:
 - Queue semantics remain unchanged.
 - No enforcement, deployment, cloud, git, or model-call behavior is introduced.
 - Repository intelligence remains advisory-only and optional.
+
+## ADR-0024: Add Advisory Repository Remediation Planner (RRP)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/remediation_planner/` contracts, deterministic scoring, remediation planning, report writers, and CLI.
+- Consume repository intelligence artifacts and generate advisory remediation items/batches only.
+- Export remediation artifacts under `.control_plane/remediation_plans/` as latest JSON, timestamped JSON, and JSONL history.
+- Integrate optionally:
+  - Strategic missions ingest high-priority remediation batches when report exists.
+  - Executive briefing flags high-priority remediation backlog risk when report exists.
+
+Reason:
+- Repository intelligence findings need a deterministic, operator-readable remediation bridge before mission execution decisions are made.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No auto-enqueue, execution, enforcement, deployment, git, cloud, or model-call behavior is introduced.
+- Remediation planning remains advisory-only and optional.

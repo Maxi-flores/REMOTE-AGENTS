@@ -1,0 +1,373 @@
+{
+  "advisory_only": true,
+  "batches": [
+    {
+      "advisory_only": true,
+      "batch_id": "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172",
+      "estimated_total_effort": 315,
+      "expected_risk_reduction": 490,
+      "item_ids": [
+        "remediation_item_ca856ac5bc8f464b86ed17be9a6eae5e",
+        "remediation_item_42e5c263dd47478c9751cf059b420996",
+        "remediation_item_166f4a015b184a7dba6fbd3933ba8a01",
+        "remediation_item_388c7a94286a4b6a8c714d13449c551f",
+        "remediation_item_cbbabda8596a4933aea03b7b6264a72b",
+        "remediation_item_3332ebacf42f435689e54d738fe3f966",
+        "remediation_item_42b58288dc56478d9ff06a77ecd90a0f"
+      ],
+      "metadata": {
+        "item_count": 7
+      },
+      "name": "P1 remediation batch",
+      "priority": "P1",
+      "repository": "REMOTE-AGENTS",
+      "status": "planned"
+    },
+    {
+      "advisory_only": true,
+      "batch_id": "remediation_batch_5873f4916654406db8fb7a4860c981e8",
+      "estimated_total_effort": 315,
+      "expected_risk_reduction": 350,
+      "item_ids": [
+        "remediation_item_e510b281a4104d4abbdae4e4920da6cc",
+        "remediation_item_a5c615e060c9428fa0515315b8b80a68",
+        "remediation_item_9fc0a1f0edfb4b18828221b96c6a9e6a",
+        "remediation_item_aa6c5333a6fe4e6a804d160a2fa81710",
+        "remediation_item_5699faea4e74464fabe2f7159b4ca83e",
+        "remediation_item_050d46b528bd4eafad24cc2932a4c29d",
+        "remediation_item_0645519666b7423599730011e73202d7"
+      ],
+      "metadata": {
+        "item_count": 7
+      },
+      "name": "P2 remediation batch",
+      "priority": "P2",
+      "repository": "REMOTE-AGENTS",
+      "status": "planned"
+    }
+  ],
+  "generated_utc": "2026-05-31T00:02:52Z",
+  "items": [
+    {
+      "advisory_only": true,
+      "category": "tests",
+      "confidence_score": 80,
+      "description": "CLI entrypoint 'src/mission_engine/cli.py' has no matching tests/*cli* coverage.",
+      "effort_score": 45,
+      "item_id": "remediation_item_ca856ac5bc8f464b86ed17be9a6eae5e",
+      "metadata": {
+        "severity": "medium",
+        "source": "repository_intelligence"
+      },
+      "priority": "P1",
+      "repository": "REMOTE-AGENTS",
+      "risk_score": 70,
+      "source_finding_ids": [
+        "repo_finding_9288b9f194894f23a27b9ca80d65ed06"
+      ],
+      "status": "open",
+      "suggested_action": "Add CLI tests for 'mission_engine'.",
+      "title": "CLI without matching CLI test: mission_engine"
+    },
+    {
+      "advisory_only": true,
+      "category": "tests",
+      "confidence_score": 80,
+      "description": "Module 'src/mission_engine' has no direct test file pattern match in tests/test_mission_engine*.py.",
+      "effort_score": 45,
+      "item_id": "remediation_item_42e5c263dd47478c9751cf059b420996",
+      "metadata": {
+        "severity": "medium",
+        "source": "repository_intelligence"
+      },
+      "priority": "P1",
+      "repository": "REMOTE-AGENTS",
+      "risk_score": 70,
+      "source_finding_ids": [
+        "repo_finding_7c410aaf58ee4771bbf19722f525492d"
+      ],
+      "status": "open",
+      "suggested_action": "Add targeted tests for module 'mission_engine'.",
+      "title": "Source module without direct tests: mission_engine"
+    },
+    {
+      "advisory_only": true,
+      "category": "tests",
+      "confidence_score": 80,
+      "description": "Module 'src/orchastrator' has no direct test file pattern match in tests/test_orchastrator*.py.",
+      "effort_score": 45,
+      "item_id": "remediation_item_166f4a015b184a7dba6fbd3933ba8a01",
+      "metadata": {
+        "severity": "medium",
+        "source": "repository_intelligence"
+      },
+      "priority": "P1",
+      "repository": "REMOTE-AGENTS",
+      "risk_score": 70,
+      "source_finding_ids": [
+        "repo_finding_e380014065fe41c09df34887a858095d"
+      ],
+      "status": "open",
+      "suggested_action": "Add targeted tests for module 'orchastrator'.",
+      "title": "Source module without direct tests: orchastrator"
+    },
+    {
+      "advisory_only": true,
+      "category": "tests",
+      "confidence_score": 80,
+      "description": "Module 'src/orchestrator' has no direct test file pattern match in tests/test_orchestrator*.py.",
+      "effort_score": 45,
+      "item_id": "remediation_item_388c7a94286a4b6a8c714d13449c551f",
+      "metadata": {
+        "severity": "medium",
+        "source": "repository_intelligence"
+      },
+      "priority": "P1",
+      "repository": "REMOTE-AGENTS",
+      "risk_score": 70,
+      "source_finding_ids": [
+        "repo_finding_56bcb375f4fa46ad9a5ebc5627e24766"
+      ],
+      "status": "open",
+      "suggested_action": "Add targeted tests for module 'orchestrator'.",
+      "title": "Source module without direct tests: orchestrator"
+    },
+    {
+      "advisory_only": true,
+      "category": "tests",
+      "confidence_score": 80,
+      "description": "Module 'src/routers' has no direct test file pattern match in tests/test_routers*.py.",
+      "effort_score": 45,
+      "item_id": "remediation_item_cbbabda8596a4933aea03b7b6264a72b",
+      "metadata": {
+        "severity": "medium",
+        "source": "repository_intelligence"
+      },
+      "priority": "P1",
+      "repository": "REMOTE-AGENTS",
+      "risk_score": 70,
+      "source_finding_ids": [
+        "repo_finding_5f3abb8587bd4021bd95b08348160e9d"
+      ],
+      "status": "open",
+      "suggested_action": "Add targeted tests for module 'routers'.",
+      "title": "Source module without direct tests: routers"
+    },
+    {
+      "advisory_only": true,
+      "category": "tests",
+      "confidence_score": 80,
+      "description": "Module 'src/tools' has no direct test file pattern match in tests/test_tools*.py.",
+      "effort_score": 45,
+      "item_id": "remediation_item_3332ebacf42f435689e54d738fe3f966",
+      "metadata": {
+        "severity": "medium",
+        "source": "repository_intelligence"
+      },
+      "priority": "P1",
+      "repository": "REMOTE-AGENTS",
+      "risk_score": 70,
+      "source_finding_ids": [
+        "repo_finding_52d2e1eaa27b4498af6a345f2e3c74f2"
+      ],
+      "status": "open",
+      "suggested_action": "Add targeted tests for module 'tools'.",
+      "title": "Source module without direct tests: tools"
+    },
+    {
+      "advisory_only": true,
+      "category": "tests",
+      "confidence_score": 80,
+      "description": "Module 'src/ui' has no direct test file pattern match in tests/test_ui*.py.",
+      "effort_score": 45,
+      "item_id": "remediation_item_42b58288dc56478d9ff06a77ecd90a0f",
+      "metadata": {
+        "severity": "medium",
+        "source": "repository_intelligence"
+      },
+      "priority": "P1",
+      "repository": "REMOTE-AGENTS",
+      "risk_score": 70,
+      "source_finding_ids": [
+        "repo_finding_32d9bca85c5b4611a00fd9507d67b8d3"
+      ],
+      "status": "open",
+      "suggested_action": "Add targeted tests for module 'ui'.",
+      "title": "Source module without direct tests: ui"
+    },
+    {
+      "advisory_only": true,
+      "category": "docs",
+      "confidence_score": 75,
+      "description": "No docs/*.md filename appears to map directly to module 'executive_briefing'.",
+      "effort_score": 45,
+      "item_id": "remediation_item_e510b281a4104d4abbdae4e4920da6cc",
+      "metadata": {
+        "severity": "low",
+        "source": "repository_intelligence"
+      },
+      "priority": "P2",
+      "repository": "REMOTE-AGENTS",
+      "risk_score": 50,
+      "source_finding_ids": [
+        "repo_finding_7a01460ab1c64e179f56fea383ed56f6"
+      ],
+      "status": "open",
+      "suggested_action": "Add or update docs coverage for 'executive_briefing'.",
+      "title": "Source module without subsystem docs: executive_briefing"
+    },
+    {
+      "advisory_only": true,
+      "category": "docs",
+      "confidence_score": 75,
+      "description": "No docs/*.md filename appears to map directly to module 'orchastrator'.",
+      "effort_score": 45,
+      "item_id": "remediation_item_a5c615e060c9428fa0515315b8b80a68",
+      "metadata": {
+        "severity": "low",
+        "source": "repository_intelligence"
+      },
+      "priority": "P2",
+      "repository": "REMOTE-AGENTS",
+      "risk_score": 50,
+      "source_finding_ids": [
+        "repo_finding_982dcb854b7b40c48eb0707b291ef93d"
+      ],
+      "status": "open",
+      "suggested_action": "Add or update docs coverage for 'orchastrator'.",
+      "title": "Source module without subsystem docs: orchastrator"
+    },
+    {
+      "advisory_only": true,
+      "category": "docs",
+      "confidence_score": 75,
+      "description": "No docs/*.md filename appears to map directly to module 'orchestrator'.",
+      "effort_score": 45,
+      "item_id": "remediation_item_9fc0a1f0edfb4b18828221b96c6a9e6a",
+      "metadata": {
+        "severity": "low",
+        "source": "repository_intelligence"
+      },
+      "priority": "P2",
+      "repository": "REMOTE-AGENTS",
+      "risk_score": 50,
+      "source_finding_ids": [
+        "repo_finding_3bcfd7e0719747f698514b792423e2f7"
+      ],
+      "status": "open",
+      "suggested_action": "Add or update docs coverage for 'orchestrator'.",
+      "title": "Source module without subsystem docs: orchestrator"
+    },
+    {
+      "advisory_only": true,
+      "category": "docs",
+      "confidence_score": 75,
+      "description": "No docs/*.md filename appears to map directly to module 'routers'.",
+      "effort_score": 45,
+      "item_id": "remediation_item_aa6c5333a6fe4e6a804d160a2fa81710",
+      "metadata": {
+        "severity": "low",
+        "source": "repository_intelligence"
+      },
+      "priority": "P2",
+      "repository": "REMOTE-AGENTS",
+      "risk_score": 50,
+      "source_finding_ids": [
+        "repo_finding_8dedf8daef924fe7ad4be88249b16175"
+      ],
+      "status": "open",
+      "suggested_action": "Add or update docs coverage for 'routers'.",
+      "title": "Source module without subsystem docs: routers"
+    },
+    {
+      "advisory_only": true,
+      "category": "docs",
+      "confidence_score": 75,
+      "description": "No docs/*.md filename appears to map directly to module 'strategic_missions'.",
+      "effort_score": 45,
+      "item_id": "remediation_item_5699faea4e74464fabe2f7159b4ca83e",
+      "metadata": {
+        "severity": "low",
+        "source": "repository_intelligence"
+      },
+      "priority": "P2",
+      "repository": "REMOTE-AGENTS",
+      "risk_score": 50,
+      "source_finding_ids": [
+        "repo_finding_caa2498dccc64940870fc351dcb07544"
+      ],
+      "status": "open",
+      "suggested_action": "Add or update docs coverage for 'strategic_missions'.",
+      "title": "Source module without subsystem docs: strategic_missions"
+    },
+    {
+      "advisory_only": true,
+      "category": "docs",
+      "confidence_score": 75,
+      "description": "No docs/*.md filename appears to map directly to module 'tool_router'.",
+      "effort_score": 45,
+      "item_id": "remediation_item_050d46b528bd4eafad24cc2932a4c29d",
+      "metadata": {
+        "severity": "low",
+        "source": "repository_intelligence"
+      },
+      "priority": "P2",
+      "repository": "REMOTE-AGENTS",
+      "risk_score": 50,
+      "source_finding_ids": [
+        "repo_finding_1fe4915ef246409492cb4306d7c1e02b"
+      ],
+      "status": "open",
+      "suggested_action": "Add or update docs coverage for 'tool_router'.",
+      "title": "Source module without subsystem docs: tool_router"
+    },
+    {
+      "advisory_only": true,
+      "category": "docs",
+      "confidence_score": 75,
+      "description": "No docs/*.md filename appears to map directly to module 'tools'.",
+      "effort_score": 45,
+      "item_id": "remediation_item_0645519666b7423599730011e73202d7",
+      "metadata": {
+        "severity": "low",
+        "source": "repository_intelligence"
+      },
+      "priority": "P2",
+      "repository": "REMOTE-AGENTS",
+      "risk_score": 50,
+      "source_finding_ids": [
+        "repo_finding_0e165dac944046328486466060294730"
+      ],
+      "status": "open",
+      "suggested_action": "Add or update docs coverage for 'tools'.",
+      "title": "Source module without subsystem docs: tools"
+    }
+  ],
+  "metadata": {
+    "advisory_only": true,
+    "auto_enqueue": false,
+    "base_dir": ".",
+    "queue_mutation": false,
+    "source_report_path": ".control_plane\\repository_intelligence\\repository_intelligence_report.json"
+  },
+  "overall_status": "degraded",
+  "recommended_sequence": [
+    "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172",
+    "remediation_batch_5873f4916654406db8fb7a4860c981e8"
+  ],
+  "report_id": "remediation_report_a612a2717eaf4ceb99d36f2a4b61e1bf",
+  "source_report_id": "repo_intel_report_4ef69c5a5e3c4189b7aa562fc71ac52f",
+  "summary": {
+    "batch_count": 2,
+    "category_counts": {
+      "docs": 7,
+      "tests": 7
+    },
+    "item_count": 14,
+    "priority_counts": {
+      "P1": 7,
+      "P2": 7
+    },
+    "source_report_status": "warning"
+  }
+}

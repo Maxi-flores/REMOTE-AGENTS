@@ -1,0 +1,341 @@
+{
+  "advisory_only": true,
+  "findings": [
+    {
+      "category": "repository_intelligence",
+      "description": "No repository intelligence findings matched this repository.",
+      "finding_id": "portfolio_finding_ef6a235d37334a48aed3ed2492155669",
+      "metadata": {},
+      "recommended_action": "Run repository intelligence export for REMOTE-AGENTS.",
+      "repository_id": "REMOTE-AGENTS",
+      "severity": "medium",
+      "title": "REMOTE-AGENTS missing repository intelligence coverage"
+    },
+    {
+      "category": "remediation",
+      "description": "14 remediation items are associated with this repository.",
+      "finding_id": "portfolio_finding_ca32d6aafdf149fe96cff7bb3c49e455",
+      "metadata": {},
+      "recommended_action": "Prioritize top remediation batches and convert to execution dossiers.",
+      "repository_id": "REMOTE-AGENTS",
+      "severity": "high",
+      "title": "REMOTE-AGENTS has high remediation backlog"
+    },
+    {
+      "category": "readiness",
+      "description": "Repository readiness score is 0.",
+      "finding_id": "portfolio_finding_b44fb652d1584e4782a6014f54394932",
+      "metadata": {},
+      "recommended_action": "Improve readiness by reducing blockers and increasing validated dossier coverage.",
+      "repository_id": "REMOTE-AGENTS",
+      "severity": "medium",
+      "title": "REMOTE-AGENTS readiness score is low"
+    },
+    {
+      "category": "repository_intelligence",
+      "description": "No repository intelligence findings matched this repository.",
+      "finding_id": "portfolio_finding_6b6d5b0c0fa041d2b69cc25c485b28a8",
+      "metadata": {},
+      "recommended_action": "Run repository intelligence export for Sentient OS.",
+      "repository_id": "Sentient-OS",
+      "severity": "medium",
+      "title": "Sentient OS missing repository intelligence coverage"
+    },
+    {
+      "category": "readiness",
+      "description": "Repository readiness score is 0.",
+      "finding_id": "portfolio_finding_90a103f74f5f4ece868e03af6f830f5b",
+      "metadata": {},
+      "recommended_action": "Improve readiness by reducing blockers and increasing validated dossier coverage.",
+      "repository_id": "Sentient-OS",
+      "severity": "medium",
+      "title": "Sentient OS readiness score is low"
+    },
+    {
+      "category": "repository_intelligence",
+      "description": "No repository intelligence findings matched this repository.",
+      "finding_id": "portfolio_finding_2dd38681ee34447abaf0adcda6a2fa8d",
+      "metadata": {},
+      "recommended_action": "Run repository intelligence export for Powerframe.",
+      "repository_id": "Powerframe",
+      "severity": "medium",
+      "title": "Powerframe missing repository intelligence coverage"
+    },
+    {
+      "category": "readiness",
+      "description": "Repository readiness score is 0.",
+      "finding_id": "portfolio_finding_7d6306bc1f6047259bd2866e640db3b3",
+      "metadata": {},
+      "recommended_action": "Improve readiness by reducing blockers and increasing validated dossier coverage.",
+      "repository_id": "Powerframe",
+      "severity": "medium",
+      "title": "Powerframe readiness score is low"
+    },
+    {
+      "category": "repository_intelligence",
+      "description": "No repository intelligence findings matched this repository.",
+      "finding_id": "portfolio_finding_aad6aa8fcca24995bb784809d6f3d5a4",
+      "metadata": {},
+      "recommended_action": "Run repository intelligence export for Sapient KB.",
+      "repository_id": "Sapient-KB",
+      "severity": "medium",
+      "title": "Sapient KB missing repository intelligence coverage"
+    },
+    {
+      "category": "readiness",
+      "description": "Repository readiness score is 0.",
+      "finding_id": "portfolio_finding_70b36d0d62ff44cfb64ff18df271cb64",
+      "metadata": {},
+      "recommended_action": "Improve readiness by reducing blockers and increasing validated dossier coverage.",
+      "repository_id": "Sapient-KB",
+      "severity": "medium",
+      "title": "Sapient KB readiness score is low"
+    },
+    {
+      "category": "repository_intelligence",
+      "description": "No repository intelligence findings matched this repository.",
+      "finding_id": "portfolio_finding_471aa272de714729a368ddda60f6eda2",
+      "metadata": {},
+      "recommended_action": "Run repository intelligence export for Mucho3D.",
+      "repository_id": "Mucho3D",
+      "severity": "medium",
+      "title": "Mucho3D missing repository intelligence coverage"
+    },
+    {
+      "category": "readiness",
+      "description": "Repository readiness score is 0.",
+      "finding_id": "portfolio_finding_f30a7ddc75ad434abfade3e9646b3704",
+      "metadata": {},
+      "recommended_action": "Improve readiness by reducing blockers and increasing validated dossier coverage.",
+      "repository_id": "Mucho3D",
+      "severity": "medium",
+      "title": "Mucho3D readiness score is low"
+    },
+    {
+      "category": "repository_intelligence",
+      "description": "No repository intelligence findings matched this repository.",
+      "finding_id": "portfolio_finding_8fed29f36ed84e38b426e98a0ca7767b",
+      "metadata": {},
+      "recommended_action": "Run repository intelligence export for TRT.",
+      "repository_id": "TRT",
+      "severity": "medium",
+      "title": "TRT missing repository intelligence coverage"
+    },
+    {
+      "category": "readiness",
+      "description": "Repository readiness score is 0.",
+      "finding_id": "portfolio_finding_6c58e653ac144dcfb1800c098cf12361",
+      "metadata": {},
+      "recommended_action": "Improve readiness by reducing blockers and increasing validated dossier coverage.",
+      "repository_id": "TRT",
+      "severity": "medium",
+      "title": "TRT readiness score is low"
+    },
+    {
+      "category": "repository_intelligence",
+      "description": "No repository intelligence findings matched this repository.",
+      "finding_id": "portfolio_finding_7655d91a1efe467d84f26760e3c9ea2c",
+      "metadata": {},
+      "recommended_action": "Run repository intelligence export for Trade-Agent.",
+      "repository_id": "Trade-Agent",
+      "severity": "medium",
+      "title": "Trade-Agent missing repository intelligence coverage"
+    },
+    {
+      "category": "readiness",
+      "description": "Repository readiness score is 0.",
+      "finding_id": "portfolio_finding_d836970f80a64666a2f7500f832c867c",
+      "metadata": {},
+      "recommended_action": "Improve readiness by reducing blockers and increasing validated dossier coverage.",
+      "repository_id": "Trade-Agent",
+      "severity": "medium",
+      "title": "Trade-Agent readiness score is low"
+    }
+  ],
+  "generated_utc": "2026-05-31T11:32:42Z",
+  "metadata": {
+    "advisory_only": true,
+    "queue_mutation": false,
+    "runtime_unchanged": true,
+    "source_artifacts": {
+      "execution_dossiers": ".control_plane\\execution_dossiers\\latest.json",
+      "remediation_plans": ".control_plane\\remediation_plans\\remediation_plan_report.json",
+      "repository_intelligence": ".control_plane\\repository_intelligence\\repository_intelligence_report.json",
+      "work_queue": ".control_plane\\work_queue\\latest.json"
+    }
+  },
+  "portfolio_health_score": 82,
+  "portfolio_readiness_score": 0,
+  "recommended_execution_order": [
+    "REMOTE-AGENTS",
+    "Mucho3D",
+    "Powerframe",
+    "Sapient-KB",
+    "Sentient-OS",
+    "TRT",
+    "Trade-Agent"
+  ],
+  "report_id": "portfolio_report_cd292bf25751412bba0e3c2ef208ce8b",
+  "repositories": [
+    {
+      "enabled": true,
+      "metadata": {
+        "description": "Local advisory control-plane runtime and orchestration workspace"
+      },
+      "repository_id": "REMOTE-AGENTS",
+      "repository_name": "REMOTE-AGENTS",
+      "repository_path": ".",
+      "repository_type": "agent"
+    },
+    {
+      "enabled": true,
+      "metadata": {
+        "description": "Sentient platform integration repository"
+      },
+      "repository_id": "Sentient-OS",
+      "repository_name": "Sentient OS",
+      "repository_path": "../Sentient OS",
+      "repository_type": "platform"
+    },
+    {
+      "enabled": true,
+      "metadata": {},
+      "repository_id": "Powerframe",
+      "repository_name": "Powerframe",
+      "repository_path": "../Powerframe",
+      "repository_type": "platform"
+    },
+    {
+      "enabled": true,
+      "metadata": {},
+      "repository_id": "Sapient-KB",
+      "repository_name": "Sapient KB",
+      "repository_path": "../Sapient-KB",
+      "repository_type": "knowledge"
+    },
+    {
+      "enabled": true,
+      "metadata": {},
+      "repository_id": "Mucho3D",
+      "repository_name": "Mucho3D",
+      "repository_path": "../Mucho3D",
+      "repository_type": "game"
+    },
+    {
+      "enabled": true,
+      "metadata": {},
+      "repository_id": "TRT",
+      "repository_name": "TRT",
+      "repository_path": "../TRT",
+      "repository_type": "tooling"
+    },
+    {
+      "enabled": true,
+      "metadata": {},
+      "repository_id": "Trade-Agent",
+      "repository_name": "Trade-Agent",
+      "repository_path": "../Trade-Agent",
+      "repository_type": "agent"
+    }
+  ],
+  "repository_statuses": [
+    {
+      "dossier_count": 0,
+      "health_score": 40,
+      "metadata": {
+        "high_risk_dossier_count": 0,
+        "repository_intelligence_findings": 0,
+        "repository_name": "REMOTE-AGENTS"
+      },
+      "overall_status": "critical",
+      "queue_count": 0,
+      "readiness_score": 0,
+      "remediation_count": 14,
+      "repository_id": "REMOTE-AGENTS"
+    },
+    {
+      "dossier_count": 0,
+      "health_score": 90,
+      "metadata": {
+        "high_risk_dossier_count": 0,
+        "repository_intelligence_findings": 0,
+        "repository_name": "Sentient OS"
+      },
+      "overall_status": "critical",
+      "queue_count": 0,
+      "readiness_score": 0,
+      "remediation_count": 0,
+      "repository_id": "Sentient-OS"
+    },
+    {
+      "dossier_count": 0,
+      "health_score": 90,
+      "metadata": {
+        "high_risk_dossier_count": 0,
+        "repository_intelligence_findings": 0,
+        "repository_name": "Powerframe"
+      },
+      "overall_status": "critical",
+      "queue_count": 0,
+      "readiness_score": 0,
+      "remediation_count": 0,
+      "repository_id": "Powerframe"
+    },
+    {
+      "dossier_count": 0,
+      "health_score": 90,
+      "metadata": {
+        "high_risk_dossier_count": 0,
+        "repository_intelligence_findings": 0,
+        "repository_name": "Sapient KB"
+      },
+      "overall_status": "critical",
+      "queue_count": 0,
+      "readiness_score": 0,
+      "remediation_count": 0,
+      "repository_id": "Sapient-KB"
+    },
+    {
+      "dossier_count": 0,
+      "health_score": 90,
+      "metadata": {
+        "high_risk_dossier_count": 0,
+        "repository_intelligence_findings": 0,
+        "repository_name": "Mucho3D"
+      },
+      "overall_status": "critical",
+      "queue_count": 0,
+      "readiness_score": 0,
+      "remediation_count": 0,
+      "repository_id": "Mucho3D"
+    },
+    {
+      "dossier_count": 0,
+      "health_score": 90,
+      "metadata": {
+        "high_risk_dossier_count": 0,
+        "repository_intelligence_findings": 0,
+        "repository_name": "TRT"
+      },
+      "overall_status": "critical",
+      "queue_count": 0,
+      "readiness_score": 0,
+      "remediation_count": 0,
+      "repository_id": "TRT"
+    },
+    {
+      "dossier_count": 0,
+      "health_score": 90,
+      "metadata": {
+        "high_risk_dossier_count": 0,
+        "repository_intelligence_findings": 0,
+        "repository_name": "Trade-Agent"
+      },
+      "overall_status": "critical",
+      "queue_count": 0,
+      "readiness_score": 0,
+      "remediation_count": 0,
+      "repository_id": "Trade-Agent"
+    }
+  ]
+}

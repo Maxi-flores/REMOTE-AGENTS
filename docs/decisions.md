@@ -527,3 +527,179 @@ Consequences:
 - `.platform_queue/next_task.json` semantics remain unchanged.
 - No execution, enqueue, enforcement, deployment, git operations, repository mutation, or model invocation is introduced.
 - AWQM remains advisory-only.
+
+## ADR-0028: Add Advisory Execution Readiness Dossier Engine (ERDE)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/execution_dossier/` to generate deterministic execution dossiers and codex execution packets from work queue items.
+- Include objective, target files, expected changes, validation plans, review checklist, rollback guidance, and traceability in each dossier.
+- Export dossier artifacts under `.control_plane/execution_dossiers/`.
+- Integrate optionally with strategic mission and executive briefing layers when dossier artifacts are present.
+
+Reason:
+- Work queue prioritization identifies what should execute first, but operators still need complete execution packets for safe manual approval and implementation.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No execution, enqueue, enforcement, deployment, git operations, repository mutation, or model invocation is introduced.
+- ERDE remains advisory-only.
+
+## ADR-0029: Add Advisory Portfolio Orchestration Layer (POL)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/portfolio_orchestration/` for deterministic multi-repository aggregation and scoring.
+- Add portfolio registry support using `.config/portfolio/portfolio_registry.json`.
+- Aggregate advisory artifact posture from repository intelligence, remediation planning, work queue planning, and execution dossiers.
+- Export portfolio artifacts only under `.control_plane/portfolio/`.
+- Keep portfolio integrations optional for executive briefing and strategic mission generation.
+
+Reason:
+- Advisory systems through Phase 25 were repository-centric. Portfolio-level orchestration is needed to prioritize cross-repository work without changing runtime execution.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No execution, enqueue, enforcement, deployment, git operations, repository mutation, or model invocation is introduced.
+- POL remains advisory-only.
+
+## ADR-0030: Add Advisory Portfolio Artifact Bootstrap Layer (PABL)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/portfolio_bootstrap/` for deterministic portfolio repository discovery and onboarding record generation.
+- Detect advisory artifact and repository-structure presence without mutating external repositories.
+- Export bootstrap outputs only under `.control_plane/portfolio_bootstrap/`.
+- Allow optional consumption by portfolio orchestration, executive briefing, and strategic missions.
+
+Reason:
+- Portfolio orchestration needs repository onboarding visibility to avoid treating missing advisory artifacts as indistinguishable from low-quality execution posture.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No external repository writes, execution, enqueue, enforcement, deployment, git operations, or model invocation are introduced.
+- PABL remains advisory-only.
+
+## ADR-0031: Add Advisory Portfolio Repository Onboarding Recommendations (PROR)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/portfolio_onboarding_recommendations/` to convert bootstrap findings into repository-specific onboarding recommendation packages.
+- Generate deterministic actions for four states: not discovered/registered, discovered+none, discovered+partial, discovered+complete.
+- Export recommendation reports only under `.control_plane/portfolio_onboarding_recommendations/`.
+- Add optional read-only integrations with portfolio orchestration, executive briefing, and strategic mission generation.
+
+Reason:
+- Bootstrap identifies gaps, but operators need repository-scoped, action-oriented onboarding guidance that is safe and deterministic.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No external repository writes, execution, enqueue, enforcement, deployment, git operations, or model invocation are introduced.
+- PROR remains advisory-only.
+
+## ADR-0032: Add Advisory Portfolio Dependency Intelligence Layer (PDIL)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/portfolio_dependencies/` to model dependency graph intelligence across portfolio repositories.
+- Add `.config/portfolio/dependencies.json` as deterministic dependency mapping input.
+- Generate advisory findings for dependency unknown, dependency blocked, dependency risk, dependency chain, and dependency missing conditions.
+- Export reports only under `.control_plane/portfolio_dependencies/`.
+- Add optional read-only integration with portfolio orchestration, executive briefing, and strategic missions.
+
+Reason:
+- Repository onboarding and readiness signals need dependency context so cross-repository blockers and upstream risk propagation are visible.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No external repository writes, execution, enqueue, enforcement, deployment, git operations, or model invocation are introduced.
+- PDIL remains advisory-only.
+
+## ADR-0033: Add Advisory Portfolio Critical Path Intelligence (PCPI)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/portfolio_critical_path/` to compute deterministic repository influence and critical-path scores.
+- Generate critical-path recommendations that emphasize highest-leverage portfolio actions.
+- Export reports only under `.control_plane/portfolio_critical_path/`.
+- Add optional read-only integration with portfolio orchestration, executive briefing, and strategic missions.
+
+Reason:
+- Dependency awareness alone does not prioritize the most leveraged repository action across the ecosystem. Critical-path scoring introduces deterministic prioritization.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No external repository writes, execution, enqueue, enforcement, deployment, git operations, or model invocation are introduced.
+- PCPI remains advisory-only.
+
+## ADR-0034: Add Advisory Portfolio Strategic Execution Roadmap Layer (PSERL)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/portfolio_roadmap/` to convert portfolio critical-path recommendations into deterministic strategic roadmap items.
+- Add dependency-aware sequencing that maps actions into `near_term`, `mid_term`, and `long_term` horizons with `wave_1`/`wave_2`/`wave_3` grouping.
+- Generate advisory milestone summaries and recommended item sequence.
+- Export reports only under `.control_plane/portfolio_roadmap/`.
+- Add optional read-only integrations with portfolio orchestration, executive briefing, and strategic mission generation.
+
+Reason:
+- Critical-path intelligence identifies high-leverage actions but does not yet provide a coherent phased portfolio execution plan.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No external repository writes, execution, enqueue, enforcement, deployment, git operations, or model invocation are introduced.
+- PSERL remains advisory-only.
+
+## ADR-0035: Add Advisory Portfolio Progress Intelligence Layer (PPIL)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/portfolio_progress/` to compute deterministic portfolio progress metrics, deltas, and trends from advisory artifact histories.
+- Compare current vs previous portfolio, roadmap, onboarding, dependency, and critical-path snapshots where history exists.
+- Produce advisory findings for declining trends and insufficient historical coverage.
+- Export reports only under `.control_plane/portfolio_progress/`.
+- Add optional read-only integration with portfolio orchestration, executive briefing, strategic missions, and roadmap metadata.
+
+Reason:
+- Snapshot generation alone does not indicate whether the portfolio is improving over time. Progress intelligence adds deterministic directionality and trend visibility.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No external repository writes, execution, enqueue, enforcement, deployment, git operations, or model invocation are introduced.
+- PPIL remains advisory-only.
+
+## ADR-0036: Add Advisory Portfolio Drift Intelligence Layer (PDIL-2)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/portfolio_drift/` to detect deterministic governance drift across portfolio artifacts.
+- Compare portfolio registry, dependency registry, bootstrap, onboarding, dependency findings, critical-path recommendations, roadmap, progress, and portfolio summaries.
+- Emit structured drift findings for missing references, stale artifacts, orphaned references, and contradictory status signals.
+- Export reports only under `.control_plane/portfolio_drift/`.
+- Add optional read-only integration with portfolio orchestration, executive briefing, strategic missions, and progress trends.
+
+Reason:
+- Progress tracking indicates direction over time, but cannot reveal consistency drift between portfolio governance artifacts.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No external repository writes, execution, enqueue, enforcement, deployment, git operations, or model invocation are introduced.
+- PDIL-2 remains advisory-only.

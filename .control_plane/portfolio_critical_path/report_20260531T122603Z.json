@@ -1,0 +1,236 @@
+{
+  "advisory_only": true,
+  "critical_repository_scores": [
+    {
+      "advisory_only": true,
+      "consumer_count": 3,
+      "critical_path_score": 83,
+      "dependency_chain_count": 8,
+      "influence_score": 72,
+      "metadata": {},
+      "propagated_risk_count": 4,
+      "provider_count": 2,
+      "readiness_score": 0,
+      "repository_id": "Sentient-OS",
+      "repository_name": "Sentient OS"
+    },
+    {
+      "advisory_only": true,
+      "consumer_count": 0,
+      "critical_path_score": 60,
+      "dependency_chain_count": 3,
+      "influence_score": 47,
+      "metadata": {},
+      "propagated_risk_count": 6,
+      "provider_count": 2,
+      "readiness_score": 0,
+      "repository_id": "TRT",
+      "repository_name": "TRT"
+    },
+    {
+      "advisory_only": true,
+      "consumer_count": 0,
+      "critical_path_score": 50,
+      "dependency_chain_count": 2,
+      "influence_score": 32,
+      "metadata": {},
+      "propagated_risk_count": 3,
+      "provider_count": 1,
+      "readiness_score": 0,
+      "repository_id": "Powerframe",
+      "repository_name": "Powerframe"
+    },
+    {
+      "advisory_only": true,
+      "consumer_count": 1,
+      "critical_path_score": 49,
+      "dependency_chain_count": 4,
+      "influence_score": 28,
+      "metadata": {},
+      "propagated_risk_count": 0,
+      "provider_count": 0,
+      "readiness_score": 0,
+      "repository_id": "Sapient-KB",
+      "repository_name": "Sapient KB"
+    },
+    {
+      "advisory_only": true,
+      "consumer_count": 1,
+      "critical_path_score": 45,
+      "dependency_chain_count": 1,
+      "influence_score": 19,
+      "metadata": {},
+      "propagated_risk_count": 0,
+      "provider_count": 0,
+      "readiness_score": 0,
+      "repository_id": "Mucho3D",
+      "repository_name": "Mucho3D"
+    },
+    {
+      "advisory_only": true,
+      "consumer_count": 0,
+      "critical_path_score": 38,
+      "dependency_chain_count": 2,
+      "influence_score": 28,
+      "metadata": {},
+      "propagated_risk_count": 3,
+      "provider_count": 1,
+      "readiness_score": 40,
+      "repository_id": "Trade-Agent",
+      "repository_name": "Trade-Agent"
+    },
+    {
+      "advisory_only": true,
+      "consumer_count": 1,
+      "critical_path_score": 14,
+      "dependency_chain_count": 4,
+      "influence_score": 18,
+      "metadata": {},
+      "propagated_risk_count": 0,
+      "provider_count": 0,
+      "readiness_score": 100,
+      "repository_id": "REMOTE-AGENTS",
+      "repository_name": "REMOTE-AGENTS"
+    }
+  ],
+  "generated_utc": "2026-05-31T12:26:03Z",
+  "metadata": {
+    "advisory_only": true,
+    "queue_mutation": false,
+    "runtime_unchanged": true
+  },
+  "portfolio_leverage_summary": {
+    "average_critical_path_score": 48,
+    "recommendation_count": 7,
+    "repository_count": 7
+  },
+  "recommendations": [
+    {
+      "advisory_only": true,
+      "dependency_refs": [
+        "REMOTE-AGENTS",
+        "Sapient-KB"
+      ],
+      "expected_portfolio_impact": "Improves downstream dependency confidence and portfolio leverage.",
+      "metadata": {},
+      "priority": "P1",
+      "rationale": "Critical path score 83, influence 72, readiness 0.",
+      "recommendation_id": "critical_path_recommendation_d4f081273b8c4301bf8f28b987d0d3da",
+      "recommended_action": "Prioritize onboarding/readiness blockers for Sentient-OS before dependent portfolio execution.",
+      "repository_id": "Sentient-OS",
+      "title": "Critical path action for Sentient-OS"
+    },
+    {
+      "advisory_only": true,
+      "dependency_refs": [
+        "Sentient-OS",
+        "Mucho3D"
+      ],
+      "expected_portfolio_impact": "Improves repository readiness posture.",
+      "metadata": {},
+      "priority": "P2",
+      "rationale": "Critical path score 60, influence 47, readiness 0.",
+      "recommendation_id": "critical_path_recommendation_439e921079a5464c89539530d2b7827e",
+      "recommended_action": "Prioritize onboarding/readiness blockers for TRT before dependent portfolio execution.",
+      "repository_id": "TRT",
+      "title": "Critical path action for TRT"
+    },
+    {
+      "advisory_only": true,
+      "dependency_refs": [],
+      "expected_portfolio_impact": "Improves downstream dependency confidence and portfolio leverage.",
+      "metadata": {},
+      "priority": "P3",
+      "rationale": "Critical path score 45, influence 19, readiness 0.",
+      "recommendation_id": "critical_path_recommendation_96cd9e4461244a649b0b73ff693e4607",
+      "recommended_action": "Prioritize onboarding/readiness blockers for Mucho3D before dependent portfolio execution.",
+      "repository_id": "Mucho3D",
+      "title": "Critical path action for Mucho3D"
+    },
+    {
+      "advisory_only": true,
+      "dependency_refs": [
+        "Sentient-OS"
+      ],
+      "expected_portfolio_impact": "Improves repository readiness posture.",
+      "metadata": {},
+      "priority": "P3",
+      "rationale": "Critical path score 50, influence 32, readiness 0.",
+      "recommendation_id": "critical_path_recommendation_df547793eb544475aec4147c78f2b4bf",
+      "recommended_action": "Prioritize onboarding/readiness blockers for Powerframe before dependent portfolio execution.",
+      "repository_id": "Powerframe",
+      "title": "Critical path action for Powerframe"
+    },
+    {
+      "advisory_only": true,
+      "dependency_refs": [],
+      "expected_portfolio_impact": "Improves downstream dependency confidence and portfolio leverage.",
+      "metadata": {},
+      "priority": "P3",
+      "rationale": "Critical path score 49, influence 28, readiness 0.",
+      "recommendation_id": "critical_path_recommendation_4d52fcc0a7654e6d91d479d1330e6541",
+      "recommended_action": "Prioritize onboarding/readiness blockers for Sapient-KB before dependent portfolio execution.",
+      "repository_id": "Sapient-KB",
+      "title": "Critical path action for Sapient-KB"
+    },
+    {
+      "advisory_only": true,
+      "dependency_refs": [],
+      "expected_portfolio_impact": "Improves downstream dependency confidence and portfolio leverage.",
+      "metadata": {},
+      "priority": "P4",
+      "rationale": "Critical path score 14, influence 18, readiness 100.",
+      "recommendation_id": "critical_path_recommendation_fbe7656b125246468d4d89130e8e278c",
+      "recommended_action": "Prioritize onboarding/readiness blockers for REMOTE-AGENTS before dependent portfolio execution.",
+      "repository_id": "REMOTE-AGENTS",
+      "title": "Critical path action for REMOTE-AGENTS"
+    },
+    {
+      "advisory_only": true,
+      "dependency_refs": [
+        "Sentient-OS"
+      ],
+      "expected_portfolio_impact": "Improves repository readiness posture.",
+      "metadata": {},
+      "priority": "P4",
+      "rationale": "Critical path score 38, influence 28, readiness 40.",
+      "recommendation_id": "critical_path_recommendation_74cec662265c4223b4a6799a7e997f76",
+      "recommended_action": "Prioritize onboarding/readiness blockers for Trade-Agent before dependent portfolio execution.",
+      "repository_id": "Trade-Agent",
+      "title": "Critical path action for Trade-Agent"
+    }
+  ],
+  "report_id": "portfolio_critical_path_report_1de3f3cc288e4a6cba77f7486b18b323",
+  "top_critical_repositories": [
+    "Sentient-OS",
+    "TRT",
+    "Powerframe",
+    "Sapient-KB",
+    "Mucho3D"
+  ],
+  "top_dependency_chains": [
+    [
+      "Powerframe",
+      "Sentient-OS",
+      "REMOTE-AGENTS"
+    ],
+    [
+      "Powerframe",
+      "Sentient-OS",
+      "Sapient-KB"
+    ],
+    [
+      "Sentient-OS",
+      "REMOTE-AGENTS"
+    ],
+    [
+      "Sentient-OS",
+      "Sapient-KB"
+    ],
+    [
+      "TRT",
+      "Sentient-OS",
+      "REMOTE-AGENTS"
+    ]
+  ]
+}

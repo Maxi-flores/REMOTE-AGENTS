@@ -1,0 +1,40 @@
+{
+  "repositories": [
+    {
+      "repository_id": "Sentient-OS",
+      "depends_on": [
+        "REMOTE-AGENTS",
+        "Sapient-KB"
+      ],
+      "metadata": {}
+    },
+    {
+      "repository_id": "TRT",
+      "depends_on": [
+        "Sentient-OS",
+        "Mucho3D"
+      ],
+      "metadata": {}
+    },
+    {
+      "repository_id": "Powerframe",
+      "depends_on": [
+        "Sentient-OS"
+      ],
+      "metadata": {}
+    },
+    {
+      "repository_id": "Trade-Agent",
+      "depends_on": [
+        "Sentient-OS"
+      ],
+      "metadata": {}
+    },
+    {
+      "repository_id": "REMOTE-AGENTS",
+      "depends_on": [],
+      "metadata": {}
+    }
+  ]
+}
+

@@ -32,6 +32,15 @@ def analyze_artifacts(
     remediation_handoff_report: Dict[str, Any] | None = None,
     handoff_refinement_report: Dict[str, Any] | None = None,
     work_queue_report: Dict[str, Any] | None = None,
+    execution_dossier_report: Dict[str, Any] | None = None,
+    portfolio_report: Dict[str, Any] | None = None,
+    portfolio_bootstrap_report: Dict[str, Any] | None = None,
+    portfolio_onboarding_recommendation_report: Dict[str, Any] | None = None,
+    portfolio_dependency_report: Dict[str, Any] | None = None,
+    portfolio_critical_path_report: Dict[str, Any] | None = None,
+    portfolio_roadmap_report: Dict[str, Any] | None = None,
+    portfolio_progress_report: Dict[str, Any] | None = None,
+    portfolio_drift_report: Dict[str, Any] | None = None,
 ) -> Dict[str, Any]:
     if repository_intelligence_report is None:
         repository_intelligence_report = load_json_file(".control_plane/repository_intelligence/repository_intelligence_report.json")
@@ -43,6 +52,24 @@ def analyze_artifacts(
         handoff_refinement_report = load_json_file(".control_plane/handoff_refinements/latest.json")
     if work_queue_report is None:
         work_queue_report = load_json_file(".control_plane/work_queue/latest.json")
+    if execution_dossier_report is None:
+        execution_dossier_report = load_json_file(".control_plane/execution_dossiers/latest.json")
+    if portfolio_report is None:
+        portfolio_report = load_json_file(".control_plane/portfolio/latest.json")
+    if portfolio_bootstrap_report is None:
+        portfolio_bootstrap_report = load_json_file(".control_plane/portfolio_bootstrap/latest.json")
+    if portfolio_onboarding_recommendation_report is None:
+        portfolio_onboarding_recommendation_report = load_json_file(".control_plane/portfolio_onboarding_recommendations/latest.json")
+    if portfolio_dependency_report is None:
+        portfolio_dependency_report = load_json_file(".control_plane/portfolio_dependencies/latest.json")
+    if portfolio_critical_path_report is None:
+        portfolio_critical_path_report = load_json_file(".control_plane/portfolio_critical_path/latest.json")
+    if portfolio_roadmap_report is None:
+        portfolio_roadmap_report = load_json_file(".control_plane/portfolio_roadmap/latest.json")
+    if portfolio_progress_report is None:
+        portfolio_progress_report = load_json_file(".control_plane/portfolio_progress/latest.json")
+    if portfolio_drift_report is None:
+        portfolio_drift_report = load_json_file(".control_plane/portfolio_drift/latest.json")
     findings: List[Dict[str, Any]] = []
     findings.extend(_from_orchestration(orchestration_report or {}))
     findings.extend(_from_release_readiness(release_readiness_report or {}))
@@ -56,6 +83,15 @@ def analyze_artifacts(
     findings.extend(_from_remediation_handoffs(remediation_handoff_report or {}, remediation_plan_report or {}))
     findings.extend(_from_handoff_refinements(handoff_refinement_report or {}))
     findings.extend(_from_work_queue(work_queue_report or {}))
+    findings.extend(_from_execution_dossiers(execution_dossier_report or {}))
+    findings.extend(_from_portfolio_report(portfolio_report or {}))
+    findings.extend(_from_portfolio_bootstrap(portfolio_bootstrap_report or {}))
+    findings.extend(_from_portfolio_onboarding_recommendations(portfolio_onboarding_recommendation_report or {}))
+    findings.extend(_from_portfolio_dependencies(portfolio_dependency_report or {}))
+    findings.extend(_from_portfolio_critical_path(portfolio_critical_path_report or {}))
+    findings.extend(_from_portfolio_roadmap(portfolio_roadmap_report or {}))
+    findings.extend(_from_portfolio_progress(portfolio_progress_report or {}))
+    findings.extend(_from_portfolio_drift(portfolio_drift_report or {}))
 
     blockers = [f for f in findings if f.get("severity") == "critical"]
     risks = [f for f in findings if f.get("severity") in {"high", "critical", "medium"}]
@@ -442,6 +478,284 @@ def _from_work_queue(report: Dict[str, Any]) -> List[Dict[str, Any]]:
             ).to_dict()
         )
     return findings
+
+
+def _from_execution_dossiers(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    dossiers = report.get("dossiers")
+    if not isinstance(dossiers, list):
+        return []
+    ready = 0
+    high_risk = 0
+    dist = {"low": 0, "medium": 0, "high": 0, "critical": 0}
+    for dossier in dossiers:
+        if not isinstance(dossier, dict):
+            continue
+        if int(dossier.get("execution_readiness_score") or 0) >= 85:
+            ready += 1
+        risk = str(dossier.get("execution_risk") or "medium").lower()
+        if risk in dist:
+            dist[risk] += 1
+        if risk in {"high", "critical"}:
+            high_risk += 1
+    findings: List[Dict[str, Any]] = []
+    if ready > 0:
+        findings.append(
+            ExecutiveFinding(
+                finding_id=new_id("finding_dossier"),
+                severity="low",
+                category="repository",
+                title="Execution-ready dossiers available",
+                description=f"{ready} dossier(s) are immediately ready for human approval and manual execution.",
+                recommended_action="Prioritize execution-ready dossiers in next delivery cycle.",
+            ).to_dict()
+        )
+    if high_risk > 0:
+        findings.append(
+            ExecutiveFinding(
+                finding_id=new_id("finding_dossier"),
+                severity="medium",
+                category="repository",
+                title="High-risk execution dossiers present",
+                description=f"{high_risk} dossier(s) are classified as high/critical execution risk.",
+                recommended_action="Review high-risk dossiers with extra scrutiny before approval.",
+            ).to_dict()
+        )
+    return findings
+
+
+def _from_portfolio_report(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    findings: List[Dict[str, Any]] = []
+    health = int(report.get("portfolio_health_score") or 0)
+    readiness = int(report.get("portfolio_readiness_score") or 0)
+    repo_statuses = report.get("repository_statuses")
+    repo_count = len(repo_statuses) if isinstance(repo_statuses, list) else 0
+    if repo_count > 0:
+        sev = "medium" if health < 70 or readiness < 70 else "low"
+        findings.append(
+            ExecutiveFinding(
+                finding_id=new_id("finding_portfolio"),
+                severity=sev,
+                category="system",
+                title="Portfolio orchestration summary available",
+                description=f"Portfolio report covers {repo_count} repositories with health {health} and readiness {readiness}.",
+                recommended_action="Use portfolio recommended execution order to prioritize cross-repository advisory work.",
+            ).to_dict()
+        )
+    portfolio_findings = report.get("findings")
+    if isinstance(portfolio_findings, list) and portfolio_findings:
+        critical = 0
+        for finding in portfolio_findings:
+            if isinstance(finding, dict) and str(finding.get("severity") or "").lower() in {"high", "critical"}:
+                critical += 1
+        if critical > 0:
+            findings.append(
+                ExecutiveFinding(
+                    finding_id=new_id("finding_portfolio"),
+                    severity="medium",
+                    category="repository",
+                    title="Portfolio high-severity findings detected",
+                    description=f"Portfolio report includes {critical} high/critical cross-repository finding(s).",
+                    recommended_action="Address top cross-repository risks in strategic mission planning.",
+                ).to_dict()
+            )
+    return findings
+
+
+def _from_portfolio_bootstrap(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    summary = report.get("readiness_summary")
+    if not isinstance(summary, dict):
+        return []
+    avg = int(summary.get("average_readiness_estimate") or 0)
+    repo_count = int(summary.get("repository_count") or 0)
+    if repo_count <= 0:
+        return []
+    severity = "low" if avg >= 70 else ("medium" if avg >= 45 else "high")
+    return [
+        ExecutiveFinding(
+            finding_id=new_id("finding_portfolio_bootstrap"),
+            severity=severity,
+            category="repository",
+            title="Portfolio onboarding readiness summary available",
+            description=f"Portfolio bootstrap assessed {repo_count} repositories with average onboarding readiness {avg}.",
+            recommended_action="Use onboarding recommendations to raise repository advisory readiness and artifact coverage.",
+        ).to_dict()
+    ]
+
+
+def _from_portfolio_onboarding_recommendations(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    recommendations = report.get("recommendations")
+    if not isinstance(recommendations, list):
+        return []
+    high = 0
+    for item in recommendations:
+        if not isinstance(item, dict):
+            continue
+        if str(item.get("priority") or "P4") in {"P0", "P1"}:
+            high += 1
+    if high <= 0:
+        return []
+    return [
+        ExecutiveFinding(
+            finding_id=new_id("finding_portfolio_onboarding"),
+            severity="medium",
+            category="repository",
+            title="High-priority portfolio onboarding recommendations present",
+            description=f"{high} onboarding recommendation(s) are marked P0/P1.",
+            recommended_action="Address repository path/discovery and advisory baseline onboarding recommendations first.",
+        ).to_dict()
+    ]
+
+
+def _from_portfolio_dependencies(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    findings = report.get("findings")
+    if not isinstance(findings, list):
+        return []
+    high = 0
+    for item in findings:
+        if not isinstance(item, dict):
+            continue
+        if str(item.get("severity") or "").lower() in {"high", "critical"}:
+            high += 1
+    if high <= 0:
+        return []
+    return [
+        ExecutiveFinding(
+            finding_id=new_id("finding_portfolio_dependency"),
+            severity="high",
+            category="repository",
+            title="High-severity dependency findings detected",
+            description=f"Portfolio dependency intelligence reported {high} high/critical finding(s).",
+            recommended_action="Resolve upstream dependency blockers and unknown dependencies before dependent execution planning.",
+        ).to_dict()
+    ]
+
+
+def _from_portfolio_critical_path(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    recs = report.get("recommendations")
+    if not isinstance(recs, list) or not recs:
+        return []
+    p0p1 = 0
+    for rec in recs:
+        if isinstance(rec, dict) and str(rec.get("priority") or "").upper() in {"P0", "P1"}:
+            p0p1 += 1
+    if p0p1 <= 0:
+        return []
+    return [
+        ExecutiveFinding(
+            finding_id=new_id("finding_portfolio_critical_path"),
+            severity="high",
+            category="repository",
+            title="High-leverage critical path actions identified",
+            description=f"{p0p1} critical-path recommendation(s) are marked P0/P1.",
+            recommended_action="Sequence immediate remediation on top critical repositories to maximize portfolio improvement.",
+        ).to_dict()
+    ]
+
+
+def _from_portfolio_roadmap(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    items = report.get("roadmap_items")
+    waves = report.get("waves")
+    if not isinstance(items, list) or not isinstance(waves, list):
+        return []
+    near_term = [
+        item for item in items if isinstance(item, dict) and str(item.get("horizon") or "").lower() == "near_term"
+    ]
+    if not near_term:
+        return []
+    return [
+        ExecutiveFinding(
+            finding_id=new_id("finding_portfolio_roadmap"),
+            severity="medium",
+            category="repository",
+            title="Near-term strategic roadmap wave is populated",
+            description=f"Portfolio roadmap includes {len(near_term)} near-term item(s) across {len(waves)} wave(s).",
+            recommended_action="Use near-term roadmap wave to align next advisory mission planning cycle.",
+        ).to_dict()
+    ]
+
+
+def _from_portfolio_progress(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    trends = report.get("portfolio_trends")
+    findings = report.get("findings")
+    if not isinstance(trends, dict):
+        return []
+    overall = str(trends.get("overall_trend") or "unknown")
+    out: List[Dict[str, Any]] = []
+    if overall == "declining":
+        out.append(
+            ExecutiveFinding(
+                finding_id=new_id("finding_portfolio_progress"),
+                severity="high",
+                category="repository",
+                title="Portfolio progress trend is declining",
+                description="Portfolio progress intelligence indicates declining aggregate trend.",
+                recommended_action="Prioritize declining trend remediation before expanding roadmap scope.",
+            ).to_dict()
+        )
+    if isinstance(findings, list):
+        declining_count = 0
+        for finding in findings:
+            if isinstance(finding, dict) and str(finding.get("trend") or "") == "declining":
+                declining_count += 1
+        if declining_count > 0:
+            out.append(
+                ExecutiveFinding(
+                    finding_id=new_id("finding_portfolio_progress"),
+                    severity="medium",
+                    category="repository",
+                    title="Declining progress findings detected",
+                    description=f"Portfolio progress report contains {declining_count} declining trend finding(s).",
+                    recommended_action="Review declining progress findings and create targeted follow-up missions.",
+                ).to_dict()
+            )
+    return out
+
+
+def _from_portfolio_drift(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    findings = report.get("findings")
+    if not isinstance(findings, list):
+        return []
+    high = 0
+    critical = 0
+    for finding in findings:
+        if not isinstance(finding, dict):
+            continue
+        sev = str(finding.get("severity") or "").lower()
+        if sev == "high":
+            high += 1
+        elif sev == "critical":
+            critical += 1
+    if high + critical == 0:
+        return []
+    severity = "critical" if critical > 0 else "high"
+    return [
+        ExecutiveFinding(
+            finding_id=new_id("finding_portfolio_drift"),
+            severity=severity,
+            category="repository",
+            title="High-severity portfolio drift findings detected",
+            description=f"Portfolio drift report contains {high} high and {critical} critical finding(s).",
+            recommended_action="Reconcile drift findings before trusting downstream portfolio planning outputs.",
+        ).to_dict()
+    ]
 
 
 def _release_summary(readiness: Dict[str, Any], gate_trace: Dict[str, Any], timeline: Dict[str, Any]) -> Dict[str, Any]:

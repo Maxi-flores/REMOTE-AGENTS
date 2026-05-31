@@ -264,3 +264,120 @@ Status: complete.
   - Strategic Missions can ingest queue-driven recommendations.
   - Executive Briefing can report blocked/ready/deferred queue states.
 - Keep queue semantics and runtime behavior unchanged with no execution, enqueue, or enforcement.
+
+Phase 25: Execution Readiness Dossier Engine (ERDE).
+Status: complete.
+
+- Add `src/execution_dossier/` contracts, dossier generator, review checklist builder, report writers, and CLI.
+- Consume work queue items and generate complete execution dossiers with rollback guidance, validation plans, and codex execution packets.
+- Export optional artifacts under `.control_plane/execution_dossiers/`.
+- Add optional integrations:
+  - Strategic Missions can prioritize execution-ready dossiers.
+  - Executive Briefing can summarize ready/high-risk dossier distributions.
+- Keep queue semantics and runtime behavior unchanged with no execution, enqueue, or enforcement.
+
+Phase 26: Portfolio Orchestration Layer (POL).
+Status: complete.
+
+- Add `src/portfolio_orchestration/` for deterministic multi-repository aggregation, scoring, findings, and recommended execution ordering.
+- Add portfolio registry support via `.config/portfolio/portfolio_registry.json` with future-repository extensibility.
+- Aggregate advisory posture from repository intelligence, remediation planning, work queue planning, and execution dossiers.
+- Export optional portfolio artifacts under `.control_plane/portfolio/`.
+- Integrate optionally:
+  - Executive briefing can ingest portfolio summary findings when present.
+  - Strategic missions can ingest portfolio execution-order recommendations when present.
+- Keep runtime execution and queue behavior unchanged with advisory-only behavior.
+
+Phase 27: Portfolio Artifact Bootstrap Layer (PABL).
+Status: complete.
+
+- Add `src/portfolio_bootstrap/` contracts, discovery, onboarding, report writers, and CLI.
+- Discover repositories from portfolio registry and inspect repository-root structure/artifact presence.
+- Generate deterministic onboarding records and readiness estimates without writing into external repositories.
+- Export optional bootstrap artifacts under `.control_plane/portfolio_bootstrap/`.
+- Integrate optionally:
+  - Portfolio orchestration can consume bootstrap onboarding records to improve readiness scoring.
+  - Executive briefing can include portfolio onboarding readiness summary findings.
+  - Strategic missions can include onboarding recommendation candidates.
+- Keep runtime execution and queue behavior unchanged with advisory-only behavior.
+
+Phase 28: Portfolio Repository Onboarding Recommendations (PROR).
+Status: complete.
+
+- Add `src/portfolio_onboarding_recommendations/` contracts, generator, report writers, and CLI.
+- Convert bootstrap onboarding records into deterministic repository-specific onboarding recommendation packages.
+- Distinguish path/discovery gaps, no-artifact baselines, partial-artifact completion, and complete-artifact refresh posture.
+- Export optional recommendation artifacts under `.control_plane/portfolio_onboarding_recommendations/`.
+- Integrate optionally:
+  - Portfolio orchestration can include onboarding recommendation summary.
+  - Executive briefing can include high-priority onboarding recommendation risks.
+  - Strategic missions can produce onboarding mission candidates.
+- Keep runtime execution and queue behavior unchanged with advisory-only behavior.
+
+Phase 29: Portfolio Dependency Intelligence Layer (PDIL).
+Status: complete.
+
+- Add `src/portfolio_dependencies/` contracts, dependency registry loader, graph builder, analyzer, report writers, and CLI.
+- Introduce `.config/portfolio/dependencies.json` for deterministic dependency mapping across repositories.
+- Detect unknown dependencies, dependency blockers, dependency risks, and dependency chains.
+- Generate advisory risk-propagation findings for downstream dependent repositories.
+- Export optional dependency artifacts under `.control_plane/portfolio_dependencies/`.
+- Integrate optionally:
+  - Portfolio orchestration includes dependency summary metadata and findings.
+  - Executive briefing includes high-severity dependency findings.
+  - Strategic missions include dependency-aware mission candidates.
+- Keep runtime execution and queue behavior unchanged with advisory-only behavior.
+
+Phase 30: Portfolio Critical Path Intelligence (PCPI).
+Status: complete.
+
+- Add `src/portfolio_critical_path/` contracts, scoring, analyzer, report writers, and CLI.
+- Compute deterministic influence and critical-path scores from dependency and onboarding posture.
+- Rank top critical repositories and generate highest-leverage recommendation packages.
+- Export optional artifacts under `.control_plane/portfolio_critical_path/`.
+- Integrate optionally:
+  - Portfolio orchestration includes critical path summary metadata.
+  - Executive briefing includes high-priority critical path signals.
+  - Strategic missions include critical-path-driven mission candidates.
+- Keep runtime execution and queue behavior unchanged with advisory-only behavior.
+
+Phase 31: Portfolio Strategic Execution Roadmap Layer (PSERL).
+Status: complete.
+
+- Add `src/portfolio_roadmap/` for deterministic roadmap item generation, dependency-aware sequencing, wave grouping, and milestone synthesis.
+- Convert critical-path recommendations into near-term, mid-term, and long-term strategic execution horizons.
+- Group recommendations into reviewable portfolio waves (`wave_1`, `wave_2`, `wave_3`) using dependency depth, criticality, and readiness impact.
+- Export optional roadmap artifacts under `.control_plane/portfolio_roadmap/`.
+- Integrate optionally:
+  - Portfolio orchestration can include roadmap summary metadata.
+  - Executive briefing can surface near-term roadmap focus signals.
+  - Strategic missions can ingest roadmap-driven mission candidates.
+- Keep runtime execution and queue behavior unchanged with advisory-only behavior.
+
+Phase 32: Portfolio Progress Intelligence Layer (PPIL).
+Status: complete.
+
+- Add `src/portfolio_progress/` for deterministic current-vs-previous portfolio trend analysis.
+- Track portfolio, onboarding, dependency, critical-path, and roadmap metrics with delta and trend states.
+- Generate advisory progress findings for declining and insufficient-history trends.
+- Export optional progress artifacts under `.control_plane/portfolio_progress/`.
+- Integrate optionally:
+  - Portfolio orchestration can include progress summary metadata.
+  - Executive briefing can include trend summary and declining trend signals.
+  - Strategic missions can include trend-driven mission candidates.
+  - Portfolio roadmap can include optional progress metadata when available.
+- Keep runtime execution and queue behavior unchanged with advisory-only behavior.
+
+Phase 33: Portfolio Drift Intelligence Layer (PDIL-2).
+Status: complete.
+
+- Add `src/portfolio_drift/` for deterministic cross-artifact drift detection.
+- Compare registry, dependency registry, bootstrap, onboarding, dependency findings, critical-path recommendations, roadmap, progress, and portfolio status signals.
+- Detect missing references, stale artifacts, orphaned roadmap/critical-path items, and contradictory status conditions.
+- Export optional drift artifacts under `.control_plane/portfolio_drift/`.
+- Integrate optionally:
+  - Portfolio orchestration includes drift summary metadata.
+  - Executive briefing can include high/critical drift signals.
+  - Strategic missions can include drift-remediation candidates.
+  - Portfolio progress can include drift count trend when available.
+- Keep runtime execution and queue behavior unchanged with advisory-only behavior.

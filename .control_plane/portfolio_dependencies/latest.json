@@ -1,0 +1,435 @@
+{
+  "advisory_only": true,
+  "dependency_chains": [
+    [
+      "Powerframe",
+      "Sentient-OS",
+      "REMOTE-AGENTS"
+    ],
+    [
+      "Powerframe",
+      "Sentient-OS",
+      "Sapient-KB"
+    ],
+    [
+      "Sentient-OS",
+      "REMOTE-AGENTS"
+    ],
+    [
+      "Sentient-OS",
+      "Sapient-KB"
+    ],
+    [
+      "TRT",
+      "Sentient-OS",
+      "REMOTE-AGENTS"
+    ],
+    [
+      "TRT",
+      "Sentient-OS",
+      "Sapient-KB"
+    ],
+    [
+      "TRT",
+      "Mucho3D"
+    ],
+    [
+      "Trade-Agent",
+      "Sentient-OS",
+      "REMOTE-AGENTS"
+    ],
+    [
+      "Trade-Agent",
+      "Sentient-OS",
+      "Sapient-KB"
+    ]
+  ],
+  "dependency_graph": {
+    "Powerframe": [
+      "Sentient-OS"
+    ],
+    "REMOTE-AGENTS": [],
+    "Sentient-OS": [
+      "REMOTE-AGENTS",
+      "Sapient-KB"
+    ],
+    "TRT": [
+      "Sentient-OS",
+      "Mucho3D"
+    ],
+    "Trade-Agent": [
+      "Sentient-OS"
+    ]
+  },
+  "findings": [
+    {
+      "category": "dependency_blocked",
+      "dependency_repository_id": "REMOTE-AGENTS",
+      "description": "Dependency 'REMOTE-AGENTS' readiness/state is below threshold (readiness=100, status=degraded).",
+      "finding_id": "dependency_finding_c7e7f75481634eafbb9f0faa277cbc20",
+      "impact": "Sentient-OS delivery planning is blocked by dependency readiness.",
+      "metadata": {},
+      "recommended_action": "Raise REMOTE-AGENTS readiness before scheduling dependent portfolio work for Sentient-OS.",
+      "repository_id": "Sentient-OS",
+      "severity": "high",
+      "title": "Sentient-OS inherits dependency blocker from REMOTE-AGENTS"
+    },
+    {
+      "category": "dependency_blocked",
+      "dependency_repository_id": "Sapient-KB",
+      "description": "Dependency 'Sapient-KB' readiness/state is below threshold (readiness=0, status=critical).",
+      "finding_id": "dependency_finding_7fac3018337441adbf2f07486bbff3db",
+      "impact": "Sentient-OS delivery planning is blocked by dependency readiness.",
+      "metadata": {},
+      "recommended_action": "Raise Sapient-KB readiness before scheduling dependent portfolio work for Sentient-OS.",
+      "repository_id": "Sentient-OS",
+      "severity": "high",
+      "title": "Sentient-OS inherits dependency blocker from Sapient-KB"
+    },
+    {
+      "category": "dependency_risk",
+      "dependency_repository_id": "Sapient-KB",
+      "description": "Dependency 'Sapient-KB' has high-priority onboarding recommendations (P1).",
+      "finding_id": "dependency_finding_1cc6be33d56e49f78369f63df85d5305",
+      "impact": "Sentient-OS risk posture inherits upstream onboarding gaps.",
+      "metadata": {},
+      "recommended_action": "Prioritize onboarding recommendations for Sapient-KB before dependent work.",
+      "repository_id": "Sentient-OS",
+      "severity": "medium",
+      "title": "Sentient-OS inherits onboarding risk from Sapient-KB"
+    },
+    {
+      "category": "dependency_missing",
+      "dependency_repository_id": "Sapient-KB",
+      "description": "Dependency 'Sapient-KB' has no usable readiness baseline yet.",
+      "finding_id": "dependency_finding_6a8a804a9a0641f99a5ead638f8e7630",
+      "impact": "Dependency chain confidence is reduced.",
+      "metadata": {},
+      "recommended_action": "Generate/bootstrap advisory readiness for Sapient-KB.",
+      "repository_id": "Sentient-OS",
+      "severity": "medium",
+      "title": "Sentient-OS dependency Sapient-KB has missing readiness baseline"
+    },
+    {
+      "category": "dependency_blocked",
+      "dependency_repository_id": "Sentient-OS",
+      "description": "Dependency 'Sentient-OS' readiness/state is below threshold (readiness=0, status=critical).",
+      "finding_id": "dependency_finding_d5db60e8e8cf42c39d5a7df2ae484d75",
+      "impact": "TRT delivery planning is blocked by dependency readiness.",
+      "metadata": {},
+      "recommended_action": "Raise Sentient-OS readiness before scheduling dependent portfolio work for TRT.",
+      "repository_id": "TRT",
+      "severity": "high",
+      "title": "TRT inherits dependency blocker from Sentient-OS"
+    },
+    {
+      "category": "dependency_risk",
+      "dependency_repository_id": "Sentient-OS",
+      "description": "Dependency 'Sentient-OS' has high-priority onboarding recommendations (P1).",
+      "finding_id": "dependency_finding_6ede30175ae641e59b61fe73815c5e43",
+      "impact": "TRT risk posture inherits upstream onboarding gaps.",
+      "metadata": {},
+      "recommended_action": "Prioritize onboarding recommendations for Sentient-OS before dependent work.",
+      "repository_id": "TRT",
+      "severity": "medium",
+      "title": "TRT inherits onboarding risk from Sentient-OS"
+    },
+    {
+      "category": "dependency_missing",
+      "dependency_repository_id": "Sentient-OS",
+      "description": "Dependency 'Sentient-OS' has no usable readiness baseline yet.",
+      "finding_id": "dependency_finding_cf69f395d7b244938356b0634f7490f4",
+      "impact": "Dependency chain confidence is reduced.",
+      "metadata": {},
+      "recommended_action": "Generate/bootstrap advisory readiness for Sentient-OS.",
+      "repository_id": "TRT",
+      "severity": "medium",
+      "title": "TRT dependency Sentient-OS has missing readiness baseline"
+    },
+    {
+      "category": "dependency_blocked",
+      "dependency_repository_id": "Mucho3D",
+      "description": "Dependency 'Mucho3D' readiness/state is below threshold (readiness=0, status=critical).",
+      "finding_id": "dependency_finding_70d1ad217ba24f18bbec792d02853c1f",
+      "impact": "TRT delivery planning is blocked by dependency readiness.",
+      "metadata": {},
+      "recommended_action": "Raise Mucho3D readiness before scheduling dependent portfolio work for TRT.",
+      "repository_id": "TRT",
+      "severity": "high",
+      "title": "TRT inherits dependency blocker from Mucho3D"
+    },
+    {
+      "category": "dependency_risk",
+      "dependency_repository_id": "Mucho3D",
+      "description": "Dependency 'Mucho3D' has high-priority onboarding recommendations (P1).",
+      "finding_id": "dependency_finding_567a78282933450ea46ff8496f7006e8",
+      "impact": "TRT risk posture inherits upstream onboarding gaps.",
+      "metadata": {},
+      "recommended_action": "Prioritize onboarding recommendations for Mucho3D before dependent work.",
+      "repository_id": "TRT",
+      "severity": "medium",
+      "title": "TRT inherits onboarding risk from Mucho3D"
+    },
+    {
+      "category": "dependency_missing",
+      "dependency_repository_id": "Mucho3D",
+      "description": "Dependency 'Mucho3D' has no usable readiness baseline yet.",
+      "finding_id": "dependency_finding_e75ac59ada074566ae90015db7aba412",
+      "impact": "Dependency chain confidence is reduced.",
+      "metadata": {},
+      "recommended_action": "Generate/bootstrap advisory readiness for Mucho3D.",
+      "repository_id": "TRT",
+      "severity": "medium",
+      "title": "TRT dependency Mucho3D has missing readiness baseline"
+    },
+    {
+      "category": "dependency_blocked",
+      "dependency_repository_id": "Sentient-OS",
+      "description": "Dependency 'Sentient-OS' readiness/state is below threshold (readiness=0, status=critical).",
+      "finding_id": "dependency_finding_5e1bdd6eb6d94312805488ebc8289c82",
+      "impact": "Powerframe delivery planning is blocked by dependency readiness.",
+      "metadata": {},
+      "recommended_action": "Raise Sentient-OS readiness before scheduling dependent portfolio work for Powerframe.",
+      "repository_id": "Powerframe",
+      "severity": "high",
+      "title": "Powerframe inherits dependency blocker from Sentient-OS"
+    },
+    {
+      "category": "dependency_risk",
+      "dependency_repository_id": "Sentient-OS",
+      "description": "Dependency 'Sentient-OS' has high-priority onboarding recommendations (P1).",
+      "finding_id": "dependency_finding_d76d21bd98924094a73cae407f43429f",
+      "impact": "Powerframe risk posture inherits upstream onboarding gaps.",
+      "metadata": {},
+      "recommended_action": "Prioritize onboarding recommendations for Sentient-OS before dependent work.",
+      "repository_id": "Powerframe",
+      "severity": "medium",
+      "title": "Powerframe inherits onboarding risk from Sentient-OS"
+    },
+    {
+      "category": "dependency_missing",
+      "dependency_repository_id": "Sentient-OS",
+      "description": "Dependency 'Sentient-OS' has no usable readiness baseline yet.",
+      "finding_id": "dependency_finding_d5d4477738f84a68a0843c806f60d2c5",
+      "impact": "Dependency chain confidence is reduced.",
+      "metadata": {},
+      "recommended_action": "Generate/bootstrap advisory readiness for Sentient-OS.",
+      "repository_id": "Powerframe",
+      "severity": "medium",
+      "title": "Powerframe dependency Sentient-OS has missing readiness baseline"
+    },
+    {
+      "category": "dependency_blocked",
+      "dependency_repository_id": "Sentient-OS",
+      "description": "Dependency 'Sentient-OS' readiness/state is below threshold (readiness=0, status=critical).",
+      "finding_id": "dependency_finding_14ad4615364d43a495502e06759841d2",
+      "impact": "Trade-Agent delivery planning is blocked by dependency readiness.",
+      "metadata": {},
+      "recommended_action": "Raise Sentient-OS readiness before scheduling dependent portfolio work for Trade-Agent.",
+      "repository_id": "Trade-Agent",
+      "severity": "high",
+      "title": "Trade-Agent inherits dependency blocker from Sentient-OS"
+    },
+    {
+      "category": "dependency_risk",
+      "dependency_repository_id": "Sentient-OS",
+      "description": "Dependency 'Sentient-OS' has high-priority onboarding recommendations (P1).",
+      "finding_id": "dependency_finding_f4a889dd19404996b7c9110d46c97247",
+      "impact": "Trade-Agent risk posture inherits upstream onboarding gaps.",
+      "metadata": {},
+      "recommended_action": "Prioritize onboarding recommendations for Sentient-OS before dependent work.",
+      "repository_id": "Trade-Agent",
+      "severity": "medium",
+      "title": "Trade-Agent inherits onboarding risk from Sentient-OS"
+    },
+    {
+      "category": "dependency_missing",
+      "dependency_repository_id": "Sentient-OS",
+      "description": "Dependency 'Sentient-OS' has no usable readiness baseline yet.",
+      "finding_id": "dependency_finding_03efcd24c72d43148cf51924be37bd1f",
+      "impact": "Dependency chain confidence is reduced.",
+      "metadata": {},
+      "recommended_action": "Generate/bootstrap advisory readiness for Sentient-OS.",
+      "repository_id": "Trade-Agent",
+      "severity": "medium",
+      "title": "Trade-Agent dependency Sentient-OS has missing readiness baseline"
+    },
+    {
+      "category": "dependency_chain",
+      "dependency_repository_id": "REMOTE-AGENTS",
+      "description": "Chain length 3 across portfolio repositories.",
+      "finding_id": "dependency_finding_55501b7a418b4ffd9fed7aeb657d158c",
+      "impact": "Longer chains increase coordination complexity.",
+      "metadata": {
+        "chain": [
+          "Powerframe",
+          "Sentient-OS",
+          "REMOTE-AGENTS"
+        ]
+      },
+      "recommended_action": "Review chain and prioritize upstream readiness improvements.",
+      "repository_id": "Powerframe",
+      "severity": "info",
+      "title": "Dependency chain detected: Powerframe -> Sentient-OS -> REMOTE-AGENTS"
+    },
+    {
+      "category": "dependency_chain",
+      "dependency_repository_id": "Sapient-KB",
+      "description": "Chain length 3 across portfolio repositories.",
+      "finding_id": "dependency_finding_af18eaadd7704c3182beac11d7505236",
+      "impact": "Longer chains increase coordination complexity.",
+      "metadata": {
+        "chain": [
+          "Powerframe",
+          "Sentient-OS",
+          "Sapient-KB"
+        ]
+      },
+      "recommended_action": "Review chain and prioritize upstream readiness improvements.",
+      "repository_id": "Powerframe",
+      "severity": "info",
+      "title": "Dependency chain detected: Powerframe -> Sentient-OS -> Sapient-KB"
+    },
+    {
+      "category": "dependency_chain",
+      "dependency_repository_id": "REMOTE-AGENTS",
+      "description": "Chain length 2 across portfolio repositories.",
+      "finding_id": "dependency_finding_ff15c7bc715c4eeba514ea61bd20a48a",
+      "impact": "Longer chains increase coordination complexity.",
+      "metadata": {
+        "chain": [
+          "Sentient-OS",
+          "REMOTE-AGENTS"
+        ]
+      },
+      "recommended_action": "Review chain and prioritize upstream readiness improvements.",
+      "repository_id": "Sentient-OS",
+      "severity": "info",
+      "title": "Dependency chain detected: Sentient-OS -> REMOTE-AGENTS"
+    },
+    {
+      "category": "dependency_chain",
+      "dependency_repository_id": "Sapient-KB",
+      "description": "Chain length 2 across portfolio repositories.",
+      "finding_id": "dependency_finding_3c7e8ec2a44a4585acf827bc9c3e8ca4",
+      "impact": "Longer chains increase coordination complexity.",
+      "metadata": {
+        "chain": [
+          "Sentient-OS",
+          "Sapient-KB"
+        ]
+      },
+      "recommended_action": "Review chain and prioritize upstream readiness improvements.",
+      "repository_id": "Sentient-OS",
+      "severity": "info",
+      "title": "Dependency chain detected: Sentient-OS -> Sapient-KB"
+    },
+    {
+      "category": "dependency_chain",
+      "dependency_repository_id": "REMOTE-AGENTS",
+      "description": "Chain length 3 across portfolio repositories.",
+      "finding_id": "dependency_finding_2ab0e547d43645febc7292097ecc4fad",
+      "impact": "Longer chains increase coordination complexity.",
+      "metadata": {
+        "chain": [
+          "TRT",
+          "Sentient-OS",
+          "REMOTE-AGENTS"
+        ]
+      },
+      "recommended_action": "Review chain and prioritize upstream readiness improvements.",
+      "repository_id": "TRT",
+      "severity": "info",
+      "title": "Dependency chain detected: TRT -> Sentient-OS -> REMOTE-AGENTS"
+    },
+    {
+      "category": "dependency_chain",
+      "dependency_repository_id": "Sapient-KB",
+      "description": "Chain length 3 across portfolio repositories.",
+      "finding_id": "dependency_finding_4a4781d13bdc46e2a93f25974f2ab148",
+      "impact": "Longer chains increase coordination complexity.",
+      "metadata": {
+        "chain": [
+          "TRT",
+          "Sentient-OS",
+          "Sapient-KB"
+        ]
+      },
+      "recommended_action": "Review chain and prioritize upstream readiness improvements.",
+      "repository_id": "TRT",
+      "severity": "info",
+      "title": "Dependency chain detected: TRT -> Sentient-OS -> Sapient-KB"
+    },
+    {
+      "category": "dependency_chain",
+      "dependency_repository_id": "Mucho3D",
+      "description": "Chain length 2 across portfolio repositories.",
+      "finding_id": "dependency_finding_d9cba090ca774665af5eced8a6abf822",
+      "impact": "Longer chains increase coordination complexity.",
+      "metadata": {
+        "chain": [
+          "TRT",
+          "Mucho3D"
+        ]
+      },
+      "recommended_action": "Review chain and prioritize upstream readiness improvements.",
+      "repository_id": "TRT",
+      "severity": "info",
+      "title": "Dependency chain detected: TRT -> Mucho3D"
+    },
+    {
+      "category": "dependency_chain",
+      "dependency_repository_id": "REMOTE-AGENTS",
+      "description": "Chain length 3 across portfolio repositories.",
+      "finding_id": "dependency_finding_e88fd80ec85b4f2c96920629277fe0e9",
+      "impact": "Longer chains increase coordination complexity.",
+      "metadata": {
+        "chain": [
+          "Trade-Agent",
+          "Sentient-OS",
+          "REMOTE-AGENTS"
+        ]
+      },
+      "recommended_action": "Review chain and prioritize upstream readiness improvements.",
+      "repository_id": "Trade-Agent",
+      "severity": "info",
+      "title": "Dependency chain detected: Trade-Agent -> Sentient-OS -> REMOTE-AGENTS"
+    },
+    {
+      "category": "dependency_chain",
+      "dependency_repository_id": "Sapient-KB",
+      "description": "Chain length 3 across portfolio repositories.",
+      "finding_id": "dependency_finding_377ac66d91cd4d0aabe5942ba3c29300",
+      "impact": "Longer chains increase coordination complexity.",
+      "metadata": {
+        "chain": [
+          "Trade-Agent",
+          "Sentient-OS",
+          "Sapient-KB"
+        ]
+      },
+      "recommended_action": "Review chain and prioritize upstream readiness improvements.",
+      "repository_id": "Trade-Agent",
+      "severity": "info",
+      "title": "Dependency chain detected: Trade-Agent -> Sentient-OS -> Sapient-KB"
+    }
+  ],
+  "generated_utc": "2026-05-31T13:00:12Z",
+  "metadata": {
+    "advisory_only": true,
+    "queue_mutation": false,
+    "runtime_unchanged": true
+  },
+  "portfolio_impact": {
+    "consumer_count": 6,
+    "dependency_count": 6,
+    "finding_count": 25,
+    "repository_count": 7,
+    "severity_counts": {
+      "high": 6,
+      "info": 9,
+      "medium": 10
+    }
+  },
+  "report_id": "portfolio_dependency_report_d865f84d519146aead1e48e4538ab492"
+}

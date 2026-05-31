@@ -436,6 +436,144 @@ python src/work_queue_manager/cli.py --limit 10
 
 AWQM outputs are advisory only and are written under `.control_plane/work_queue/`.
 
+## Execution Readiness Dossier Engine (ERDE)
+
+Phase 25 converts prioritized queue items into complete execution dossiers and codex-ready execution packets for manual approval and execution.
+
+It does not execute changes, does not enqueue tasks, and does not mutate `.platform_queue`.
+
+Examples:
+
+```bash
+python src/execution_dossier/cli.py --print
+python src/execution_dossier/cli.py --export
+python src/execution_dossier/cli.py --export-jsonl
+python src/execution_dossier/cli.py --from-work-queue ".control_plane/work_queue/latest.json"
+python src/execution_dossier/cli.py --limit 10
+```
+
+ERDE outputs are advisory only and are written under `.control_plane/execution_dossiers/`.
+
+## Portfolio Orchestration Layer (POL)
+
+Phase 26 extends advisory planning to a multi-repository portfolio view.
+
+POL aggregates repository intelligence, remediation plans, work queue posture, and execution dossier posture into deterministic portfolio scoring and execution-order recommendations.
+
+It does not execute anything, does not enqueue anything, and does not mutate `.platform_queue`.
+
+Examples:
+
+```bash
+python src/portfolio_orchestration/cli.py --print
+python src/portfolio_orchestration/cli.py --export
+python src/portfolio_orchestration/cli.py --export-jsonl
+python src/portfolio_orchestration/cli.py --registry ".config/portfolio/portfolio_registry.json"
+```
+
+POL outputs are advisory only and are written under `.control_plane/portfolio/`.
+
+## Portfolio Artifact Bootstrap Layer (PABL)
+
+Phase 27 adds deterministic repository onboarding and advisory artifact discovery for portfolio repositories.
+
+PABL inspects repository roots and records advisory artifact coverage without modifying external repositories.
+
+Examples:
+
+```bash
+python src/portfolio_bootstrap/cli.py --print
+python src/portfolio_bootstrap/cli.py --export
+python src/portfolio_bootstrap/cli.py --export-jsonl
+```
+
+PABL outputs are advisory only and are written under `.control_plane/portfolio_bootstrap/`.
+
+## Portfolio Onboarding Recommendations (PROR)
+
+Phase 28 converts bootstrap onboarding gaps into deterministic repository-specific onboarding recommendation packages.
+
+Examples:
+
+```bash
+python src/portfolio_onboarding_recommendations/cli.py --print
+python src/portfolio_onboarding_recommendations/cli.py --export
+python src/portfolio_onboarding_recommendations/cli.py --export-jsonl
+python src/portfolio_onboarding_recommendations/cli.py --from-bootstrap-report ".control_plane/portfolio_bootstrap/latest.json"
+```
+
+PROR outputs are advisory only and are written under `.control_plane/portfolio_onboarding_recommendations/`.
+
+## Portfolio Dependency Intelligence Layer (PDIL)
+
+Phase 29 adds deterministic dependency-aware portfolio governance intelligence.
+
+Examples:
+
+```bash
+python src/portfolio_dependencies/cli.py --print
+python src/portfolio_dependencies/cli.py --export
+python src/portfolio_dependencies/cli.py --export-jsonl
+```
+
+PDIL outputs are advisory only and are written under `.control_plane/portfolio_dependencies/`.
+
+## Portfolio Critical Path Intelligence (PCPI)
+
+Phase 30 adds deterministic critical-path analysis for highest-leverage portfolio actions.
+
+Examples:
+
+```bash
+python src/portfolio_critical_path/cli.py --print
+python src/portfolio_critical_path/cli.py --export
+python src/portfolio_critical_path/cli.py --export-jsonl
+```
+
+PCPI outputs are advisory only and are written under `.control_plane/portfolio_critical_path/`.
+
+## Portfolio Strategic Execution Roadmap Layer (PSERL)
+
+Phase 31 converts critical-path findings into deterministic near-term, mid-term, and long-term portfolio execution waves.
+
+Examples:
+
+```bash
+python src/portfolio_roadmap/cli.py --print
+python src/portfolio_roadmap/cli.py --export
+python src/portfolio_roadmap/cli.py --export-jsonl
+```
+
+PSERL outputs are advisory only and are written under `.control_plane/portfolio_roadmap/`.
+
+## Portfolio Progress Intelligence Layer (PPIL)
+
+Phase 32 adds deterministic progress tracking over portfolio, onboarding, dependency, critical-path, and roadmap artifacts.
+
+Examples:
+
+```bash
+python src/portfolio_progress/cli.py --print
+python src/portfolio_progress/cli.py --export
+python src/portfolio_progress/cli.py --export-jsonl
+```
+
+PPIL outputs are advisory only and are written under `.control_plane/portfolio_progress/`.
+
+## Portfolio Drift Intelligence Layer (PDIL-2)
+
+Phase 33 adds deterministic cross-artifact drift detection across the portfolio governance stack.
+
+Examples:
+
+```bash
+python src/portfolio_drift/cli.py --print
+python src/portfolio_drift/cli.py --export
+python src/portfolio_drift/cli.py --export-jsonl
+```
+
+PDIL-2 outputs are advisory only and are written under `.control_plane/portfolio_drift/`.
+
 ## Handoff Package Refinement Engine (HPRE)
 
 Phase 23 refines broad handoff packages into smaller subsystem-scoped packages with focused validation plans and smaller Codex prompts.
@@ -490,6 +628,15 @@ See `docs/runtime-contracts.md` for the Phase 0 contracts covering:
 - `docs/remediation-batch-handoff-engine.md` records the Phase 22 advisory remediation handoff boundary.
 - `docs/handoff-package-refinement-engine.md` records the Phase 23 advisory handoff refinement boundary.
 - `docs/autonomous-work-queue-manager.md` records the Phase 24 advisory work queue boundary.
+- `docs/execution-readiness-dossier-engine.md` records the Phase 25 advisory execution dossier boundary.
+- `docs/portfolio-orchestration-layer.md` records the Phase 26 advisory portfolio orchestration boundary.
+- `docs/portfolio-artifact-bootstrap-layer.md` records the Phase 27 advisory portfolio onboarding and artifact discovery boundary.
+- `docs/portfolio-onboarding-recommendations.md` records the Phase 28 advisory onboarding recommendation boundary.
+- `docs/portfolio-dependency-intelligence-layer.md` records the Phase 29 advisory dependency intelligence boundary.
+- `docs/portfolio-critical-path-intelligence.md` records the Phase 30 advisory critical-path intelligence boundary.
+- `docs/portfolio-strategic-execution-roadmap.md` records the Phase 31 advisory strategic execution roadmap boundary.
+- `docs/portfolio-progress-intelligence-layer.md` records the Phase 32 advisory portfolio progress boundary.
+- `docs/portfolio-drift-intelligence-layer.md` records the Phase 33 advisory portfolio drift boundary.
 - `docs/handoff-package-refinement-engine.md` records the Phase 23 advisory refinement boundary.
 
 ## Additional Repository Components

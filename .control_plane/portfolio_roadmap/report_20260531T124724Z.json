@@ -1,0 +1,318 @@
+{
+  "advisory_only": true,
+  "generated_utc": "2026-05-31T12:47:24Z",
+  "metadata": {
+    "advisory_only": true,
+    "queue_mutation": false,
+    "runtime_unchanged": true,
+    "source_artifacts": {
+      "portfolio": ".control_plane\\portfolio\\latest.json",
+      "portfolio_critical_path": ".control_plane\\portfolio_critical_path\\latest.json",
+      "portfolio_dependencies": ".control_plane\\portfolio_dependencies\\latest.json",
+      "portfolio_onboarding_recommendations": ".control_plane\\portfolio_onboarding_recommendations\\latest.json"
+    }
+  },
+  "milestones": [
+    {
+      "advisory_only": true,
+      "description": "Complete advisory objectives for Near-Term Wave 1.",
+      "horizon": "near_term",
+      "item_ids": [
+        "roadmap_item_b24522f72ed54806b9d77cce3c775a4b",
+        "roadmap_item_f5051ed70ebe4175b34721cd597b2d5b",
+        "roadmap_item_781e646e31e042bf87cc37f025cc0475",
+        "roadmap_item_94c008e5a87c477e9178141b501d168a",
+        "roadmap_item_ea27b48acd9d474298b6050dbbd76aa8",
+        "roadmap_item_8e436e482ca3417ba44d4a9460efbb2b"
+      ],
+      "metadata": {
+        "item_count": 6
+      },
+      "milestone_id": "roadmap_milestone_d1d662b25a7f4fa9b3d0b686db4e3762",
+      "title": "Near-Term Wave 1 completion",
+      "wave": "wave_1"
+    },
+    {
+      "advisory_only": true,
+      "description": "Complete advisory objectives for Mid-Term Wave 2.",
+      "horizon": "mid_term",
+      "item_ids": [],
+      "metadata": {
+        "item_count": 0
+      },
+      "milestone_id": "roadmap_milestone_07fd72e57de646f3b751dd8306cca9bf",
+      "title": "Mid-Term Wave 2 completion",
+      "wave": "wave_2"
+    },
+    {
+      "advisory_only": true,
+      "description": "Complete advisory objectives for Long-Term Wave 3.",
+      "horizon": "long_term",
+      "item_ids": [
+        "roadmap_item_94fb9638919f43f892553ab9072bd1a9"
+      ],
+      "metadata": {
+        "item_count": 1
+      },
+      "milestone_id": "roadmap_milestone_1910364ea6914983aab5da64c144d2d9",
+      "title": "Long-Term Wave 3 completion",
+      "wave": "wave_3"
+    },
+    {
+      "advisory_only": true,
+      "description": "Validated dependency-aware sequence for advisory portfolio execution.",
+      "horizon": "near_term",
+      "item_ids": [
+        "roadmap_item_b24522f72ed54806b9d77cce3c775a4b"
+      ],
+      "metadata": {
+        "top_repository": "Sentient-OS"
+      },
+      "milestone_id": "roadmap_milestone_2f28f924bb0642428c2291e85c2178d2",
+      "title": "Portfolio strategic sequence baseline",
+      "wave": "wave_1"
+    }
+  ],
+  "recommended_sequence": [
+    "roadmap_item_b24522f72ed54806b9d77cce3c775a4b",
+    "roadmap_item_f5051ed70ebe4175b34721cd597b2d5b",
+    "roadmap_item_781e646e31e042bf87cc37f025cc0475",
+    "roadmap_item_94c008e5a87c477e9178141b501d168a",
+    "roadmap_item_ea27b48acd9d474298b6050dbbd76aa8",
+    "roadmap_item_8e436e482ca3417ba44d4a9460efbb2b",
+    "roadmap_item_94fb9638919f43f892553ab9072bd1a9"
+  ],
+  "report_id": "portfolio_roadmap_report_e0aa021d026f4596a8a4e818ba0eb17d",
+  "roadmap_items": [
+    {
+      "advisory_only": true,
+      "dependencies": [
+        "REMOTE-AGENTS",
+        "Sapient-KB"
+      ],
+      "expected_impact": "Improves downstream dependency confidence and portfolio leverage.",
+      "horizon": "near_term",
+      "item_id": "roadmap_item_b24522f72ed54806b9d77cce3c775a4b",
+      "metadata": {
+        "dependency_depth": 1,
+        "onboarding_priority": "P1",
+        "portfolio_status": "critical",
+        "repository_known_in_registry": true
+      },
+      "objective": "Prioritize onboarding/readiness blockers for Sentient-OS before dependent portfolio execution.",
+      "priority": "P1",
+      "repository_id": "Sentient-OS",
+      "source_recommendation_id": "critical_path_recommendation_2ec76fd606b74645a79524c4c18bc2ee",
+      "title": "Critical path action for Sentient-OS",
+      "validation_focus": [
+        "contract_validation",
+        "advisory_artifact_refresh",
+        "dependency_blocker_review",
+        "readiness_recovery",
+        "onboarding_blocker_resolution"
+      ],
+      "wave": "wave_1"
+    },
+    {
+      "advisory_only": true,
+      "dependencies": [
+        "Sentient-OS",
+        "Mucho3D"
+      ],
+      "expected_impact": "Improves repository readiness posture.",
+      "horizon": "near_term",
+      "item_id": "roadmap_item_f5051ed70ebe4175b34721cd597b2d5b",
+      "metadata": {
+        "dependency_depth": 2,
+        "onboarding_priority": "P1",
+        "portfolio_status": "critical",
+        "repository_known_in_registry": true
+      },
+      "objective": "Prioritize onboarding/readiness blockers for TRT before dependent portfolio execution.",
+      "priority": "P2",
+      "repository_id": "TRT",
+      "source_recommendation_id": "critical_path_recommendation_be8ccaae5b074a639d7507deff754506",
+      "title": "Critical path action for TRT",
+      "validation_focus": [
+        "contract_validation",
+        "advisory_artifact_refresh",
+        "readiness_recovery",
+        "onboarding_blocker_resolution"
+      ],
+      "wave": "wave_1"
+    },
+    {
+      "advisory_only": true,
+      "dependencies": [],
+      "expected_impact": "Improves downstream dependency confidence and portfolio leverage.",
+      "horizon": "near_term",
+      "item_id": "roadmap_item_781e646e31e042bf87cc37f025cc0475",
+      "metadata": {
+        "dependency_depth": 0,
+        "onboarding_priority": "P1",
+        "portfolio_status": "critical",
+        "repository_known_in_registry": true
+      },
+      "objective": "Prioritize onboarding/readiness blockers for Mucho3D before dependent portfolio execution.",
+      "priority": "P3",
+      "repository_id": "Mucho3D",
+      "source_recommendation_id": "critical_path_recommendation_1e96ca9ad455446aa6834874f23b318a",
+      "title": "Critical path action for Mucho3D",
+      "validation_focus": [
+        "contract_validation",
+        "advisory_artifact_refresh",
+        "readiness_recovery",
+        "onboarding_blocker_resolution"
+      ],
+      "wave": "wave_1"
+    },
+    {
+      "advisory_only": true,
+      "dependencies": [
+        "Sentient-OS"
+      ],
+      "expected_impact": "Improves repository readiness posture.",
+      "horizon": "near_term",
+      "item_id": "roadmap_item_94c008e5a87c477e9178141b501d168a",
+      "metadata": {
+        "dependency_depth": 2,
+        "onboarding_priority": "P1",
+        "portfolio_status": "critical",
+        "repository_known_in_registry": true
+      },
+      "objective": "Prioritize onboarding/readiness blockers for Powerframe before dependent portfolio execution.",
+      "priority": "P3",
+      "repository_id": "Powerframe",
+      "source_recommendation_id": "critical_path_recommendation_1d20169a75e04226969e51534f5e9566",
+      "title": "Critical path action for Powerframe",
+      "validation_focus": [
+        "contract_validation",
+        "advisory_artifact_refresh",
+        "readiness_recovery",
+        "onboarding_blocker_resolution"
+      ],
+      "wave": "wave_1"
+    },
+    {
+      "advisory_only": true,
+      "dependencies": [],
+      "expected_impact": "Improves downstream dependency confidence and portfolio leverage.",
+      "horizon": "near_term",
+      "item_id": "roadmap_item_ea27b48acd9d474298b6050dbbd76aa8",
+      "metadata": {
+        "dependency_depth": 0,
+        "onboarding_priority": "P1",
+        "portfolio_status": "critical",
+        "repository_known_in_registry": true
+      },
+      "objective": "Prioritize onboarding/readiness blockers for Sapient-KB before dependent portfolio execution.",
+      "priority": "P3",
+      "repository_id": "Sapient-KB",
+      "source_recommendation_id": "critical_path_recommendation_9be64db8e81f42dfa134c688071a5ad7",
+      "title": "Critical path action for Sapient-KB",
+      "validation_focus": [
+        "contract_validation",
+        "advisory_artifact_refresh",
+        "readiness_recovery",
+        "onboarding_blocker_resolution"
+      ],
+      "wave": "wave_1"
+    },
+    {
+      "advisory_only": true,
+      "dependencies": [
+        "Sentient-OS"
+      ],
+      "expected_impact": "Improves repository readiness posture.",
+      "horizon": "near_term",
+      "item_id": "roadmap_item_8e436e482ca3417ba44d4a9460efbb2b",
+      "metadata": {
+        "dependency_depth": 2,
+        "onboarding_priority": "P1",
+        "portfolio_status": "degraded",
+        "repository_known_in_registry": true
+      },
+      "objective": "Prioritize onboarding/readiness blockers for Trade-Agent before dependent portfolio execution.",
+      "priority": "P4",
+      "repository_id": "Trade-Agent",
+      "source_recommendation_id": "critical_path_recommendation_3a12506c6f23407188230de00179802d",
+      "title": "Critical path action for Trade-Agent",
+      "validation_focus": [
+        "contract_validation",
+        "advisory_artifact_refresh",
+        "readiness_recovery",
+        "onboarding_blocker_resolution"
+      ],
+      "wave": "wave_1"
+    },
+    {
+      "advisory_only": true,
+      "dependencies": [],
+      "expected_impact": "Improves downstream dependency confidence and portfolio leverage.",
+      "horizon": "long_term",
+      "item_id": "roadmap_item_94fb9638919f43f892553ab9072bd1a9",
+      "metadata": {
+        "dependency_depth": 0,
+        "onboarding_priority": "P3",
+        "portfolio_status": "degraded",
+        "repository_known_in_registry": true
+      },
+      "objective": "Prioritize onboarding/readiness blockers for REMOTE-AGENTS before dependent portfolio execution.",
+      "priority": "P4",
+      "repository_id": "REMOTE-AGENTS",
+      "source_recommendation_id": "critical_path_recommendation_5e763bc1abd748dc8fed7ae627f9cc5d",
+      "title": "Critical path action for REMOTE-AGENTS",
+      "validation_focus": [
+        "contract_validation",
+        "advisory_artifact_refresh",
+        "readiness_recovery"
+      ],
+      "wave": "wave_3"
+    }
+  ],
+  "source_critical_path_report_id": "portfolio_critical_path_report_8fe2b19106cf43cd8684e871443a674c",
+  "waves": [
+    {
+      "advisory_only": true,
+      "horizon": "near_term",
+      "items": [
+        "roadmap_item_b24522f72ed54806b9d77cce3c775a4b",
+        "roadmap_item_f5051ed70ebe4175b34721cd597b2d5b",
+        "roadmap_item_781e646e31e042bf87cc37f025cc0475",
+        "roadmap_item_94c008e5a87c477e9178141b501d168a",
+        "roadmap_item_ea27b48acd9d474298b6050dbbd76aa8",
+        "roadmap_item_8e436e482ca3417ba44d4a9460efbb2b"
+      ],
+      "metadata": {},
+      "objective": "Stabilize critical-path blockers and onboarding gaps.",
+      "readiness_focus": "P0/P1 execution readiness and dependency unblockers.",
+      "risk_focus": "Immediate high-risk dependency and governance bottlenecks.",
+      "title": "Near-Term Wave 1",
+      "wave_id": "wave_1"
+    },
+    {
+      "advisory_only": true,
+      "horizon": "mid_term",
+      "items": [],
+      "metadata": {},
+      "objective": "Expand readiness and portfolio intelligence coverage.",
+      "readiness_focus": "P2 operational uplift and advisory baseline expansion.",
+      "risk_focus": "Medium-risk coordination and cross-repository consistency.",
+      "title": "Mid-Term Wave 2",
+      "wave_id": "wave_2"
+    },
+    {
+      "advisory_only": true,
+      "horizon": "long_term",
+      "items": [
+        "roadmap_item_94fb9638919f43f892553ab9072bd1a9"
+      ],
+      "metadata": {},
+      "objective": "Harden ecosystem governance and federation readiness.",
+      "readiness_focus": "P3/P4 hardening and long-range portfolio coherence.",
+      "risk_focus": "Long-tail risk reduction and documentation maturity.",
+      "title": "Long-Term Wave 3",
+      "wave_id": "wave_3"
+    }
+  ]
+}

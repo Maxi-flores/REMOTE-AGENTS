@@ -1,0 +1,4 @@
+from portfolio_onboarding_recommendations.generator import generate_portfolio_onboarding_recommendation_report
+
+__all__ = ["generate_portfolio_onboarding_recommendation_report"]
+

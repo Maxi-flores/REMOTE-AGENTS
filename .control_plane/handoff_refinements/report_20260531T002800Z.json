@@ -1,0 +1,567 @@
+{
+  "advisory_only": true,
+  "generated_utc": "2026-05-31T00:28:00Z",
+  "metadata": {
+    "advisory_only": true,
+    "base_dir": ".",
+    "source_report_path": ".control_plane\\remediation_handoffs\\latest.json"
+  },
+  "refined_packages": [
+    {
+      "advisory_only": true,
+      "change_type": "add_cli_test",
+      "codex_prompt": {
+        "advisory_only": true,
+        "metadata": {
+          "advisory_only": true
+        },
+        "prompt_id": "refined_prompt_41753248c70c4344ab4eb2cbb887c872",
+        "prompt_text": "You are implementing a focused refinement package.\nConstraints:\n- Keep changes scoped to listed files and subsystem.\n- Do not modify platform_engine.py behavior.\n- Do not mutate queue semantics.\n\nTitle: mission_engine add_cli_test refinement\nObjective: Apply focused changes for subsystem 'mission_engine' with change type 'add_cli_test'.\nSubsystem: mission_engine\nChange Type: add_cli_test\nRisk Level: medium\n\nTarget Files:\n- tests/test_mission_engine_cli.py\n\nExpected Changes:\n- file_additions:\n  - tests/test_mission_engine_cli.py\n- file_updates:\n  - None\n- notes:\n  - Add CLI tests for 'mission_engine'.\n  - Add targeted tests for module 'mission_engine'.\n  - Add targeted tests for module 'orchastrator'.\n  - Add targeted tests for module 'orchestrator'.\n  - Add targeted tests for module 'routers'.\n  - Add targeted tests for module 'tools'.\n  - Add targeted tests for module 'ui'.\n\nValidation Commands:\n- python -m unittest tests.test_mission_engine_cli -v\n- python -m unittest tests.test_mission_engine -v\n"
+      },
+      "estimated_scope": "small",
+      "expected_changes": {
+        "file_additions": [
+          "tests/test_mission_engine_cli.py"
+        ],
+        "file_updates": [],
+        "notes": [
+          "Add CLI tests for 'mission_engine'.",
+          "Add targeted tests for module 'mission_engine'.",
+          "Add targeted tests for module 'orchastrator'.",
+          "Add targeted tests for module 'orchestrator'.",
+          "Add targeted tests for module 'routers'.",
+          "Add targeted tests for module 'tools'.",
+          "Add targeted tests for module 'ui'."
+        ]
+      },
+      "metadata": {
+        "advisory_only": true,
+        "broad_reasons": [
+          "target_files_gt_3",
+          "multi_subsystem",
+          "validation_commands_gt_2",
+          "mixed_change_types"
+        ],
+        "source_was_broad": true
+      },
+      "objective": "Apply focused changes for subsystem 'mission_engine' with change type 'add_cli_test'.",
+      "refined_package_id": "refined_pkg_00f802878ed64bf197b898a2c76df14e",
+      "risk_level": "medium",
+      "source_batch_id": "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172",
+      "source_package_id": "implementation_package_50736cc6734f453fbb626d7c21b193cf",
+      "subsystem": "mission_engine",
+      "target_files": [
+        "tests/test_mission_engine_cli.py"
+      ],
+      "title": "mission_engine add_cli_test refinement",
+      "traceability_refs": [
+        "implementation_package_50736cc6734f453fbb626d7c21b193cf",
+        "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172",
+        "codex_prompt_30b20503f3c64577b28e0584706c7fa5"
+      ],
+      "validation_commands": [
+        "python -m unittest tests.test_mission_engine_cli -v",
+        "python -m unittest tests.test_mission_engine -v"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "change_type": "add_test",
+      "codex_prompt": {
+        "advisory_only": true,
+        "metadata": {
+          "advisory_only": true
+        },
+        "prompt_id": "refined_prompt_73af002ee7cc407fb2391c5c3e7dc638",
+        "prompt_text": "You are implementing a focused refinement package.\nConstraints:\n- Keep changes scoped to listed files and subsystem.\n- Do not modify platform_engine.py behavior.\n- Do not mutate queue semantics.\n\nTitle: mission_engine add_test refinement\nObjective: Apply focused changes for subsystem 'mission_engine' with change type 'add_test'.\nSubsystem: mission_engine\nChange Type: add_test\nRisk Level: high\n\nTarget Files:\n- tests/test_mission_engine.py\n\nExpected Changes:\n- file_additions:\n  - tests/test_mission_engine.py\n- file_updates:\n  - None\n- notes:\n  - Add CLI tests for 'mission_engine'.\n  - Add targeted tests for module 'mission_engine'.\n  - Add targeted tests for module 'orchastrator'.\n  - Add targeted tests for module 'orchestrator'.\n  - Add targeted tests for module 'routers'.\n  - Add targeted tests for module 'tools'.\n  - Add targeted tests for module 'ui'.\n\nValidation Commands:\n- python -m unittest tests.test_mission_engine_cli -v\n- python -m unittest tests.test_mission_engine -v\n- python -m unittest tests.test_orchastrator -v\n- python -m unittest tests.test_orchestrator -v\n- python -m unittest tests.test_routers -v\n- python -m unittest tests.test_tools -v\n- python -m unittest tests.test_ui -v\n"
+      },
+      "estimated_scope": "medium",
+      "expected_changes": {
+        "file_additions": [
+          "tests/test_mission_engine.py"
+        ],
+        "file_updates": [],
+        "notes": [
+          "Add CLI tests for 'mission_engine'.",
+          "Add targeted tests for module 'mission_engine'.",
+          "Add targeted tests for module 'orchastrator'.",
+          "Add targeted tests for module 'orchestrator'.",
+          "Add targeted tests for module 'routers'.",
+          "Add targeted tests for module 'tools'.",
+          "Add targeted tests for module 'ui'."
+        ]
+      },
+      "metadata": {
+        "advisory_only": true,
+        "broad_reasons": [
+          "target_files_gt_3",
+          "multi_subsystem",
+          "validation_commands_gt_2",
+          "mixed_change_types"
+        ],
+        "source_was_broad": true
+      },
+      "objective": "Apply focused changes for subsystem 'mission_engine' with change type 'add_test'.",
+      "refined_package_id": "refined_pkg_0d275bda66e448e0948fa04b8e17764d",
+      "risk_level": "high",
+      "source_batch_id": "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172",
+      "source_package_id": "implementation_package_50736cc6734f453fbb626d7c21b193cf",
+      "subsystem": "mission_engine",
+      "target_files": [
+        "tests/test_mission_engine.py"
+      ],
+      "title": "mission_engine add_test refinement",
+      "traceability_refs": [
+        "implementation_package_50736cc6734f453fbb626d7c21b193cf",
+        "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172",
+        "codex_prompt_30b20503f3c64577b28e0584706c7fa5"
+      ],
+      "validation_commands": [
+        "python -m unittest tests.test_mission_engine_cli -v",
+        "python -m unittest tests.test_mission_engine -v",
+        "python -m unittest tests.test_orchastrator -v",
+        "python -m unittest tests.test_orchestrator -v",
+        "python -m unittest tests.test_routers -v",
+        "python -m unittest tests.test_tools -v",
+        "python -m unittest tests.test_ui -v"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "change_type": "add_test",
+      "codex_prompt": {
+        "advisory_only": true,
+        "metadata": {
+          "advisory_only": true
+        },
+        "prompt_id": "refined_prompt_ba17c866fb494c6fbd1f73bd0657ec32",
+        "prompt_text": "You are implementing a focused refinement package.\nConstraints:\n- Keep changes scoped to listed files and subsystem.\n- Do not modify platform_engine.py behavior.\n- Do not mutate queue semantics.\n\nTitle: orchastrator add_test refinement\nObjective: Apply focused changes for subsystem 'orchastrator' with change type 'add_test'.\nSubsystem: orchastrator\nChange Type: add_test\nRisk Level: high\n\nTarget Files:\n- tests/test_orchastrator.py\n\nExpected Changes:\n- file_additions:\n  - tests/test_orchastrator.py\n- file_updates:\n  - None\n- notes:\n  - Add CLI tests for 'mission_engine'.\n  - Add targeted tests for module 'mission_engine'.\n  - Add targeted tests for module 'orchastrator'.\n  - Add targeted tests for module 'orchestrator'.\n  - Add targeted tests for module 'routers'.\n  - Add targeted tests for module 'tools'.\n  - Add targeted tests for module 'ui'.\n\nValidation Commands:\n- python -m unittest tests.test_mission_engine_cli -v\n- python -m unittest tests.test_mission_engine -v\n- python -m unittest tests.test_orchastrator -v\n- python -m unittest tests.test_orchestrator -v\n- python -m unittest tests.test_routers -v\n- python -m unittest tests.test_tools -v\n- python -m unittest tests.test_ui -v\n"
+      },
+      "estimated_scope": "medium",
+      "expected_changes": {
+        "file_additions": [
+          "tests/test_orchastrator.py"
+        ],
+        "file_updates": [],
+        "notes": [
+          "Add CLI tests for 'mission_engine'.",
+          "Add targeted tests for module 'mission_engine'.",
+          "Add targeted tests for module 'orchastrator'.",
+          "Add targeted tests for module 'orchestrator'.",
+          "Add targeted tests for module 'routers'.",
+          "Add targeted tests for module 'tools'.",
+          "Add targeted tests for module 'ui'."
+        ]
+      },
+      "metadata": {
+        "advisory_only": true,
+        "broad_reasons": [
+          "target_files_gt_3",
+          "multi_subsystem",
+          "validation_commands_gt_2",
+          "mixed_change_types"
+        ],
+        "source_was_broad": true
+      },
+      "objective": "Apply focused changes for subsystem 'orchastrator' with change type 'add_test'.",
+      "refined_package_id": "refined_pkg_8f02c229b2694401bd0df8e76c056a4d",
+      "risk_level": "high",
+      "source_batch_id": "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172",
+      "source_package_id": "implementation_package_50736cc6734f453fbb626d7c21b193cf",
+      "subsystem": "orchastrator",
+      "target_files": [
+        "tests/test_orchastrator.py"
+      ],
+      "title": "orchastrator add_test refinement",
+      "traceability_refs": [
+        "implementation_package_50736cc6734f453fbb626d7c21b193cf",
+        "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172",
+        "codex_prompt_30b20503f3c64577b28e0584706c7fa5"
+      ],
+      "validation_commands": [
+        "python -m unittest tests.test_mission_engine_cli -v",
+        "python -m unittest tests.test_mission_engine -v",
+        "python -m unittest tests.test_orchastrator -v",
+        "python -m unittest tests.test_orchestrator -v",
+        "python -m unittest tests.test_routers -v",
+        "python -m unittest tests.test_tools -v",
+        "python -m unittest tests.test_ui -v"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "change_type": "add_test",
+      "codex_prompt": {
+        "advisory_only": true,
+        "metadata": {
+          "advisory_only": true
+        },
+        "prompt_id": "refined_prompt_fb9c9131a0a34908b6be18d43402314a",
+        "prompt_text": "You are implementing a focused refinement package.\nConstraints:\n- Keep changes scoped to listed files and subsystem.\n- Do not modify platform_engine.py behavior.\n- Do not mutate queue semantics.\n\nTitle: orchestrator add_test refinement\nObjective: Apply focused changes for subsystem 'orchestrator' with change type 'add_test'.\nSubsystem: orchestrator\nChange Type: add_test\nRisk Level: high\n\nTarget Files:\n- tests/test_orchestrator.py\n\nExpected Changes:\n- file_additions:\n  - tests/test_orchestrator.py\n- file_updates:\n  - None\n- notes:\n  - Add CLI tests for 'mission_engine'.\n  - Add targeted tests for module 'mission_engine'.\n  - Add targeted tests for module 'orchastrator'.\n  - Add targeted tests for module 'orchestrator'.\n  - Add targeted tests for module 'routers'.\n  - Add targeted tests for module 'tools'.\n  - Add targeted tests for module 'ui'.\n\nValidation Commands:\n- python -m unittest tests.test_mission_engine_cli -v\n- python -m unittest tests.test_mission_engine -v\n- python -m unittest tests.test_orchastrator -v\n- python -m unittest tests.test_orchestrator -v\n- python -m unittest tests.test_routers -v\n- python -m unittest tests.test_tools -v\n- python -m unittest tests.test_ui -v\n"
+      },
+      "estimated_scope": "medium",
+      "expected_changes": {
+        "file_additions": [
+          "tests/test_orchestrator.py"
+        ],
+        "file_updates": [],
+        "notes": [
+          "Add CLI tests for 'mission_engine'.",
+          "Add targeted tests for module 'mission_engine'.",
+          "Add targeted tests for module 'orchastrator'.",
+          "Add targeted tests for module 'orchestrator'.",
+          "Add targeted tests for module 'routers'.",
+          "Add targeted tests for module 'tools'.",
+          "Add targeted tests for module 'ui'."
+        ]
+      },
+      "metadata": {
+        "advisory_only": true,
+        "broad_reasons": [
+          "target_files_gt_3",
+          "multi_subsystem",
+          "validation_commands_gt_2",
+          "mixed_change_types"
+        ],
+        "source_was_broad": true
+      },
+      "objective": "Apply focused changes for subsystem 'orchestrator' with change type 'add_test'.",
+      "refined_package_id": "refined_pkg_6aceae7a8a214ebab978170b6d8264b5",
+      "risk_level": "high",
+      "source_batch_id": "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172",
+      "source_package_id": "implementation_package_50736cc6734f453fbb626d7c21b193cf",
+      "subsystem": "orchestrator",
+      "target_files": [
+        "tests/test_orchestrator.py"
+      ],
+      "title": "orchestrator add_test refinement",
+      "traceability_refs": [
+        "implementation_package_50736cc6734f453fbb626d7c21b193cf",
+        "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172",
+        "codex_prompt_30b20503f3c64577b28e0584706c7fa5"
+      ],
+      "validation_commands": [
+        "python -m unittest tests.test_mission_engine_cli -v",
+        "python -m unittest tests.test_mission_engine -v",
+        "python -m unittest tests.test_orchastrator -v",
+        "python -m unittest tests.test_orchestrator -v",
+        "python -m unittest tests.test_routers -v",
+        "python -m unittest tests.test_tools -v",
+        "python -m unittest tests.test_ui -v"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "change_type": "add_test",
+      "codex_prompt": {
+        "advisory_only": true,
+        "metadata": {
+          "advisory_only": true
+        },
+        "prompt_id": "refined_prompt_b2136f79082c45d78a105a27408e8f5c",
+        "prompt_text": "You are implementing a focused refinement package.\nConstraints:\n- Keep changes scoped to listed files and subsystem.\n- Do not modify platform_engine.py behavior.\n- Do not mutate queue semantics.\n\nTitle: routers add_test refinement\nObjective: Apply focused changes for subsystem 'routers' with change type 'add_test'.\nSubsystem: routers\nChange Type: add_test\nRisk Level: high\n\nTarget Files:\n- tests/test_routers.py\n\nExpected Changes:\n- file_additions:\n  - tests/test_routers.py\n- file_updates:\n  - None\n- notes:\n  - Add CLI tests for 'mission_engine'.\n  - Add targeted tests for module 'mission_engine'.\n  - Add targeted tests for module 'orchastrator'.\n  - Add targeted tests for module 'orchestrator'.\n  - Add targeted tests for module 'routers'.\n  - Add targeted tests for module 'tools'.\n  - Add targeted tests for module 'ui'.\n\nValidation Commands:\n- python -m unittest tests.test_mission_engine_cli -v\n- python -m unittest tests.test_mission_engine -v\n- python -m unittest tests.test_orchastrator -v\n- python -m unittest tests.test_orchestrator -v\n- python -m unittest tests.test_routers -v\n- python -m unittest tests.test_tools -v\n- python -m unittest tests.test_ui -v\n"
+      },
+      "estimated_scope": "medium",
+      "expected_changes": {
+        "file_additions": [
+          "tests/test_routers.py"
+        ],
+        "file_updates": [],
+        "notes": [
+          "Add CLI tests for 'mission_engine'.",
+          "Add targeted tests for module 'mission_engine'.",
+          "Add targeted tests for module 'orchastrator'.",
+          "Add targeted tests for module 'orchestrator'.",
+          "Add targeted tests for module 'routers'.",
+          "Add targeted tests for module 'tools'.",
+          "Add targeted tests for module 'ui'."
+        ]
+      },
+      "metadata": {
+        "advisory_only": true,
+        "broad_reasons": [
+          "target_files_gt_3",
+          "multi_subsystem",
+          "validation_commands_gt_2",
+          "mixed_change_types"
+        ],
+        "source_was_broad": true
+      },
+      "objective": "Apply focused changes for subsystem 'routers' with change type 'add_test'.",
+      "refined_package_id": "refined_pkg_a699bc2867174c4f8e406bebb1cacfc1",
+      "risk_level": "high",
+      "source_batch_id": "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172",
+      "source_package_id": "implementation_package_50736cc6734f453fbb626d7c21b193cf",
+      "subsystem": "routers",
+      "target_files": [
+        "tests/test_routers.py"
+      ],
+      "title": "routers add_test refinement",
+      "traceability_refs": [
+        "implementation_package_50736cc6734f453fbb626d7c21b193cf",
+        "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172",
+        "codex_prompt_30b20503f3c64577b28e0584706c7fa5"
+      ],
+      "validation_commands": [
+        "python -m unittest tests.test_mission_engine_cli -v",
+        "python -m unittest tests.test_mission_engine -v",
+        "python -m unittest tests.test_orchastrator -v",
+        "python -m unittest tests.test_orchestrator -v",
+        "python -m unittest tests.test_routers -v",
+        "python -m unittest tests.test_tools -v",
+        "python -m unittest tests.test_ui -v"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "change_type": "add_test",
+      "codex_prompt": {
+        "advisory_only": true,
+        "metadata": {
+          "advisory_only": true
+        },
+        "prompt_id": "refined_prompt_5e06fdf0c7fd4b389bdbda86b71a2163",
+        "prompt_text": "You are implementing a focused refinement package.\nConstraints:\n- Keep changes scoped to listed files and subsystem.\n- Do not modify platform_engine.py behavior.\n- Do not mutate queue semantics.\n\nTitle: tools add_test refinement\nObjective: Apply focused changes for subsystem 'tools' with change type 'add_test'.\nSubsystem: tools\nChange Type: add_test\nRisk Level: high\n\nTarget Files:\n- tests/test_tools.py\n\nExpected Changes:\n- file_additions:\n  - tests/test_tools.py\n- file_updates:\n  - None\n- notes:\n  - Add CLI tests for 'mission_engine'.\n  - Add targeted tests for module 'mission_engine'.\n  - Add targeted tests for module 'orchastrator'.\n  - Add targeted tests for module 'orchestrator'.\n  - Add targeted tests for module 'routers'.\n  - Add targeted tests for module 'tools'.\n  - Add targeted tests for module 'ui'.\n\nValidation Commands:\n- python -m unittest tests.test_mission_engine_cli -v\n- python -m unittest tests.test_mission_engine -v\n- python -m unittest tests.test_orchastrator -v\n- python -m unittest tests.test_orchestrator -v\n- python -m unittest tests.test_routers -v\n- python -m unittest tests.test_tools -v\n- python -m unittest tests.test_ui -v\n"
+      },
+      "estimated_scope": "medium",
+      "expected_changes": {
+        "file_additions": [
+          "tests/test_tools.py"
+        ],
+        "file_updates": [],
+        "notes": [
+          "Add CLI tests for 'mission_engine'.",
+          "Add targeted tests for module 'mission_engine'.",
+          "Add targeted tests for module 'orchastrator'.",
+          "Add targeted tests for module 'orchestrator'.",
+          "Add targeted tests for module 'routers'.",
+          "Add targeted tests for module 'tools'.",
+          "Add targeted tests for module 'ui'."
+        ]
+      },
+      "metadata": {
+        "advisory_only": true,
+        "broad_reasons": [
+          "target_files_gt_3",
+          "multi_subsystem",
+          "validation_commands_gt_2",
+          "mixed_change_types"
+        ],
+        "source_was_broad": true
+      },
+      "objective": "Apply focused changes for subsystem 'tools' with change type 'add_test'.",
+      "refined_package_id": "refined_pkg_87d54078ceda4fc0bc21a6f36994340a",
+      "risk_level": "high",
+      "source_batch_id": "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172",
+      "source_package_id": "implementation_package_50736cc6734f453fbb626d7c21b193cf",
+      "subsystem": "tools",
+      "target_files": [
+        "tests/test_tools.py"
+      ],
+      "title": "tools add_test refinement",
+      "traceability_refs": [
+        "implementation_package_50736cc6734f453fbb626d7c21b193cf",
+        "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172",
+        "codex_prompt_30b20503f3c64577b28e0584706c7fa5"
+      ],
+      "validation_commands": [
+        "python -m unittest tests.test_mission_engine_cli -v",
+        "python -m unittest tests.test_mission_engine -v",
+        "python -m unittest tests.test_orchastrator -v",
+        "python -m unittest tests.test_orchestrator -v",
+        "python -m unittest tests.test_routers -v",
+        "python -m unittest tests.test_tools -v",
+        "python -m unittest tests.test_ui -v"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "change_type": "add_test",
+      "codex_prompt": {
+        "advisory_only": true,
+        "metadata": {
+          "advisory_only": true
+        },
+        "prompt_id": "refined_prompt_d1c763de8b414b0ea8de473d923762f9",
+        "prompt_text": "You are implementing a focused refinement package.\nConstraints:\n- Keep changes scoped to listed files and subsystem.\n- Do not modify platform_engine.py behavior.\n- Do not mutate queue semantics.\n\nTitle: ui add_test refinement\nObjective: Apply focused changes for subsystem 'ui' with change type 'add_test'.\nSubsystem: ui\nChange Type: add_test\nRisk Level: high\n\nTarget Files:\n- tests/test_ui.py\n\nExpected Changes:\n- file_additions:\n  - tests/test_ui.py\n- file_updates:\n  - None\n- notes:\n  - Add CLI tests for 'mission_engine'.\n  - Add targeted tests for module 'mission_engine'.\n  - Add targeted tests for module 'orchastrator'.\n  - Add targeted tests for module 'orchestrator'.\n  - Add targeted tests for module 'routers'.\n  - Add targeted tests for module 'tools'.\n  - Add targeted tests for module 'ui'.\n\nValidation Commands:\n- python -m unittest tests.test_mission_engine_cli -v\n- python -m unittest tests.test_mission_engine -v\n- python -m unittest tests.test_orchastrator -v\n- python -m unittest tests.test_orchestrator -v\n- python -m unittest tests.test_routers -v\n- python -m unittest tests.test_tools -v\n- python -m unittest tests.test_ui -v\n"
+      },
+      "estimated_scope": "medium",
+      "expected_changes": {
+        "file_additions": [
+          "tests/test_ui.py"
+        ],
+        "file_updates": [],
+        "notes": [
+          "Add CLI tests for 'mission_engine'.",
+          "Add targeted tests for module 'mission_engine'.",
+          "Add targeted tests for module 'orchastrator'.",
+          "Add targeted tests for module 'orchestrator'.",
+          "Add targeted tests for module 'routers'.",
+          "Add targeted tests for module 'tools'.",
+          "Add targeted tests for module 'ui'."
+        ]
+      },
+      "metadata": {
+        "advisory_only": true,
+        "broad_reasons": [
+          "target_files_gt_3",
+          "multi_subsystem",
+          "validation_commands_gt_2",
+          "mixed_change_types"
+        ],
+        "source_was_broad": true
+      },
+      "objective": "Apply focused changes for subsystem 'ui' with change type 'add_test'.",
+      "refined_package_id": "refined_pkg_a02d65c3a7b4448eae72083497814640",
+      "risk_level": "high",
+      "source_batch_id": "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172",
+      "source_package_id": "implementation_package_50736cc6734f453fbb626d7c21b193cf",
+      "subsystem": "ui",
+      "target_files": [
+        "tests/test_ui.py"
+      ],
+      "title": "ui add_test refinement",
+      "traceability_refs": [
+        "implementation_package_50736cc6734f453fbb626d7c21b193cf",
+        "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172",
+        "codex_prompt_30b20503f3c64577b28e0584706c7fa5"
+      ],
+      "validation_commands": [
+        "python -m unittest tests.test_mission_engine_cli -v",
+        "python -m unittest tests.test_mission_engine -v",
+        "python -m unittest tests.test_orchastrator -v",
+        "python -m unittest tests.test_orchestrator -v",
+        "python -m unittest tests.test_routers -v",
+        "python -m unittest tests.test_tools -v",
+        "python -m unittest tests.test_ui -v"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "change_type": "add_docs",
+      "codex_prompt": {
+        "advisory_only": true,
+        "metadata": {
+          "advisory_only": true
+        },
+        "prompt_id": "refined_prompt_94e0e12bf7d343ad8e591e8678868b23",
+        "prompt_text": "You are implementing a focused refinement package.\nConstraints:\n- Keep changes scoped to listed files and subsystem.\n- Do not modify platform_engine.py behavior.\n- Do not mutate queue semantics.\n\nTitle: docs add_docs refinement\nObjective: Apply focused changes for subsystem 'docs' with change type 'add_docs'.\nSubsystem: docs\nChange Type: add_docs\nRisk Level: high\n\nTarget Files:\n- docs/executive-briefing.md\n- docs/orchastrator.md\n- docs/orchestrator.md\n- docs/strategic-missions.md\n- docs/tool-router.md\n- docs/tools.md\n\nExpected Changes:\n- file_additions:\n  - docs/executive-briefing.md\n  - docs/orchastrator.md\n  - docs/orchestrator.md\n  - docs/strategic-missions.md\n  - docs/tool-router.md\n  - docs/tools.md\n- file_updates:\n  - None\n- notes:\n  - Add or update docs coverage for 'executive_briefing'.\n  - Add or update docs coverage for 'orchastrator'.\n  - Add or update docs coverage for 'orchestrator'.\n  - Add or update docs coverage for 'routers'.\n  - Add or update docs coverage for 'strategic_missions'.\n  - Add or update docs coverage for 'tool_router'.\n  - Add or update docs coverage for 'tools'.\n\nValidation Commands:\n- python -m unittest tests.test_repository_intelligence_analyzer -v\n"
+      },
+      "estimated_scope": "medium",
+      "expected_changes": {
+        "file_additions": [
+          "docs/executive-briefing.md",
+          "docs/orchastrator.md",
+          "docs/orchestrator.md",
+          "docs/strategic-missions.md",
+          "docs/tool-router.md",
+          "docs/tools.md"
+        ],
+        "file_updates": [],
+        "notes": [
+          "Add or update docs coverage for 'executive_briefing'.",
+          "Add or update docs coverage for 'orchastrator'.",
+          "Add or update docs coverage for 'orchestrator'.",
+          "Add or update docs coverage for 'routers'.",
+          "Add or update docs coverage for 'strategic_missions'.",
+          "Add or update docs coverage for 'tool_router'.",
+          "Add or update docs coverage for 'tools'."
+        ]
+      },
+      "metadata": {
+        "advisory_only": true,
+        "broad_reasons": [
+          "target_files_gt_3",
+          "multi_subsystem"
+        ],
+        "source_was_broad": true
+      },
+      "objective": "Apply focused changes for subsystem 'docs' with change type 'add_docs'.",
+      "refined_package_id": "refined_pkg_539eef75cd004c4796b5078c361dae68",
+      "risk_level": "high",
+      "source_batch_id": "remediation_batch_5873f4916654406db8fb7a4860c981e8",
+      "source_package_id": "implementation_package_698288375c914b8f8f9714251f669dea",
+      "subsystem": "docs",
+      "target_files": [
+        "docs/executive-briefing.md",
+        "docs/orchastrator.md",
+        "docs/orchestrator.md",
+        "docs/strategic-missions.md",
+        "docs/tool-router.md",
+        "docs/tools.md"
+      ],
+      "title": "docs add_docs refinement",
+      "traceability_refs": [
+        "implementation_package_698288375c914b8f8f9714251f669dea",
+        "remediation_batch_5873f4916654406db8fb7a4860c981e8",
+        "codex_prompt_5dbcdd591af5477d9d004e51a86a9d6e"
+      ],
+      "validation_commands": [
+        "python -m unittest tests.test_repository_intelligence_analyzer -v"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "change_type": "add_docs",
+      "codex_prompt": {
+        "advisory_only": true,
+        "metadata": {
+          "advisory_only": true
+        },
+        "prompt_id": "refined_prompt_34cb34c357e145dfb2cc38430460191b",
+        "prompt_text": "You are implementing a focused refinement package.\nConstraints:\n- Keep changes scoped to listed files and subsystem.\n- Do not modify platform_engine.py behavior.\n- Do not mutate queue semantics.\n\nTitle: routers add_docs refinement\nObjective: Apply focused changes for subsystem 'routers' with change type 'add_docs'.\nSubsystem: routers\nChange Type: add_docs\nRisk Level: low\n\nTarget Files:\n- docs/routers.md\n\nExpected Changes:\n- file_additions:\n  - docs/routers.md\n- file_updates:\n  - None\n- notes:\n  - Add or update docs coverage for 'executive_briefing'.\n  - Add or update docs coverage for 'orchastrator'.\n  - Add or update docs coverage for 'orchestrator'.\n  - Add or update docs coverage for 'routers'.\n  - Add or update docs coverage for 'strategic_missions'.\n  - Add or update docs coverage for 'tool_router'.\n  - Add or update docs coverage for 'tools'.\n\nValidation Commands:\n- python -m unittest tests.test_repository_intelligence_analyzer -v\n"
+      },
+      "estimated_scope": "tiny",
+      "expected_changes": {
+        "file_additions": [
+          "docs/routers.md"
+        ],
+        "file_updates": [],
+        "notes": [
+          "Add or update docs coverage for 'executive_briefing'.",
+          "Add or update docs coverage for 'orchastrator'.",
+          "Add or update docs coverage for 'orchestrator'.",
+          "Add or update docs coverage for 'routers'.",
+          "Add or update docs coverage for 'strategic_missions'.",
+          "Add or update docs coverage for 'tool_router'.",
+          "Add or update docs coverage for 'tools'."
+        ]
+      },
+      "metadata": {
+        "advisory_only": true,
+        "broad_reasons": [
+          "target_files_gt_3",
+          "multi_subsystem"
+        ],
+        "source_was_broad": true
+      },
+      "objective": "Apply focused changes for subsystem 'routers' with change type 'add_docs'.",
+      "refined_package_id": "refined_pkg_370d6de21bec431a91f0f72492e0bf88",
+      "risk_level": "low",
+      "source_batch_id": "remediation_batch_5873f4916654406db8fb7a4860c981e8",
+      "source_package_id": "implementation_package_698288375c914b8f8f9714251f669dea",
+      "subsystem": "routers",
+      "target_files": [
+        "docs/routers.md"
+      ],
+      "title": "routers add_docs refinement",
+      "traceability_refs": [
+        "implementation_package_698288375c914b8f8f9714251f669dea",
+        "remediation_batch_5873f4916654406db8fb7a4860c981e8",
+        "codex_prompt_5dbcdd591af5477d9d004e51a86a9d6e"
+      ],
+      "validation_commands": [
+        "python -m unittest tests.test_repository_intelligence_analyzer -v"
+      ]
+    }
+  ],
+  "report_id": "handoff_refinement_report_63535743f1ce4174943089f28666d11a",
+  "source_handoff_report_id": "remediation_handoff_report_5865c83bef6340779ca8400afe12f303",
+  "split_summary": {
+    "high_risk_refined_count": 7,
+    "original_package_count": 2,
+    "refined_from_broad_count": 9,
+    "refined_package_count": 9,
+    "split_delta": 7
+  }
+}

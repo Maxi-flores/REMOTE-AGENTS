@@ -30,6 +30,8 @@ def generate_strategic_mission_report(
     repo_intel = load_executive_briefing(root / ".control_plane" / "repository_intelligence" / "repository_intelligence_report.json")
     remediation_plan = load_executive_briefing(root / ".control_plane" / "remediation_plans" / "remediation_plan_report.json")
     remediation_handoff = load_executive_briefing(root / ".control_plane" / "remediation_handoffs" / "latest.json")
+    handoff_refinement = load_executive_briefing(root / ".control_plane" / "handoff_refinements" / "latest.json")
+    work_queue = load_executive_briefing(root / ".control_plane" / "work_queue" / "latest.json")
     if briefing is None:
         source_path = Path(briefing_path) if briefing_path else (root / ".control_plane" / "executive" / "executive_briefing.json")
         briefing = load_executive_briefing(source_path)
@@ -41,6 +43,8 @@ def generate_strategic_mission_report(
         repository_intelligence_report=repo_intel,
         remediation_plan_report=remediation_plan,
         remediation_handoff_report=remediation_handoff,
+        handoff_refinement_report=handoff_refinement,
+        work_queue_report=work_queue,
     )
     if limit is not None and isinstance(limit, int) and limit > 0:
         candidates = candidates[:limit]
@@ -91,6 +95,8 @@ def _candidates_from_briefing(
     repository_intelligence_report: Dict[str, Any] | None = None,
     remediation_plan_report: Dict[str, Any] | None = None,
     remediation_handoff_report: Dict[str, Any] | None = None,
+    handoff_refinement_report: Dict[str, Any] | None = None,
+    work_queue_report: Dict[str, Any] | None = None,
 ) -> List[Dict[str, Any]]:
     if not isinstance(briefing, dict):
         return _maintenance_candidates()
@@ -98,12 +104,14 @@ def _candidates_from_briefing(
     actions = briefing.get("recommended_actions")
     repo_candidates = _candidates_from_repo_intel(repository_intelligence_report or {})
     remediation_candidates = _candidates_from_remediation(remediation_plan_report or {})
-    handoff_candidates = _candidates_from_handoffs(remediation_handoff_report or {})
+    queue_candidates = _candidates_from_work_queue(work_queue_report or {})
+    refinement_candidates = _candidates_from_refinements(handoff_refinement_report or {})
+    handoff_candidates = refinement_candidates if refinement_candidates else _candidates_from_handoffs(remediation_handoff_report or {})
     if isinstance(findings, list) and findings:
         base = [_candidate_from_finding(f, actions) for f in findings if isinstance(f, dict)]
-        return _rank_candidates(base + repo_candidates + remediation_candidates + handoff_candidates)
+        return _rank_candidates(base + queue_candidates + repo_candidates + remediation_candidates + handoff_candidates)
     # healthy/no-risks => maintenance continuity recommendations
-    return _rank_candidates(_maintenance_candidates() + repo_candidates + remediation_candidates + handoff_candidates)
+    return _rank_candidates(_maintenance_candidates() + queue_candidates + repo_candidates + remediation_candidates + handoff_candidates)
 
 
 def _candidate_from_finding(finding: Dict[str, Any], actions: Any) -> Dict[str, Any]:
@@ -290,6 +298,67 @@ def _candidates_from_handoffs(report: Dict[str, Any]) -> List[Dict[str, Any]]:
                 suggested_instruction=f"Review implementation package '{title}', validate scope, then execute manually after approval.",
                 advisory_only=True,
                 metadata={"source": "remediation_handoff"},
+            ).to_dict()
+        )
+    return out
+
+
+def _candidates_from_refinements(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    packages = report.get("refined_packages")
+    if not isinstance(packages, list):
+        return []
+    out: List[Dict[str, Any]] = []
+    for package in packages[:5]:
+        if not isinstance(package, dict):
+            continue
+        out.append(
+            StrategicMissionCandidate(
+                candidate_id=new_id("strategic_mission"),
+                title=f"Review refined package: {str(package.get('title') or 'Untitled')}",
+                description="Use a focused refined package for safer manual implementation planning.",
+                source_finding_ids=[str(package.get("refined_package_id") or new_id("ref_pkg_ref"))],
+                category="repository",
+                priority="P2",
+                risk_reduction_score=70,
+                effort_score=35,
+                confidence_score=90,
+                recommended_repository=str((package.get("metadata") or {}).get("repository") or "").strip() or None,
+                suggested_instruction=f"Review refined package '{str(package.get('title') or '')}' and execute after manual approval.",
+                advisory_only=True,
+                metadata={"source": "handoff_refinement"},
+            ).to_dict()
+        )
+    return out
+
+
+def _candidates_from_work_queue(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    items = report.get("queue_items")
+    if not isinstance(items, list):
+        return []
+    out: List[Dict[str, Any]] = []
+    for item in items[:5]:
+        if not isinstance(item, dict):
+            continue
+        readiness = int(item.get("readiness_score") or 0)
+        out.append(
+            StrategicMissionCandidate(
+                candidate_id=new_id("strategic_mission"),
+                title=f"Execute queue item: {str(item.get('title') or 'Untitled')}",
+                description="Queue-driven recommendation from autonomous work queue planning.",
+                source_finding_ids=[str(item.get("queue_item_id") or new_id("queue_ref"))],
+                category="repository",
+                priority=str(item.get("priority") or ("P1" if readiness >= 85 else "P2")),
+                risk_reduction_score=min(95, readiness),
+                effort_score=int(item.get("effort_score") or 45),
+                confidence_score=90,
+                recommended_repository=None,
+                suggested_instruction=f"Execute advisory queue item '{str(item.get('title') or '')}' in recommended position {int(item.get('recommended_position') or 0)}.",
+                advisory_only=True,
+                metadata={"source": "work_queue_manager", "execution_readiness": str(item.get("execution_readiness") or "unknown")},
             ).to_dict()
         )
     return out

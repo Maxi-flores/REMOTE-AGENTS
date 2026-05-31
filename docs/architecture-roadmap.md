@@ -240,6 +240,27 @@ Status: complete.
   - Strategic missions can reference generated implementation packages.
   - Executive briefing can report remediation handoff readiness when artifacts are present.
 - Keep queue semantics and runtime behavior unchanged with no execution, enqueue, or enforcement.
-  - Strategic Missions convert repository intelligence findings into additional mission candidates when report is present.
-- Keep RIE optional and non-blocking when no report exists.
-- Keep runtime/queue behavior unchanged and advisory-only.
+
+Phase 23: Handoff Package Refinement Engine (HPRE).
+Status: complete.
+
+- Add `src/handoff_refinement/` contracts, subsystem/change-type grouping, deterministic refiner, report writers, and CLI.
+- Detect broad handoff packages and split them into smaller refined packages scoped by subsystem and change type.
+- Preserve source traceability to original handoff package and source remediation batch.
+- Generate smaller refined codex prompts per refined package.
+- Export optional artifacts under `.control_plane/handoff_refinements/`.
+- Add optional integrations:
+  - Strategic Missions prefer refined packages when a refinement report exists.
+  - Executive Briefing reports refinement coverage and remaining high-risk refined packages.
+- Keep queue semantics and runtime behavior unchanged with no execution, enqueue, or enforcement.
+
+Phase 24: Autonomous Work Queue Manager (AWQM).
+Status: complete.
+
+- Add `src/work_queue_manager/` contracts, dependency graph inference, readiness scoring, planner, report writers, and CLI.
+- Consume refined implementation packages and produce queue items with priority, readiness, blockers, dependencies, and recommended position.
+- Export optional artifacts under `.control_plane/work_queue/`.
+- Add optional integrations:
+  - Strategic Missions can ingest queue-driven recommendations.
+  - Executive Briefing can report blocked/ready/deferred queue states.
+- Keep queue semantics and runtime behavior unchanged with no execution, enqueue, or enforcement.

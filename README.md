@@ -401,6 +401,59 @@ python src/remediation_handoff/cli.py --limit 2 --print
 
 RBHE outputs are advisory only and are written under `.control_plane/remediation_handoffs/`.
 
+## Handoff Package Refinement Engine (HPRE)
+
+Phase 23 refines broad handoff packages into smaller subsystem-scoped and change-type-scoped packages for safer manual implementation.
+
+It does not execute changes, does not enqueue tasks, and does not mutate `.platform_queue`.
+
+Examples:
+
+```bash
+python src/handoff_refinement/cli.py --print
+python src/handoff_refinement/cli.py --export
+python src/handoff_refinement/cli.py --export-jsonl
+python src/handoff_refinement/cli.py --from-handoff-report ".control_plane/remediation_handoffs/latest.json"
+python src/handoff_refinement/cli.py --limit 5
+```
+
+HPRE outputs are advisory only and are written under `.control_plane/handoff_refinements/`.
+
+## Autonomous Work Queue Manager (AWQM)
+
+Phase 24 builds an advisory work queue from refined implementation packages and computes dependency-aware execution ordering with readiness scoring.
+
+It does not execute changes, does not enqueue tasks, and does not mutate `.platform_queue`.
+
+Examples:
+
+```bash
+python src/work_queue_manager/cli.py --print
+python src/work_queue_manager/cli.py --export
+python src/work_queue_manager/cli.py --export-jsonl
+python src/work_queue_manager/cli.py --limit 10
+```
+
+AWQM outputs are advisory only and are written under `.control_plane/work_queue/`.
+
+## Handoff Package Refinement Engine (HPRE)
+
+Phase 23 refines broad handoff packages into smaller subsystem-scoped packages with focused validation plans and smaller Codex prompts.
+
+It does not execute changes, does not enqueue tasks, and does not mutate `.platform_queue`.
+
+Examples:
+
+```bash
+python src/handoff_refinement/cli.py --print
+python src/handoff_refinement/cli.py --export
+python src/handoff_refinement/cli.py --export-jsonl
+python src/handoff_refinement/cli.py --from-handoff-report ".control_plane/remediation_handoffs/latest.json"
+python src/handoff_refinement/cli.py --limit 5
+```
+
+HPRE outputs are advisory only and are written under `.control_plane/handoff_refinements/`.
+
 ## Runtime Contracts
 
 See `docs/runtime-contracts.md` for the Phase 0 contracts covering:
@@ -435,6 +488,9 @@ See `docs/runtime-contracts.md` for the Phase 0 contracts covering:
 - `docs/repository-intelligence-engine.md` records the Phase 20 advisory repository intelligence boundary.
 - `docs/repository-remediation-planner.md` records the Phase 21 advisory remediation planning boundary.
 - `docs/remediation-batch-handoff-engine.md` records the Phase 22 advisory remediation handoff boundary.
+- `docs/handoff-package-refinement-engine.md` records the Phase 23 advisory handoff refinement boundary.
+- `docs/autonomous-work-queue-manager.md` records the Phase 24 advisory work queue boundary.
+- `docs/handoff-package-refinement-engine.md` records the Phase 23 advisory refinement boundary.
 
 ## Additional Repository Components
 

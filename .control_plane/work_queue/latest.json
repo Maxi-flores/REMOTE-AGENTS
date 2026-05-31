@@ -1,0 +1,213 @@
+{
+  "advisory_only": true,
+  "blockers": [],
+  "dependency_graph": {
+    "dependencies": {
+      "refined_pkg_264ffbf15ef64430aa4bb5ee70794eba": [
+        "refined_pkg_e8f3f9f9758e45d2811312c2fba77257"
+      ],
+      "refined_pkg_8734d1b154d642c7b4bba599406cffe4": [],
+      "refined_pkg_924bc1385af345fa943e4e0bd1098d41": [],
+      "refined_pkg_9879300770954e3ea9c407baf3172733": [],
+      "refined_pkg_ad271a8e1fbb464c90c923421c0b6ebd": [],
+      "refined_pkg_bb30c7f542a341d890eacd7528d2d35d": [],
+      "refined_pkg_e8138e7f63bb492ca45424409d38411c": [],
+      "refined_pkg_e8a4976b01c344f1b23e6eb486318102": [],
+      "refined_pkg_e8f3f9f9758e45d2811312c2fba77257": []
+    }
+  },
+  "generated_utc": "2026-05-31T00:38:53Z",
+  "metadata": {
+    "advisory_only": true,
+    "base_dir": ".",
+    "source_refinement_report_id": "handoff_refinement_report_0464a87b005d4b4aae1860788d3f58b9",
+    "source_report_path": ".control_plane\\handoff_refinements\\latest.json"
+  },
+  "queue_items": [
+    {
+      "advisory_only": true,
+      "blocker_count": 0,
+      "dependency_refs": [],
+      "effort_score": 76,
+      "execution_readiness": "waiting",
+      "metadata": {
+        "advisory_only": true,
+        "source_batch_id": "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172"
+      },
+      "priority": "P2",
+      "queue_item_id": "queue_item_efcacc7ebc154fa6801de2ad44ea1c9e",
+      "readiness_score": 65,
+      "recommended_position": 1,
+      "risk_score": 70,
+      "source_refined_package_id": "refined_pkg_e8f3f9f9758e45d2811312c2fba77257",
+      "subsystem": "mission_engine",
+      "title": "mission_engine add_test refinement"
+    },
+    {
+      "advisory_only": true,
+      "blocker_count": 0,
+      "dependency_refs": [
+        "refined_pkg_e8f3f9f9758e45d2811312c2fba77257"
+      ],
+      "effort_score": 41,
+      "execution_readiness": "waiting",
+      "metadata": {
+        "advisory_only": true,
+        "source_batch_id": "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172"
+      },
+      "priority": "P2",
+      "queue_item_id": "queue_item_d9c4582bbd894d3f9c774be47b5f8f61",
+      "readiness_score": 71,
+      "recommended_position": 2,
+      "risk_score": 45,
+      "source_refined_package_id": "refined_pkg_264ffbf15ef64430aa4bb5ee70794eba",
+      "subsystem": "mission_engine",
+      "title": "mission_engine add_cli_test refinement"
+    },
+    {
+      "advisory_only": true,
+      "blocker_count": 0,
+      "dependency_refs": [],
+      "effort_score": 76,
+      "execution_readiness": "waiting",
+      "metadata": {
+        "advisory_only": true,
+        "source_batch_id": "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172"
+      },
+      "priority": "P2",
+      "queue_item_id": "queue_item_96834202536447d0ac0faba52137bd57",
+      "readiness_score": 65,
+      "recommended_position": 3,
+      "risk_score": 70,
+      "source_refined_package_id": "refined_pkg_924bc1385af345fa943e4e0bd1098d41",
+      "subsystem": "orchastrator",
+      "title": "orchastrator add_test refinement"
+    },
+    {
+      "advisory_only": true,
+      "blocker_count": 0,
+      "dependency_refs": [],
+      "effort_score": 76,
+      "execution_readiness": "waiting",
+      "metadata": {
+        "advisory_only": true,
+        "source_batch_id": "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172"
+      },
+      "priority": "P2",
+      "queue_item_id": "queue_item_e8e9a973770b495fbbc89c4569a7335f",
+      "readiness_score": 65,
+      "recommended_position": 4,
+      "risk_score": 70,
+      "source_refined_package_id": "refined_pkg_e8a4976b01c344f1b23e6eb486318102",
+      "subsystem": "orchestrator",
+      "title": "orchestrator add_test refinement"
+    },
+    {
+      "advisory_only": true,
+      "blocker_count": 0,
+      "dependency_refs": [],
+      "effort_score": 76,
+      "execution_readiness": "waiting",
+      "metadata": {
+        "advisory_only": true,
+        "source_batch_id": "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172"
+      },
+      "priority": "P2",
+      "queue_item_id": "queue_item_7f52ad31357840baade1cc29f4f06a9c",
+      "readiness_score": 65,
+      "recommended_position": 5,
+      "risk_score": 70,
+      "source_refined_package_id": "refined_pkg_ad271a8e1fbb464c90c923421c0b6ebd",
+      "subsystem": "routers",
+      "title": "routers add_test refinement"
+    },
+    {
+      "advisory_only": true,
+      "blocker_count": 0,
+      "dependency_refs": [],
+      "effort_score": 76,
+      "execution_readiness": "waiting",
+      "metadata": {
+        "advisory_only": true,
+        "source_batch_id": "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172"
+      },
+      "priority": "P2",
+      "queue_item_id": "queue_item_02d0c9be31fa4385ba16f0458365e12d",
+      "readiness_score": 65,
+      "recommended_position": 6,
+      "risk_score": 70,
+      "source_refined_package_id": "refined_pkg_e8138e7f63bb492ca45424409d38411c",
+      "subsystem": "tools",
+      "title": "tools add_test refinement"
+    },
+    {
+      "advisory_only": true,
+      "blocker_count": 0,
+      "dependency_refs": [],
+      "effort_score": 76,
+      "execution_readiness": "waiting",
+      "metadata": {
+        "advisory_only": true,
+        "source_batch_id": "remediation_batch_ec2eddaec04b423d97bfc1f397c7d172"
+      },
+      "priority": "P2",
+      "queue_item_id": "queue_item_9c59d36b1cfe40019f6f2788054d1607",
+      "readiness_score": 65,
+      "recommended_position": 7,
+      "risk_score": 70,
+      "source_refined_package_id": "refined_pkg_9879300770954e3ea9c407baf3172733",
+      "subsystem": "ui",
+      "title": "ui add_test refinement"
+    },
+    {
+      "advisory_only": true,
+      "blocker_count": 0,
+      "dependency_refs": [],
+      "effort_score": 83,
+      "execution_readiness": "waiting",
+      "metadata": {
+        "advisory_only": true,
+        "source_batch_id": "remediation_batch_5873f4916654406db8fb7a4860c981e8"
+      },
+      "priority": "P2",
+      "queue_item_id": "queue_item_7d4c5c4d85434813a8eec323119e65f8",
+      "readiness_score": 64,
+      "recommended_position": 8,
+      "risk_score": 70,
+      "source_refined_package_id": "refined_pkg_8734d1b154d642c7b4bba599406cffe4",
+      "subsystem": "docs",
+      "title": "docs add_docs refinement"
+    },
+    {
+      "advisory_only": true,
+      "blocker_count": 0,
+      "dependency_refs": [],
+      "effort_score": 23,
+      "execution_readiness": "ready",
+      "metadata": {
+        "advisory_only": true,
+        "source_batch_id": "remediation_batch_5873f4916654406db8fb7a4860c981e8"
+      },
+      "priority": "P1",
+      "queue_item_id": "queue_item_bae8d2a1b22c445195ad0e1a569ba4d8",
+      "readiness_score": 90,
+      "recommended_position": 9,
+      "risk_score": 20,
+      "source_refined_package_id": "refined_pkg_bb30c7f542a341d890eacd7528d2d35d",
+      "subsystem": "routers",
+      "title": "routers add_docs refinement"
+    }
+  ],
+  "recommended_execution_order": [
+    "refined_pkg_e8f3f9f9758e45d2811312c2fba77257",
+    "refined_pkg_264ffbf15ef64430aa4bb5ee70794eba",
+    "refined_pkg_924bc1385af345fa943e4e0bd1098d41",
+    "refined_pkg_e8a4976b01c344f1b23e6eb486318102",
+    "refined_pkg_ad271a8e1fbb464c90c923421c0b6ebd",
+    "refined_pkg_e8138e7f63bb492ca45424409d38411c",
+    "refined_pkg_9879300770954e3ea9c407baf3172733",
+    "refined_pkg_8734d1b154d642c7b4bba599406cffe4",
+    "refined_pkg_bb30c7f542a341d890eacd7528d2d35d"
+  ],
+  "report_id": "work_queue_report_c06564e9701f445e8b4c2e030fcb5b86"
+}

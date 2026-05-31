@@ -487,3 +487,43 @@ Consequences:
 - `.platform_queue/next_task.json` semantics remain unchanged.
 - No execution, enqueue, enforcement, deployment, git operations, repository mutation, or model invocation is introduced.
 - RBHE remains advisory-only.
+
+## ADR-0026: Add Advisory Handoff Package Refinement Engine (HPRE)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/handoff_refinement/` for deterministic refinement of broad implementation packages.
+- Detect broadness by file count, subsystem spread, validation command count, and mixed change types.
+- Split broad packages by `(subsystem, change_type)` and produce refined codex prompts with preserved traceability.
+- Export refinement artifacts under `.control_plane/handoff_refinements/`.
+- Integrate optionally with strategic mission generation and executive briefing when refinement artifacts are present.
+
+Reason:
+- Broad handoff packages increase implementation risk; a deterministic refinement layer improves review safety while preserving manual execution flow.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No execution, enqueue, enforcement, deployment, git operations, repository mutation, or model invocation is introduced.
+- HPRE remains advisory-only.
+
+## ADR-0027: Add Advisory Autonomous Work Queue Manager (AWQM)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/work_queue_manager/` for deterministic queue planning from refined implementation packages.
+- Infer dependencies from subsystem/change-type metadata only.
+- Compute readiness scores, blocker counts, execution readiness states, and recommended ordering.
+- Export queue planning artifacts under `.control_plane/work_queue/`.
+- Integrate optionally with strategic mission generation and executive briefing when work queue artifacts are present.
+
+Reason:
+- Refined packages identify work scope, but not sequence or concurrency constraints. AWQM adds deterministic planning signals without runtime coupling.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No execution, enqueue, enforcement, deployment, git operations, repository mutation, or model invocation is introduced.
+- AWQM remains advisory-only.

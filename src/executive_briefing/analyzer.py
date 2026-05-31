@@ -30,6 +30,8 @@ def analyze_artifacts(
     repository_intelligence_report: Dict[str, Any] | None = None,
     remediation_plan_report: Dict[str, Any] | None = None,
     remediation_handoff_report: Dict[str, Any] | None = None,
+    handoff_refinement_report: Dict[str, Any] | None = None,
+    work_queue_report: Dict[str, Any] | None = None,
 ) -> Dict[str, Any]:
     if repository_intelligence_report is None:
         repository_intelligence_report = load_json_file(".control_plane/repository_intelligence/repository_intelligence_report.json")
@@ -37,6 +39,10 @@ def analyze_artifacts(
         remediation_plan_report = load_json_file(".control_plane/remediation_plans/remediation_plan_report.json")
     if remediation_handoff_report is None:
         remediation_handoff_report = load_json_file(".control_plane/remediation_handoffs/latest.json")
+    if handoff_refinement_report is None:
+        handoff_refinement_report = load_json_file(".control_plane/handoff_refinements/latest.json")
+    if work_queue_report is None:
+        work_queue_report = load_json_file(".control_plane/work_queue/latest.json")
     findings: List[Dict[str, Any]] = []
     findings.extend(_from_orchestration(orchestration_report or {}))
     findings.extend(_from_release_readiness(release_readiness_report or {}))
@@ -48,6 +54,8 @@ def analyze_artifacts(
     findings.extend(_from_repository_intelligence(repository_intelligence_report or {}))
     findings.extend(_from_remediation_plan(remediation_plan_report or {}))
     findings.extend(_from_remediation_handoffs(remediation_handoff_report or {}, remediation_plan_report or {}))
+    findings.extend(_from_handoff_refinements(handoff_refinement_report or {}))
+    findings.extend(_from_work_queue(work_queue_report or {}))
 
     blockers = [f for f in findings if f.get("severity") == "critical"]
     risks = [f for f in findings if f.get("severity") in {"high", "critical", "medium"}]
@@ -340,6 +348,97 @@ def _from_remediation_handoffs(
                 title="Remediation handoff coverage incomplete",
                 description=f"Generated packages ({package_count}) are fewer than remediation batches ({len(planned_batches)}).",
                 recommended_action="Generate additional handoff packages for remaining remediation batches.",
+            ).to_dict()
+        )
+    return findings
+
+
+def _from_handoff_refinements(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    summary = report.get("split_summary")
+    packages = report.get("refined_packages")
+    if not isinstance(summary, dict) or not isinstance(packages, list):
+        return []
+    findings: List[Dict[str, Any]] = []
+    delta = int(summary.get("split_delta", 0) or 0)
+    high_risk = int(summary.get("high_risk_refined_count", 0) or 0)
+    if delta > 0:
+        findings.append(
+            ExecutiveFinding(
+                finding_id=new_id("finding_refinement"),
+                severity="low",
+                category="repository",
+                title="Broad handoff packages were refined",
+                description=f"Refinement increased package count by {delta}, indicating safer scope partitioning.",
+                recommended_action="Prioritize refined packages for manual execution planning.",
+            ).to_dict()
+        )
+    if high_risk > 0:
+        findings.append(
+            ExecutiveFinding(
+                finding_id=new_id("finding_refinement"),
+                severity="medium",
+                category="repository",
+                title="High-risk refined handoff packages remain",
+                description=f"{high_risk} refined package(s) still carry high/critical risk levels.",
+                recommended_action="Split remaining high-risk refined packages further before execution.",
+            ).to_dict()
+        )
+    return findings
+
+
+def _from_work_queue(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    items = report.get("queue_items")
+    if not isinstance(items, list):
+        return []
+    ready = 0
+    blocked = 0
+    deferred = 0
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        state = str(item.get("execution_readiness") or "waiting")
+        if state == "ready":
+            ready += 1
+        elif state == "blocked":
+            blocked += 1
+        elif state == "deferred":
+            deferred += 1
+    findings: List[Dict[str, Any]] = []
+    if blocked > 0:
+        findings.append(
+            ExecutiveFinding(
+                finding_id=new_id("finding_work_queue"),
+                severity="high",
+                category="repository",
+                title="Blocked work queue items detected",
+                description=f"{blocked} work queue item(s) are blocked by dependency or readiness constraints.",
+                recommended_action="Resolve blockers and promote blocked queue items to waiting/ready state.",
+            ).to_dict()
+        )
+    if ready > 0:
+        findings.append(
+            ExecutiveFinding(
+                finding_id=new_id("finding_work_queue"),
+                severity="low",
+                category="repository",
+                title="Ready work queue items available",
+                description=f"{ready} work queue item(s) are ready for manual execution planning.",
+                recommended_action="Prioritize ready queue items in strategic mission planning.",
+            ).to_dict()
+        )
+    if deferred > 0:
+        findings.append(
+            ExecutiveFinding(
+                finding_id=new_id("finding_work_queue"),
+                severity="medium",
+                category="repository",
+                title="Deferred work queue items present",
+                description=f"{deferred} work queue item(s) are deferred due to low readiness scores.",
+                recommended_action="Re-evaluate deferred items after prerequisite work is complete.",
             ).to_dict()
         )
     return findings

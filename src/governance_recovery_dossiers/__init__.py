@@ -1,0 +1,4 @@
+from governance_recovery_dossiers.generator import generate_governance_recovery_dossier_report
+
+__all__ = ["generate_governance_recovery_dossier_report"]
+

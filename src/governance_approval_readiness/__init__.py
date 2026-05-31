@@ -1,0 +1,4 @@
+from governance_approval_readiness.evaluator import generate_governance_approval_readiness_report
+
+__all__ = ["generate_governance_approval_readiness_report"]
+

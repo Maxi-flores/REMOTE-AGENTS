@@ -1,0 +1,144 @@
+{
+  "advisory_only": true,
+  "generated_utc": "2026-05-31T17:32:33Z",
+  "metadata": {
+    "advisory_only": true,
+    "queue_mutation": false,
+    "runtime_unchanged": true,
+    "source_dossier_report_path": ".control_plane\\governance_recovery_dossiers\\latest.json"
+  },
+  "records": [
+    {
+      "advisory_only": true,
+      "approval_recommendation": "Requires elevated human review due to execution risk before approval.",
+      "approval_status": "needs_review",
+      "dossier_id": "governance_recovery_dossier_a8b66bbeec55414e817dc62f279884b2",
+      "metadata": {
+        "forbidden_hits": []
+      },
+      "missing_requirements": [],
+      "readiness_score": 55,
+      "record_id": "governance_approval_readiness_8300c82334134e8392aa63dde176bd5d",
+      "required_human_review": true,
+      "risk_level": "high",
+      "title": "Dossier: Validate and close missing onboarding/readiness repositories"
+    },
+    {
+      "advisory_only": true,
+      "approval_recommendation": "Requires elevated human review due to execution risk before approval.",
+      "approval_status": "needs_review",
+      "dossier_id": "governance_recovery_dossier_a99193d417fd4f24b2dc8998d7653935",
+      "metadata": {
+        "forbidden_hits": []
+      },
+      "missing_requirements": [],
+      "readiness_score": 55,
+      "record_id": "governance_approval_readiness_5e06036dd2ec4e3382ce934676b349f6",
+      "required_human_review": true,
+      "risk_level": "high",
+      "title": "Dossier: Resolve P1 onboarding recommendations"
+    },
+    {
+      "advisory_only": true,
+      "approval_recommendation": "Requires elevated human review due to execution risk before approval.",
+      "approval_status": "needs_review",
+      "dossier_id": "governance_recovery_dossier_d6105aa0d78c49519b7294cca1ea2c3e",
+      "metadata": {
+        "forbidden_hits": []
+      },
+      "missing_requirements": [],
+      "readiness_score": 55,
+      "record_id": "governance_approval_readiness_696757474bc8408e8b113497f168a387",
+      "required_human_review": true,
+      "risk_level": "high",
+      "title": "Dossier: Generate repository intelligence baselines for low-readiness repos"
+    },
+    {
+      "advisory_only": true,
+      "approval_recommendation": "Proceed to human approval review with standard checklist verification.",
+      "approval_status": "ready_for_review",
+      "dossier_id": "governance_recovery_dossier_e309da55dea946f79afd04bec39997da",
+      "metadata": {
+        "forbidden_hits": []
+      },
+      "missing_requirements": [],
+      "readiness_score": 90,
+      "record_id": "governance_approval_readiness_1853a651a0a3469581f14a30a9ad702b",
+      "required_human_review": false,
+      "risk_level": "medium",
+      "title": "Dossier: Reduce high/critical dependency findings"
+    },
+    {
+      "advisory_only": true,
+      "approval_recommendation": "Proceed to human approval review with standard checklist verification.",
+      "approval_status": "ready_for_review",
+      "dossier_id": "governance_recovery_dossier_21b7604d225b40e8bca68cd43b00d47f",
+      "metadata": {
+        "forbidden_hits": []
+      },
+      "missing_requirements": [],
+      "readiness_score": 90,
+      "record_id": "governance_approval_readiness_84d2de47759b4109b04b646060042990",
+      "required_human_review": false,
+      "risk_level": "medium",
+      "title": "Dossier: Resolve missing dependency references and stale artifacts"
+    },
+    {
+      "advisory_only": true,
+      "approval_recommendation": "Proceed to human approval review with standard checklist verification.",
+      "approval_status": "ready_for_review",
+      "dossier_id": "governance_recovery_dossier_a76e943f2bc44bc1be4ff5e34e5d223e",
+      "metadata": {
+        "forbidden_hits": []
+      },
+      "missing_requirements": [],
+      "readiness_score": 90,
+      "record_id": "governance_approval_readiness_60abc2a097fc4d179d313355861fea43",
+      "required_human_review": false,
+      "risk_level": "medium",
+      "title": "Dossier: Regenerate strategic roadmap from latest critical path"
+    },
+    {
+      "advisory_only": true,
+      "approval_recommendation": "Proceed to human approval review with standard checklist verification.",
+      "approval_status": "ready_for_review",
+      "dossier_id": "governance_recovery_dossier_2bf8e591bb2d4f529c9c9511ec4c4fb0",
+      "metadata": {
+        "forbidden_hits": []
+      },
+      "missing_requirements": [],
+      "readiness_score": 90,
+      "record_id": "governance_approval_readiness_00ae541239404910998cacd089171bb5",
+      "required_human_review": false,
+      "risk_level": "medium",
+      "title": "Dossier: Re-run bootstrap and onboarding recommendation refresh"
+    },
+    {
+      "advisory_only": true,
+      "approval_recommendation": "Proceed to human approval review with standard checklist verification.",
+      "approval_status": "ready_for_review",
+      "dossier_id": "governance_recovery_dossier_efb85b732ba5422890b2bf86bdc7b526",
+      "metadata": {
+        "forbidden_hits": []
+      },
+      "missing_requirements": [],
+      "readiness_score": 90,
+      "record_id": "governance_approval_readiness_b781b394e1b14f81ba0842643d486140",
+      "required_human_review": false,
+      "risk_level": "low",
+      "title": "Dossier: Build additional progress history snapshots"
+    }
+  ],
+  "report_id": "governance_approval_readiness_report_d09916ef56f24358b37c2d0e0ebe2969",
+  "source_dossier_report_id": "governance_recovery_dossier_report_badf2722bd1a4c7aabdf0dc4129faac0",
+  "summary": {
+    "blocked": 0,
+    "critical_risk_count": 0,
+    "high_risk_count": 3,
+    "needs_review": 3,
+    "ready_for_review": 5,
+    "rejected_advisory": 0,
+    "total_records": 8,
+    "unknown": 0
+  }
+}

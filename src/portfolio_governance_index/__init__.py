@@ -1,0 +1,4 @@
+from portfolio_governance_index.analyzer import generate_portfolio_governance_health_report
+
+__all__ = ["generate_portfolio_governance_health_report"]
+

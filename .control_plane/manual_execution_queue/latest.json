@@ -1,0 +1,232 @@
+{
+  "advisory_only": true,
+  "generated_utc": "2026-05-31T18:06:49Z",
+  "metadata": {
+    "advisory_only": true,
+    "queue_mutation": false,
+    "runtime_unchanged": true,
+    "source_decision_report_path": ".control_plane\\governance_decisions\\latest.json",
+    "source_packet_report_path": ".control_plane\\governance_approval_packets\\latest.json"
+  },
+  "queue_items": [
+    {
+      "advisory_only": true,
+      "decision": "pending_review",
+      "metadata": {
+        "approval_status": "ready_for_review",
+        "reviewer": "",
+        "risk_level": "low"
+      },
+      "operator_next_step": "Review approval packet and record decision.",
+      "packet_id": "governance_approval_packet_0c4139463d0244bd9f2f22e03cf31071",
+      "priority": "P2",
+      "queue_item_id": "manual_execution_queue_item_727f23b9e72040e6a98a659a5c9cb0da",
+      "queue_status": "pending_review",
+      "safety_notes": [
+        "This queue does not execute anything.",
+        "This queue does not mutate .platform_queue.",
+        "This queue does not grant runtime approval."
+      ],
+      "source_dossier_id": "governance_recovery_dossier_efb85b732ba5422890b2bf86bdc7b526",
+      "title": "Dossier: Build additional progress history snapshots",
+      "validation_commands": [
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "decision": "pending_review",
+      "metadata": {
+        "approval_status": "needs_review",
+        "reviewer": "",
+        "risk_level": "high"
+      },
+      "operator_next_step": "Review approval packet and record decision.",
+      "packet_id": "governance_approval_packet_10b272337c7a45e4a64f1d96d739d36a",
+      "priority": "P2",
+      "queue_item_id": "manual_execution_queue_item_a46730c4ec1c4926b138cab8469c8b19",
+      "queue_status": "pending_review",
+      "safety_notes": [
+        "This queue does not execute anything.",
+        "This queue does not mutate .platform_queue.",
+        "This queue does not grant runtime approval."
+      ],
+      "source_dossier_id": "governance_recovery_dossier_d6105aa0d78c49519b7294cca1ea2c3e",
+      "title": "Dossier: Generate repository intelligence baselines for low-readiness repos",
+      "validation_commands": [
+        "python src/portfolio_onboarding_recommendations/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "decision": "pending_review",
+      "metadata": {
+        "approval_status": "ready_for_review",
+        "reviewer": "",
+        "risk_level": "medium"
+      },
+      "operator_next_step": "Review approval packet and record decision.",
+      "packet_id": "governance_approval_packet_6e4bdffe32ae4584acd417d9e3b605e0",
+      "priority": "P2",
+      "queue_item_id": "manual_execution_queue_item_d32f01e29b35442d9f149cd4511fc744",
+      "queue_status": "pending_review",
+      "safety_notes": [
+        "This queue does not execute anything.",
+        "This queue does not mutate .platform_queue.",
+        "This queue does not grant runtime approval."
+      ],
+      "source_dossier_id": "governance_recovery_dossier_2bf8e591bb2d4f529c9c9511ec4c4fb0",
+      "title": "Dossier: Re-run bootstrap and onboarding recommendation refresh",
+      "validation_commands": [
+        "python src/portfolio_onboarding_recommendations/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "decision": "pending_review",
+      "metadata": {
+        "approval_status": "ready_for_review",
+        "reviewer": "",
+        "risk_level": "medium"
+      },
+      "operator_next_step": "Review approval packet and record decision.",
+      "packet_id": "governance_approval_packet_ee80ac6d3589446ba5aff35cabb3c53a",
+      "priority": "P2",
+      "queue_item_id": "manual_execution_queue_item_6d5ef190f4664a97b533cb18af374ec5",
+      "queue_status": "pending_review",
+      "safety_notes": [
+        "This queue does not execute anything.",
+        "This queue does not mutate .platform_queue.",
+        "This queue does not grant runtime approval."
+      ],
+      "source_dossier_id": "governance_recovery_dossier_e309da55dea946f79afd04bec39997da",
+      "title": "Dossier: Reduce high/critical dependency findings",
+      "validation_commands": [
+        "python src/portfolio_dependencies/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "decision": "pending_review",
+      "metadata": {
+        "approval_status": "ready_for_review",
+        "reviewer": "",
+        "risk_level": "medium"
+      },
+      "operator_next_step": "Review approval packet and record decision.",
+      "packet_id": "governance_approval_packet_15c1ab7d9afe4bab9668e3b4603dc086",
+      "priority": "P2",
+      "queue_item_id": "manual_execution_queue_item_b72f6d01e9a54d3fb01b0a8b938aba29",
+      "queue_status": "pending_review",
+      "safety_notes": [
+        "This queue does not execute anything.",
+        "This queue does not mutate .platform_queue.",
+        "This queue does not grant runtime approval."
+      ],
+      "source_dossier_id": "governance_recovery_dossier_a76e943f2bc44bc1be4ff5e34e5d223e",
+      "title": "Dossier: Regenerate strategic roadmap from latest critical path",
+      "validation_commands": [
+        "python src/portfolio_dependencies/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "decision": "pending_review",
+      "metadata": {
+        "approval_status": "needs_review",
+        "reviewer": "",
+        "risk_level": "high"
+      },
+      "operator_next_step": "Review approval packet and record decision.",
+      "packet_id": "governance_approval_packet_12d02874e073420a995c279e22ec12b4",
+      "priority": "P2",
+      "queue_item_id": "manual_execution_queue_item_6dd9e8774af144db8a0dd4a38654ee61",
+      "queue_status": "pending_review",
+      "safety_notes": [
+        "This queue does not execute anything.",
+        "This queue does not mutate .platform_queue.",
+        "This queue does not grant runtime approval."
+      ],
+      "source_dossier_id": "governance_recovery_dossier_a99193d417fd4f24b2dc8998d7653935",
+      "title": "Dossier: Resolve P1 onboarding recommendations",
+      "validation_commands": [
+        "python src/portfolio_onboarding_recommendations/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "decision": "pending_review",
+      "metadata": {
+        "approval_status": "ready_for_review",
+        "reviewer": "",
+        "risk_level": "medium"
+      },
+      "operator_next_step": "Review approval packet and record decision.",
+      "packet_id": "governance_approval_packet_c20370f6706c438d86078b6721a5a447",
+      "priority": "P2",
+      "queue_item_id": "manual_execution_queue_item_9b4ae4f291e5440a9ddb0a1044088f80",
+      "queue_status": "pending_review",
+      "safety_notes": [
+        "This queue does not execute anything.",
+        "This queue does not mutate .platform_queue.",
+        "This queue does not grant runtime approval."
+      ],
+      "source_dossier_id": "governance_recovery_dossier_21b7604d225b40e8bca68cd43b00d47f",
+      "title": "Dossier: Resolve missing dependency references and stale artifacts",
+      "validation_commands": [
+        "python src/portfolio_drift/cli.py --print",
+        "python src/portfolio_dependencies/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "decision": "pending_review",
+      "metadata": {
+        "approval_status": "needs_review",
+        "reviewer": "",
+        "risk_level": "high"
+      },
+      "operator_next_step": "Review approval packet and record decision.",
+      "packet_id": "governance_approval_packet_d5c5d70c0bfd4fca9f75a80dfa5667c5",
+      "priority": "P2",
+      "queue_item_id": "manual_execution_queue_item_d146d05f47de4cc3bbe21ce59950e715",
+      "queue_status": "pending_review",
+      "safety_notes": [
+        "This queue does not execute anything.",
+        "This queue does not mutate .platform_queue.",
+        "This queue does not grant runtime approval."
+      ],
+      "source_dossier_id": "governance_recovery_dossier_a8b66bbeec55414e817dc62f279884b2",
+      "title": "Dossier: Validate and close missing onboarding/readiness repositories",
+      "validation_commands": [
+        "python src/portfolio_onboarding_recommendations/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    }
+  ],
+  "report_id": "manual_execution_queue_report_15132e5df8d94f08a704e6a78b693582",
+  "source_decision_report_id": "governance_decision_summary_report_83260ffbeeb94fb58ede0002b80a366f",
+  "summary": {
+    "approved_manual": 0,
+    "deferred": 0,
+    "needs_changes": 0,
+    "pending_review": 8,
+    "rejected": 0,
+    "total_items": 8,
+    "unknown": 0
+  }
+}

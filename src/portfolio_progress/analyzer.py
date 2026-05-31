@@ -32,6 +32,7 @@ def generate_portfolio_progress_report(*, base_dir: str | Path = ".") -> Dict[st
     dep_cur, dep_prev = load_latest_and_previous(root / ".control_plane" / "portfolio_dependencies")
     cp_cur, cp_prev = load_latest_and_previous(root / ".control_plane" / "portfolio_critical_path")
     drift_cur, drift_prev = load_latest_and_previous(root / ".control_plane" / "portfolio_drift")
+    governance_cur, governance_prev = load_latest_and_previous(root / ".control_plane" / "portfolio_governance_index")
 
     metrics: List[Dict[str, Any]] = []
 
@@ -57,6 +58,7 @@ def generate_portfolio_progress_report(*, base_dir: str | Path = ".") -> Dict[st
             _metric("portfolio", "roadmap_item_count", _list_count(roadmap_cur.get("roadmap_items")), _list_count(roadmap_prev.get("roadmap_items"))),
             _metric("portfolio", "roadmap_wave_count", _list_count(roadmap_cur.get("waves")), _list_count(roadmap_prev.get("waves"))),
             _metric("portfolio", "drift_finding_count", _list_count(drift_cur.get("findings")), _list_count(drift_prev.get("findings"))),
+            _metric("portfolio", "governance_score", governance_cur.get("governance_score"), governance_prev.get("governance_score")),
         ]
     )
 
@@ -102,6 +104,7 @@ def generate_portfolio_progress_report(*, base_dir: str | Path = ".") -> Dict[st
                 "portfolio_dependencies_latest": str(root / ".control_plane" / "portfolio_dependencies" / "latest.json"),
                 "portfolio_critical_path_latest": str(root / ".control_plane" / "portfolio_critical_path" / "latest.json"),
                 "portfolio_drift_latest": str(root / ".control_plane" / "portfolio_drift" / "latest.json"),
+                "portfolio_governance_index_latest": str(root / ".control_plane" / "portfolio_governance_index" / "latest.json"),
             },
         },
     ).to_dict()

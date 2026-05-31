@@ -381,3 +381,100 @@ Status: complete.
   - Strategic missions can include drift-remediation candidates.
   - Portfolio progress can include drift count trend when available.
 - Keep runtime execution and queue behavior unchanged with advisory-only behavior.
+
+Phase 34: Portfolio Governance Health Index (PGHI).
+Status: complete.
+
+- Add `src/portfolio_governance_index/` for deterministic governance scoring across portfolio advisory artifacts.
+- Compute weighted component scores for health, readiness, onboarding, dependency risk, critical-path risk, roadmap completeness, progress trend, and drift health.
+- Produce one governance score, one governance status, top reasons, and top recommendations.
+- Export optional governance index artifacts under `.control_plane/portfolio_governance_index/`.
+- Integrate optionally:
+  - Portfolio orchestration includes governance index summary metadata.
+  - Executive briefing includes governance score/status signals.
+  - Strategic missions include governance-improvement mission candidates.
+  - Portfolio progress includes governance score trend metric when available.
+- Keep runtime execution and queue behavior unchanged with advisory-only behavior.
+
+Phase 35: Governance Recovery Plan Engine (GRPE).
+Status: complete.
+
+- Add `src/governance_recovery/` to convert governance index weaknesses into deterministic recovery actions.
+- Generate action priorities, expected score impacts, recovery waves, and recommended sequence.
+- Export optional artifacts under `.control_plane/governance_recovery/`.
+- Integrate optionally:
+  - Executive briefing includes recovery-plan availability summary.
+  - Strategic missions include recovery-action mission candidates.
+  - Governance index can reference recovery metadata when available.
+- Keep runtime execution and queue behavior unchanged with advisory-only behavior.
+
+Phase 36: Governance Recovery Execution Dossier Layer (GREDL).
+Status: complete.
+
+- Add `src/governance_recovery_dossiers/` to convert governance recovery actions into deterministic, human-reviewable execution dossiers.
+- Generate per-action dossiers with target artifacts, recommended manual commands, validation commands, review checklist, rollback guidance, and Codex-ready prompts.
+- Group dossier summaries by recovery wave using source recovery-wave mappings.
+- Export optional artifacts under `.control_plane/governance_recovery_dossiers/`.
+- Integrate optionally:
+  - Executive briefing includes dossier availability and high-risk dossier count summary.
+  - Strategic missions include dossier-driven governance recovery mission candidates.
+- Keep runtime execution and queue behavior unchanged with advisory-only behavior.
+
+Phase 37: Governance Recovery Approval Readiness Layer (GRARL).
+Status: complete.
+
+- Add `src/governance_approval_readiness/` to classify governance recovery dossiers into deterministic advisory approval states.
+- Evaluate dossier safety/readiness based on advisory-only flag, forbidden path checks, validation command presence, rollback/checklist presence, prompt presence, and risk tier.
+- Emit approval statuses: `ready_for_review`, `needs_review`, `blocked`, `rejected_advisory`, `unknown`.
+- Export optional artifacts under `.control_plane/governance_approval_readiness/`.
+- Integrate optionally:
+  - Executive briefing includes approval readiness summary and blocked/high-risk visibility.
+  - Strategic missions include approval-readiness remediation candidates.
+  - Governance recovery can consume readiness summary metadata in future phases.
+- Keep runtime execution and queue behavior unchanged with advisory-only behavior.
+
+Phase 38: Governance Approval Packet Layer (GAPL).
+Status: complete.
+
+- Add `src/governance_approval_packets/` to convert approval readiness records plus source dossiers into deterministic human-review approval packets.
+- Generate packets only for `ready_for_review` and `needs_review`; skip `blocked` and `rejected_advisory`.
+- Include review summary, risk/readiness context, artifact scope, validation commands, rollback guidance, and a blank human decision template.
+- Export optional artifacts under `.control_plane/governance_approval_packets/`.
+- Integrate optionally:
+  - Executive briefing includes approval packet availability summary.
+  - Strategic missions includes packet-driven governance review candidates.
+- Keep runtime execution and queue behavior unchanged with advisory-only behavior.
+
+Phase 39: Governance Human Decision Record Layer (GHDRL).
+Status: complete.
+
+- Add `src/governance_decisions/` to store advisory human governance decisions for approval packets.
+- Support manual decision recording via CLI with deterministic validation and safety acknowledgement requirements.
+- Require strict acknowledgement set for `approve_for_manual_execution` decisions.
+- Generate decision summary report with pending/approved/request_changes/rejected/deferred packet sets.
+- Export optional artifacts under `.control_plane/governance_decisions/`:
+  - `decisions.json`
+  - `latest.json`
+  - `report_<timestamp>.json`
+  - `history.jsonl`
+- Integrate optionally:
+  - Executive briefing includes governance decision summary visibility.
+  - Strategic missions includes candidates for pending packets, request-changes packets, and approved manual-execution planning.
+- Keep runtime execution and queue behavior unchanged with advisory-only behavior.
+
+Phase 40: Manual Execution Handoff Queue Layer (MEHQL).
+Status: complete.
+
+- Add `src/manual_execution_queue/` to convert governance decisions and approval packets into deterministic operator-facing handoff queue items.
+- Build queue items across decision states:
+  - `approved_manual`
+  - `deferred`
+  - `needs_changes`
+  - `pending_review`
+  - `rejected`
+- Prioritize approved-manual first, then change/review workflows, while preserving deferred/rejected visibility.
+- Export optional artifacts under `.control_plane/manual_execution_queue/`.
+- Integrate optionally:
+  - Executive briefing includes manual execution queue summary.
+  - Strategic missions includes operator review and handoff queue candidates.
+- Keep runtime execution and queue behavior unchanged with advisory-only behavior.

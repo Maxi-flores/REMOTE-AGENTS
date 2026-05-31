@@ -703,3 +703,148 @@ Consequences:
 - `.platform_queue/next_task.json` semantics remain unchanged.
 - No external repository writes, execution, enqueue, enforcement, deployment, git operations, or model invocation are introduced.
 - PDIL-2 remains advisory-only.
+
+## ADR-0037: Add Advisory Portfolio Governance Health Index (PGHI)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/portfolio_governance_index/` to compute one deterministic portfolio governance health score and status.
+- Aggregate weighted component signals from portfolio orchestration, bootstrap, onboarding recommendations, dependencies, critical path, roadmap, progress, and drift.
+- Publish top reasons and top recommendations to improve operator decision speed.
+- Export reports only under `.control_plane/portfolio_governance_index/`.
+- Add optional read-only integration with portfolio orchestration, executive briefing, strategic missions, and progress trend metrics.
+
+Reason:
+- Operators need a single governance health answer despite many advisory reports across the portfolio governance stack.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No external repository writes, execution, enqueue, enforcement, deployment, git operations, or model invocation are introduced.
+- PGHI remains advisory-only.
+
+## ADR-0038: Add Advisory Governance Recovery Plan Engine (GRPE)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/governance_recovery/` to generate deterministic governance score improvement plans from governance index outputs.
+- Convert weak governance components into prioritized advisory actions with expected score impacts.
+- Group actions into recovery waves and publish recommended sequence.
+- Export reports only under `.control_plane/governance_recovery/`.
+- Add optional read-only integration with executive briefing and strategic missions.
+
+Reason:
+- Governance score visibility alone does not tell operators which specific actions will raise the score fastest.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No external repository writes, execution, enqueue, enforcement, deployment, git operations, or model invocation are introduced.
+- GRPE remains advisory-only.
+
+## ADR-0039: Add Advisory Governance Recovery Execution Dossier Layer (GREDL)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/governance_recovery_dossiers/` to convert governance recovery actions into deterministic execution dossiers.
+- Include objective, target artifacts, recommended manual commands, validation commands, review checklist, rollback guidance, and Codex-ready prompt text per dossier.
+- Preserve advisory-only behavior and generate reports only under `.control_plane/governance_recovery_dossiers/`.
+- Add optional read-only integration with executive briefing and strategic missions.
+
+Reason:
+- Recovery actions provide prioritization but not operator-ready execution packets. Dossiers close that handoff gap without introducing automation.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No external repository writes, execution, enqueue, enforcement, deployment, git operations, or model invocation are introduced.
+- GREDL remains advisory-only.
+
+## ADR-0040: Add Advisory Governance Recovery Approval Readiness Layer (GRARL)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/governance_approval_readiness/` to evaluate governance recovery dossiers for advisory approval readiness.
+- Classify dossiers as `ready_for_review`, `needs_review`, `blocked`, `rejected_advisory`, or `unknown`.
+- Enforce deterministic checks for advisory-only flag, forbidden runtime/queue paths, validation command presence, rollback/checklist presence, and codex prompt presence.
+- Export reports only under `.control_plane/governance_approval_readiness/`.
+- Add optional read-only integration with executive briefing and strategic missions.
+
+Reason:
+- Dossier generation exists, but operator approval sequencing needs deterministic readiness classification and explicit blocked/review queues.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No external repository writes, execution, enqueue, enforcement, deployment, git operations, or model invocation are introduced.
+- GRARL remains advisory-only.
+
+## ADR-0041: Add Advisory Governance Approval Packet Layer (GAPL)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/governance_approval_packets/` to transform advisory governance approval readiness records into human-review packet artifacts.
+- Generate packets only for dossiers in `ready_for_review` or `needs_review` status.
+- Include deterministic review context, target artifacts, validation commands, rollback guidance, and blank decision template fields.
+- Export reports only under `.control_plane/governance_approval_packets/`.
+- Add optional read-only integration with executive briefing and strategic missions.
+
+Reason:
+- Readiness classification identifies approval posture, but reviewers still need a structured packet artifact for consistent decision workflows.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No external repository writes, execution, enqueue, enforcement, deployment, git operations, or model invocation are introduced.
+- GAPL remains advisory-only.
+
+## ADR-0042: Add Advisory Governance Human Decision Record Layer (GHDRL)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/governance_decisions/` to record human governance decisions for approval packets as advisory metadata only.
+- Support decision types: `approve_for_manual_execution`, `request_changes`, `reject`, `defer`.
+- Require a fixed acknowledgement set for `approve_for_manual_execution`.
+- Generate summary reports showing pending and resolved packet decision states.
+- Export artifacts only under `.control_plane/governance_decisions/`.
+- Add optional read-only integration with executive briefing and strategic missions.
+
+Reason:
+- Governance approval packets require durable, auditable human decision recording before any manual execution planning.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No external repository writes, execution, enqueue, enforcement, deployment, git operations, or model invocation are introduced.
+- GHDRL remains advisory-only.
+
+## ADR-0043: Add Advisory Manual Execution Handoff Queue Layer (MEHQL)
+
+Date: 2026-05-31
+
+Decision:
+- Add `src/manual_execution_queue/` to produce a deterministic operator handoff queue from governance decisions and approval packets.
+- Map decision states into manual queue statuses and priorities:
+  - `approve_for_manual_execution` -> `approved_manual` (P1)
+  - `request_changes` -> `needs_changes` (P2)
+  - `pending` -> `pending_review` (P2)
+  - `defer` -> `deferred` (P3)
+  - `reject` -> `rejected` (P4)
+- Generate queue items with operator next-step guidance, validation command visibility, and safety notes.
+- Export reports only under `.control_plane/manual_execution_queue/`.
+- Add optional read-only integration with executive briefing and strategic missions.
+
+Reason:
+- Decision records alone do not provide a clear human operating queue for manual execution handoff planning.
+
+Consequences:
+- `platform_engine.py` remains unchanged.
+- `.platform_queue/next_task.json` semantics remain unchanged.
+- No external repository writes, execution, enqueue, enforcement, deployment, git operations, or model invocation are introduced.
+- MEHQL remains advisory-only.

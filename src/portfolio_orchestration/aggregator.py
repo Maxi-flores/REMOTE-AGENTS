@@ -44,6 +44,7 @@ def generate_portfolio_report(*, base_dir: str | Path = ".", registry_path: str 
     roadmap_report = load_json(root / ".control_plane" / "portfolio_roadmap" / "latest.json")
     progress_report = load_json(root / ".control_plane" / "portfolio_progress" / "latest.json")
     drift_report = load_json(root / ".control_plane" / "portfolio_drift" / "latest.json")
+    governance_index_report = load_json(root / ".control_plane" / "portfolio_governance_index" / "latest.json")
     bootstrap_index = _bootstrap_index(bootstrap)
 
     for repo in repositories:
@@ -107,6 +108,10 @@ def generate_portfolio_report(*, base_dir: str | Path = ".", registry_path: str 
     roadmap_waves = roadmap_report.get("waves") if isinstance(roadmap_report.get("waves"), list) else []
     progress_trends = progress_report.get("portfolio_trends") if isinstance(progress_report.get("portfolio_trends"), dict) else {}
     drift_summary = drift_report.get("summary") if isinstance(drift_report.get("summary"), dict) else {}
+    governance_summary = {
+        "governance_score": int(governance_index_report.get("governance_score") or 0),
+        "governance_status": str(governance_index_report.get("governance_status") or "unknown"),
+    } if isinstance(governance_index_report, dict) and governance_index_report else {}
     if onboarding_summary:
         findings.append(
             PortfolioExecutiveFinding(
@@ -179,6 +184,18 @@ def generate_portfolio_report(*, base_dir: str | Path = ".", registry_path: str 
                 recommended_action="Use drift intelligence to reconcile portfolio artifact inconsistencies.",
             ).to_dict()
         )
+    if governance_summary:
+        findings.append(
+            PortfolioExecutiveFinding(
+                finding_id=new_id("portfolio_finding"),
+                severity="low",
+                category="governance_index",
+                repository_id="portfolio",
+                title="Portfolio governance health index summary available",
+                description=f"Governance score is {governance_summary['governance_score']} with status {governance_summary['governance_status']}.",
+                recommended_action="Use governance index summary as the top-level operator health signal.",
+            ).to_dict()
+        )
     report = PortfolioReport(
         report_id=new_id("portfolio_report"),
         generated_utc=utc_now(),
@@ -205,6 +222,7 @@ def generate_portfolio_report(*, base_dir: str | Path = ".", registry_path: str 
                 "portfolio_roadmap": str(root / ".control_plane" / "portfolio_roadmap" / "latest.json"),
                 "portfolio_progress": str(root / ".control_plane" / "portfolio_progress" / "latest.json"),
                 "portfolio_drift": str(root / ".control_plane" / "portfolio_drift" / "latest.json"),
+                "portfolio_governance_index": str(root / ".control_plane" / "portfolio_governance_index" / "latest.json"),
             },
             "onboarding_recommendation_summary": onboarding_summary,
             "dependency_summary": dependency_summary,
@@ -216,6 +234,7 @@ def generate_portfolio_report(*, base_dir: str | Path = ".", registry_path: str 
             },
             "progress_summary": progress_trends,
             "drift_summary": drift_summary,
+            "governance_index_summary": governance_summary,
         },
     ).to_dict()
     validate_portfolio_report_dict(report)

@@ -1,0 +1,55 @@
+{
+  "advisory_only": true,
+  "approved_packet_ids": [],
+  "decisions": [
+    {
+      "advisory_only": true,
+      "decided_utc": "2026-05-31T17:54:07Z",
+      "decision": "defer",
+      "decision_id": "governance_decision_503410febdd944709c42a91b64b616e3",
+      "decision_notes": "Defer until portfolio paths are reviewed.",
+      "metadata": {
+        "advisory_only": true,
+        "manual_recorded_via_cli": true,
+        "queue_mutation": false,
+        "runtime_unchanged": true
+      },
+      "packet_id": "governance_approval_packet_697f8e6031484f47ac9f92a363f1c528",
+      "reviewer": "Max",
+      "safety_acknowledgements": [],
+      "source_dossier_id": "governance_recovery_dossier_a8b66bbeec55414e817dc62f279884b2"
+    }
+  ],
+  "deferred_packet_ids": [
+    "governance_approval_packet_697f8e6031484f47ac9f92a363f1c528"
+  ],
+  "generated_utc": "2026-05-31T17:54:07Z",
+  "metadata": {
+    "advisory_only": true,
+    "queue_mutation": false,
+    "runtime_unchanged": true,
+    "source_decisions_path": ".control_plane\\governance_decisions\\decisions.json",
+    "source_packet_report_path": ".control_plane\\governance_approval_packets\\latest.json"
+  },
+  "pending_packet_ids": [
+    "governance_approval_packet_2a6fbf3f1b8242f89f2fa4f6de5a9f37",
+    "governance_approval_packet_028300bc954f4ba7959415d150288dcb",
+    "governance_approval_packet_dc4557cef1de4008b9cd68e1692ab0fb",
+    "governance_approval_packet_2732278cd44d478f9df017fd2962d4c2",
+    "governance_approval_packet_e3469850d0c747bf9ca3ac046546d435",
+    "governance_approval_packet_9edf4e07750341478c259b6bfef5ab4a",
+    "governance_approval_packet_732e36b45d974fb2922b42e51303eb4c"
+  ],
+  "rejected_packet_ids": [],
+  "report_id": "governance_decision_summary_report_4407782cefe94b2db452f28e60e88034",
+  "request_changes_packet_ids": [],
+  "source_packet_report_id": "governance_approval_packet_report_cdf521177054459090fd5996be8c535c",
+  "summary": {
+    "approved": 0,
+    "deferred": 1,
+    "pending": 7,
+    "rejected": 0,
+    "request_changes": 0,
+    "total_packets": 8
+  }
+}

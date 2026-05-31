@@ -1,0 +1,230 @@
+{
+  "actions": [
+    {
+      "action_id": "governance_recovery_action_ed01cc6d65764b1cb9bf75fcda7a3f35",
+      "advisory_only": true,
+      "description": "Improve portfolio readiness by resolving missing onboarding and readiness baselines.",
+      "expected_score_impact": 15,
+      "metadata": {
+        "impact_estimate_advisory": true
+      },
+      "priority": "P1",
+      "recommended_commands": [
+        "python src/portfolio_bootstrap/cli.py --export --export-jsonl",
+        "python src/portfolio_orchestration/cli.py --export --export-jsonl"
+      ],
+      "source_component_id": "governance_component_b0753145a00f4173aece43de4dde6fe4",
+      "target_component": "Portfolio Readiness",
+      "title": "Validate and close missing onboarding/readiness repositories",
+      "validation_focus": [
+        "readiness_recovery",
+        "onboarding_validation"
+      ]
+    },
+    {
+      "action_id": "governance_recovery_action_a68b5fb8c3e342e6bb5b78524636fda1",
+      "advisory_only": true,
+      "description": "Address highest-priority onboarding recommendations first.",
+      "expected_score_impact": 12,
+      "metadata": {
+        "impact_estimate_advisory": true
+      },
+      "priority": "P1",
+      "recommended_commands": [
+        "python src/portfolio_onboarding_recommendations/cli.py --export --export-jsonl"
+      ],
+      "source_component_id": "governance_component_cde9726eb7124590aee3047f3265999d",
+      "target_component": "Onboarding Coverage",
+      "title": "Resolve P1 onboarding recommendations",
+      "validation_focus": [
+        "onboarding_priority_reduction"
+      ]
+    },
+    {
+      "action_id": "governance_recovery_action_b077f4b828b041b6a2086a22d46edd00",
+      "advisory_only": true,
+      "description": "Increase readiness confidence by generating missing repository intelligence baselines.",
+      "expected_score_impact": 10,
+      "metadata": {
+        "impact_estimate_advisory": true
+      },
+      "priority": "P1",
+      "recommended_commands": [
+        "python src/repository_intelligence/cli.py --export --export-jsonl"
+      ],
+      "source_component_id": "governance_component_b0753145a00f4173aece43de4dde6fe4",
+      "target_component": "Portfolio Readiness",
+      "title": "Generate repository intelligence baselines for low-readiness repos",
+      "validation_focus": [
+        "repository_intelligence_coverage"
+      ]
+    },
+    {
+      "action_id": "governance_recovery_action_769c596d47c14994b1c6e77c94a1cb37",
+      "advisory_only": true,
+      "description": "Resolve top dependency blockers and unknown references.",
+      "expected_score_impact": 12,
+      "metadata": {
+        "impact_estimate_advisory": true
+      },
+      "priority": "P2",
+      "recommended_commands": [
+        "python src/portfolio_dependencies/cli.py --export --export-jsonl",
+        "python src/portfolio_critical_path/cli.py --export --export-jsonl"
+      ],
+      "source_component_id": "governance_component_3e7c3b92a9d3408ea92fd501819147fc",
+      "target_component": "Dependency Risk",
+      "title": "Reduce high/critical dependency findings",
+      "validation_focus": [
+        "dependency_risk_reduction"
+      ]
+    },
+    {
+      "action_id": "governance_recovery_action_a3796b1672924f258d98c7f751e77634",
+      "advisory_only": true,
+      "description": "Clean cross-artifact drift and stale report chains.",
+      "expected_score_impact": 8,
+      "metadata": {
+        "impact_estimate_advisory": true
+      },
+      "priority": "P2",
+      "recommended_commands": [
+        "python src/portfolio_drift/cli.py --export --export-jsonl",
+        "python src/portfolio_roadmap/cli.py --export --export-jsonl",
+        "python src/portfolio_progress/cli.py --export --export-jsonl"
+      ],
+      "source_component_id": "governance_component_4d92723124814cac9521e0a1e06a366e",
+      "target_component": "Drift Health",
+      "title": "Resolve missing dependency references and stale artifacts",
+      "validation_focus": [
+        "drift_reconciliation"
+      ]
+    },
+    {
+      "action_id": "governance_recovery_action_ac05547fc9f3431f9fe523a4fa136dfa",
+      "advisory_only": true,
+      "description": "Improve roadmap completeness by regenerating from up-to-date critical path analysis.",
+      "expected_score_impact": 7,
+      "metadata": {
+        "impact_estimate_advisory": true
+      },
+      "priority": "P2",
+      "recommended_commands": [
+        "python src/portfolio_critical_path/cli.py --export --export-jsonl",
+        "python src/portfolio_roadmap/cli.py --export --export-jsonl"
+      ],
+      "source_component_id": "governance_component_85e8a067a5a24365bef62472b1aba09d",
+      "target_component": "Roadmap Completeness",
+      "title": "Regenerate strategic roadmap from latest critical path",
+      "validation_focus": [
+        "roadmap_wave_coverage"
+      ]
+    },
+    {
+      "action_id": "governance_recovery_action_10cba356101d426b9f805c5606c00212",
+      "advisory_only": true,
+      "description": "Refresh onboarding artifacts to ensure recommendations match latest repository state.",
+      "expected_score_impact": 5,
+      "metadata": {
+        "impact_estimate_advisory": true
+      },
+      "priority": "P2",
+      "recommended_commands": [
+        "python src/portfolio_bootstrap/cli.py --export --export-jsonl",
+        "python src/portfolio_onboarding_recommendations/cli.py --export --export-jsonl"
+      ],
+      "source_component_id": "governance_component_cde9726eb7124590aee3047f3265999d",
+      "target_component": "Onboarding Coverage",
+      "title": "Re-run bootstrap and onboarding recommendation refresh",
+      "validation_focus": [
+        "artifact_refresh"
+      ]
+    },
+    {
+      "action_id": "governance_recovery_action_400a6ebcbba54e8caa773da4c3b7bdaf",
+      "advisory_only": true,
+      "description": "Generate consecutive snapshots to stabilize trend confidence.",
+      "expected_score_impact": 4,
+      "metadata": {
+        "impact_estimate_advisory": true
+      },
+      "priority": "P3",
+      "recommended_commands": [
+        "python src/portfolio_progress/cli.py --export --export-jsonl"
+      ],
+      "source_component_id": "governance_component_66eddf5a859a40c2ae07503bb3c71e59",
+      "target_component": "Progress Trend",
+      "title": "Build additional progress history snapshots",
+      "validation_focus": [
+        "trend_confidence"
+      ]
+    }
+  ],
+  "advisory_only": true,
+  "current_governance_score": 50,
+  "generated_utc": "2026-05-31T16:54:27Z",
+  "metadata": {
+    "advisory_only": true,
+    "queue_mutation": false,
+    "runtime_unchanged": true,
+    "source_artifacts": {
+      "governance_index": ".control_plane\\portfolio_governance_index\\latest.json"
+    }
+  },
+  "recommended_sequence": [
+    "governance_recovery_action_ed01cc6d65764b1cb9bf75fcda7a3f35",
+    "governance_recovery_action_a68b5fb8c3e342e6bb5b78524636fda1",
+    "governance_recovery_action_b077f4b828b041b6a2086a22d46edd00",
+    "governance_recovery_action_769c596d47c14994b1c6e77c94a1cb37",
+    "governance_recovery_action_a3796b1672924f258d98c7f751e77634",
+    "governance_recovery_action_ac05547fc9f3431f9fe523a4fa136dfa",
+    "governance_recovery_action_10cba356101d426b9f805c5606c00212",
+    "governance_recovery_action_400a6ebcbba54e8caa773da4c3b7bdaf"
+  ],
+  "report_id": "governance_recovery_report_e3edd4824bfe4443ac69bee286b2bb64",
+  "source_governance_report_id": "portfolio_governance_health_report_948a1e3aaefe4e4ab9736ab04cb700b8",
+  "target_governance_score": 100,
+  "waves": [
+    {
+      "actions": [
+        "governance_recovery_action_ed01cc6d65764b1cb9bf75fcda7a3f35",
+        "governance_recovery_action_a68b5fb8c3e342e6bb5b78524636fda1",
+        "governance_recovery_action_b077f4b828b041b6a2086a22d46edd00"
+      ],
+      "advisory_only": true,
+      "expected_score_impact": 37,
+      "metadata": {},
+      "objective": "Address highest-impact governance blockers first.",
+      "priority": "P1",
+      "title": "Wave 1: Readiness and Onboarding Recovery",
+      "wave_id": "wave_1"
+    },
+    {
+      "actions": [
+        "governance_recovery_action_769c596d47c14994b1c6e77c94a1cb37",
+        "governance_recovery_action_a3796b1672924f258d98c7f751e77634",
+        "governance_recovery_action_ac05547fc9f3431f9fe523a4fa136dfa",
+        "governance_recovery_action_10cba356101d426b9f805c5606c00212"
+      ],
+      "advisory_only": true,
+      "expected_score_impact": 32,
+      "metadata": {},
+      "objective": "Reduce elevated governance and dependency risk.",
+      "priority": "P2",
+      "title": "Wave 2: Dependency and Critical-Path Stabilization",
+      "wave_id": "wave_2"
+    },
+    {
+      "actions": [
+        "governance_recovery_action_400a6ebcbba54e8caa773da4c3b7bdaf"
+      ],
+      "advisory_only": true,
+      "expected_score_impact": 4,
+      "metadata": {},
+      "objective": "Stabilize governance baselines and monitoring confidence.",
+      "priority": "P3",
+      "title": "Wave 3: Drift Cleanup and Trend Hardening",
+      "wave_id": "wave_3"
+    }
+  ]
+}

@@ -574,6 +574,34 @@ python src/portfolio_drift/cli.py --export-jsonl
 
 PDIL-2 outputs are advisory only and are written under `.control_plane/portfolio_drift/`.
 
+## Portfolio Governance Health Index (PGHI)
+
+Phase 34 synthesizes portfolio governance artifacts into one deterministic governance score and status.
+
+Examples:
+
+```bash
+python src/portfolio_governance_index/cli.py --print
+python src/portfolio_governance_index/cli.py --export
+python src/portfolio_governance_index/cli.py --export-jsonl
+```
+
+PGHI outputs are advisory only and are written under `.control_plane/portfolio_governance_index/`.
+
+## Governance Recovery Plan Engine (GRPE)
+
+Phase 35 converts governance index weaknesses into deterministic recovery actions and waves.
+
+Examples:
+
+```bash
+python src/governance_recovery/cli.py --print
+python src/governance_recovery/cli.py --export
+python src/governance_recovery/cli.py --export-jsonl
+```
+
+GRPE outputs are advisory only and are written under `.control_plane/governance_recovery/`.
+
 ## Handoff Package Refinement Engine (HPRE)
 
 Phase 23 refines broad handoff packages into smaller subsystem-scoped packages with focused validation plans and smaller Codex prompts.
@@ -637,6 +665,13 @@ See `docs/runtime-contracts.md` for the Phase 0 contracts covering:
 - `docs/portfolio-strategic-execution-roadmap.md` records the Phase 31 advisory strategic execution roadmap boundary.
 - `docs/portfolio-progress-intelligence-layer.md` records the Phase 32 advisory portfolio progress boundary.
 - `docs/portfolio-drift-intelligence-layer.md` records the Phase 33 advisory portfolio drift boundary.
+- `docs/portfolio-governance-health-index.md` records the Phase 34 advisory governance index boundary.
+- `docs/governance-recovery-plan-engine.md` records the Phase 35 advisory governance recovery planning boundary.
+- `docs/governance-recovery-execution-dossiers.md` records the Phase 36 advisory governance recovery execution dossier boundary.
+- `docs/governance-recovery-approval-readiness.md` records the Phase 37 advisory governance approval readiness boundary.
+- `docs/governance-approval-packet-layer.md` records the Phase 38 advisory governance approval packet boundary.
+- `docs/governance-human-decision-records.md` records the Phase 39 advisory governance human decision record boundary.
+- `docs/manual-execution-handoff-queue.md` records the Phase 40 advisory manual execution handoff queue boundary.
 - `docs/handoff-package-refinement-engine.md` records the Phase 23 advisory refinement boundary.
 
 ## Additional Repository Components

@@ -1,0 +1,22 @@
+{
+  "decisions": [
+    {
+      "advisory_only": true,
+      "decided_utc": "2026-05-31T17:54:07Z",
+      "decision": "defer",
+      "decision_id": "governance_decision_503410febdd944709c42a91b64b616e3",
+      "decision_notes": "Defer until portfolio paths are reviewed.",
+      "metadata": {
+        "advisory_only": true,
+        "manual_recorded_via_cli": true,
+        "queue_mutation": false,
+        "runtime_unchanged": true
+      },
+      "packet_id": "governance_approval_packet_697f8e6031484f47ac9f92a363f1c528",
+      "reviewer": "Max",
+      "safety_acknowledgements": [],
+      "source_dossier_id": "governance_recovery_dossier_a8b66bbeec55414e817dc62f279884b2"
+    }
+  ],
+  "schema_version": 1
+}

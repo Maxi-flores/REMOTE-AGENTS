@@ -12,6 +12,7 @@ POSITIVE_METRICS = {
     "repository_health_score",
     "repository_readiness_score",
     "repository_onboarding_readiness",
+    "governance_score",
 }
 
 NEGATIVE_METRICS = {

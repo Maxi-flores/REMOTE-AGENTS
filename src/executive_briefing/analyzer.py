@@ -41,6 +41,13 @@ def analyze_artifacts(
     portfolio_roadmap_report: Dict[str, Any] | None = None,
     portfolio_progress_report: Dict[str, Any] | None = None,
     portfolio_drift_report: Dict[str, Any] | None = None,
+    portfolio_governance_index_report: Dict[str, Any] | None = None,
+    governance_recovery_report: Dict[str, Any] | None = None,
+    governance_recovery_dossier_report: Dict[str, Any] | None = None,
+    governance_approval_readiness_report: Dict[str, Any] | None = None,
+    governance_approval_packet_report: Dict[str, Any] | None = None,
+    governance_decision_report: Dict[str, Any] | None = None,
+    manual_execution_queue_report: Dict[str, Any] | None = None,
 ) -> Dict[str, Any]:
     if repository_intelligence_report is None:
         repository_intelligence_report = load_json_file(".control_plane/repository_intelligence/repository_intelligence_report.json")
@@ -70,6 +77,20 @@ def analyze_artifacts(
         portfolio_progress_report = load_json_file(".control_plane/portfolio_progress/latest.json")
     if portfolio_drift_report is None:
         portfolio_drift_report = load_json_file(".control_plane/portfolio_drift/latest.json")
+    if portfolio_governance_index_report is None:
+        portfolio_governance_index_report = load_json_file(".control_plane/portfolio_governance_index/latest.json")
+    if governance_recovery_report is None:
+        governance_recovery_report = load_json_file(".control_plane/governance_recovery/latest.json")
+    if governance_recovery_dossier_report is None:
+        governance_recovery_dossier_report = load_json_file(".control_plane/governance_recovery_dossiers/latest.json")
+    if governance_approval_readiness_report is None:
+        governance_approval_readiness_report = load_json_file(".control_plane/governance_approval_readiness/latest.json")
+    if governance_approval_packet_report is None:
+        governance_approval_packet_report = load_json_file(".control_plane/governance_approval_packets/latest.json")
+    if governance_decision_report is None:
+        governance_decision_report = load_json_file(".control_plane/governance_decisions/latest.json")
+    if manual_execution_queue_report is None:
+        manual_execution_queue_report = load_json_file(".control_plane/manual_execution_queue/latest.json")
     findings: List[Dict[str, Any]] = []
     findings.extend(_from_orchestration(orchestration_report or {}))
     findings.extend(_from_release_readiness(release_readiness_report or {}))
@@ -92,6 +113,13 @@ def analyze_artifacts(
     findings.extend(_from_portfolio_roadmap(portfolio_roadmap_report or {}))
     findings.extend(_from_portfolio_progress(portfolio_progress_report or {}))
     findings.extend(_from_portfolio_drift(portfolio_drift_report or {}))
+    findings.extend(_from_portfolio_governance_index(portfolio_governance_index_report or {}))
+    findings.extend(_from_governance_recovery(governance_recovery_report or {}))
+    findings.extend(_from_governance_recovery_dossiers(governance_recovery_dossier_report or {}))
+    findings.extend(_from_governance_approval_readiness(governance_approval_readiness_report or {}))
+    findings.extend(_from_governance_approval_packets(governance_approval_packet_report or {}))
+    findings.extend(_from_governance_decisions(governance_decision_report or {}))
+    findings.extend(_from_manual_execution_queue(manual_execution_queue_report or {}))
 
     blockers = [f for f in findings if f.get("severity") == "critical"]
     risks = [f for f in findings if f.get("severity") in {"high", "critical", "medium"}]
@@ -754,6 +782,171 @@ def _from_portfolio_drift(report: Dict[str, Any]) -> List[Dict[str, Any]]:
             title="High-severity portfolio drift findings detected",
             description=f"Portfolio drift report contains {high} high and {critical} critical finding(s).",
             recommended_action="Reconcile drift findings before trusting downstream portfolio planning outputs.",
+        ).to_dict()
+    ]
+
+
+def _from_portfolio_governance_index(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    score = int(report.get("governance_score") or 0)
+    status = str(report.get("governance_status") or "unknown")
+    severity = "low"
+    if status == "degraded":
+        severity = "medium"
+    elif status == "critical":
+        severity = "high"
+    elif status == "unknown":
+        severity = "medium"
+    return [
+        ExecutiveFinding(
+            finding_id=new_id("finding_portfolio_governance_index"),
+            severity=severity,
+            category="system",
+            title=f"Portfolio governance index status is {status}",
+            description=f"Portfolio governance score is {score}.",
+            recommended_action="Use governance index reasons and recommendations to prioritize portfolio governance improvements.",
+        ).to_dict()
+    ]
+
+
+def _from_governance_recovery(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    actions = report.get("actions")
+    waves = report.get("waves")
+    if not isinstance(actions, list):
+        return []
+    return [
+        ExecutiveFinding(
+            finding_id=new_id("finding_governance_recovery"),
+            severity="low",
+            category="system",
+            title="Governance recovery plan available",
+            description=f"Recovery plan includes {len(actions)} action(s) across {len(waves) if isinstance(waves, list) else 0} wave(s).",
+            recommended_action="Use governance recovery waves to prioritize highest-impact governance score improvements.",
+        ).to_dict()
+    ]
+
+
+def _from_governance_recovery_dossiers(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    dossiers = report.get("dossiers")
+    if not isinstance(dossiers, list):
+        return []
+    high_risk = 0
+    for dossier in dossiers:
+        if not isinstance(dossier, dict):
+            continue
+        if str(dossier.get("execution_risk") or "").lower() in {"high", "critical"}:
+            high_risk += 1
+    severity = "low" if high_risk == 0 else "medium"
+    return [
+        ExecutiveFinding(
+            finding_id=new_id("finding_governance_recovery_dossiers"),
+            severity=severity,
+            category="system",
+            title="Governance recovery execution dossiers available",
+            description=f"Dossier report includes {len(dossiers)} dossier(s); high/critical count: {high_risk}.",
+            recommended_action="Use dossier wave sequence for human-reviewed recovery execution planning.",
+        ).to_dict()
+    ]
+
+
+def _from_governance_approval_readiness(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    summary = report.get("summary")
+    if not isinstance(summary, dict):
+        return []
+    blocked = int(summary.get("blocked", 0) or 0)
+    high_risk = int(summary.get("high_risk_count", 0) or 0)
+    needs_review = int(summary.get("needs_review", 0) or 0)
+    severity = "low"
+    if blocked > 0:
+        severity = "high"
+    elif high_risk > 0:
+        severity = "medium"
+    return [
+        ExecutiveFinding(
+            finding_id=new_id("finding_governance_approval_readiness"),
+            severity=severity,
+            category="governance",
+            title="Governance approval readiness summary available",
+            description=f"needs_review={needs_review}, blocked={blocked}, high_risk={high_risk}.",
+            recommended_action="Use approval readiness records to sequence dossier reviews and clear blocked items first.",
+        ).to_dict()
+    ]
+
+
+def _from_governance_approval_packets(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    summary = report.get("summary")
+    if not isinstance(summary, dict):
+        return []
+    packets = int(summary.get("packets_generated", 0) or 0)
+    needs_review = int(summary.get("needs_review_packets", 0) or 0)
+    severity = "low" if needs_review == 0 else "medium"
+    return [
+        ExecutiveFinding(
+            finding_id=new_id("finding_governance_approval_packets"),
+            severity=severity,
+            category="governance",
+            title="Governance approval packets available",
+            description=f"{packets} approval packet(s) generated; needs_review packet count: {needs_review}.",
+            recommended_action="Use approval packets for human governance review decisions before any manual execution.",
+        ).to_dict()
+    ]
+
+
+def _from_governance_decisions(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    summary = report.get("summary")
+    if not isinstance(summary, dict):
+        return []
+    pending = int(summary.get("pending", 0) or 0)
+    req_changes = int(summary.get("request_changes", 0) or 0)
+    rejected = int(summary.get("rejected", 0) or 0)
+    severity = "low"
+    if rejected > 0:
+        severity = "high"
+    elif req_changes > 0:
+        severity = "medium"
+    return [
+        ExecutiveFinding(
+            finding_id=new_id("finding_governance_decisions"),
+            severity=severity,
+            category="governance",
+            title="Governance human decision summary available",
+            description=f"pending={pending}, request_changes={req_changes}, rejected={rejected}.",
+            recommended_action="Review pending and request-changes governance packets before manual execution planning.",
+        ).to_dict()
+    ]
+
+
+def _from_manual_execution_queue(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    summary = report.get("summary")
+    if not isinstance(summary, dict):
+        return []
+    pending = int(summary.get("pending_review", 0) or 0)
+    deferred = int(summary.get("deferred", 0) or 0)
+    needs_changes = int(summary.get("needs_changes", 0) or 0)
+    severity = "low"
+    if needs_changes > 0:
+        severity = "medium"
+    return [
+        ExecutiveFinding(
+            finding_id=new_id("finding_manual_execution_queue"),
+            severity=severity,
+            category="governance",
+            title="Manual execution handoff queue summary available",
+            description=f"pending={pending}, deferred={deferred}, needs_changes={needs_changes}.",
+            recommended_action="Prioritize pending review packets and prepare approved-manual handoffs.",
         ).to_dict()
     ]
 

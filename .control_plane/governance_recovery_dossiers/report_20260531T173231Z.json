@@ -1,0 +1,445 @@
+{
+  "advisory_only": true,
+  "dossiers": [
+    {
+      "advisory_only": true,
+      "codex_prompt": "You are implementing a Governance Recovery Execution Dossier in advisory-only mode.\nStrict constraints:\n- Do not modify platform_engine.py.\n- Do not modify .platform_queue/next_task.json or queue semantics.\n- Do not execute commands automatically without explicit human review and manual trigger.\n- Do not modify external repositories.\n- Use only allowed artifact paths listed below.\n\nTarget component: Portfolio Readiness\nObjective: Improve portfolio readiness by resolving missing onboarding and readiness baselines.\n\nAllowed artifact paths:\n- .config/portfolio/portfolio_registry.json\n- .control_plane/portfolio_bootstrap/latest.json\n- .control_plane/portfolio_onboarding_recommendations/latest.json\n- .control_plane/portfolio/latest.json\n\nForbidden paths:\n- src/orchestrator/platform_engine.py\n- src/orchastrator/platform_engine.py\n- .platform_queue/next_task.json\n\nRecommended manual commands:\n- python src/portfolio_bootstrap/cli.py --export --export-jsonl\n- python src/portfolio_orchestration/cli.py --export --export-jsonl\n\nValidation commands:\n- python src/portfolio_onboarding_recommendations/cli.py --print\n- python src/portfolio_orchestration/cli.py --print\n- python src/portfolio_governance_index/cli.py --print\n\nExpected outputs:\n- Updated advisory artifacts for the target component.\n- No runtime behavior change.\n- Queue contract untouched.\n",
+      "dossier_id": "governance_recovery_dossier_a8b66bbeec55414e817dc62f279884b2",
+      "execution_risk": "high",
+      "metadata": {
+        "advisory_only": true,
+        "expected_score_impact": 15,
+        "priority": "P1"
+      },
+      "objective": "Improve portfolio readiness by resolving missing onboarding and readiness baselines.",
+      "recommended_commands": [
+        "python src/portfolio_bootstrap/cli.py --export --export-jsonl",
+        "python src/portfolio_orchestration/cli.py --export --export-jsonl"
+      ],
+      "review_checklist": [
+        "Confirm objective scope is limited to action: Validate and close missing onboarding/readiness repositories",
+        "Confirm advisory-only mode (no auto execution, no enforcement).",
+        "Confirm no edits to platform_engine.py and no .platform_queue mutation.",
+        "Confirm target artifacts are inside allowed .control_plane/.config advisory paths.",
+        "Confirm expected artifact updates are human-reviewed before any manual command execution.",
+        "Confirm runtime queue contract remains unchanged after manual run.",
+        "Confirm all target artifacts were reviewed (4 path(s))."
+      ],
+      "rollback_guidance": [
+        "Rollback is artifact-only: restore previous generated advisory reports from history backups.",
+        "Do not attempt runtime rollback through queue or platform engine paths.",
+        "Restore previous state for: .config/portfolio/portfolio_registry.json",
+        "Restore previous state for: .control_plane/portfolio_bootstrap/latest.json",
+        "Restore previous state for: .control_plane/portfolio_onboarding_recommendations/latest.json",
+        "Restore previous state for: .control_plane/portfolio/latest.json",
+        "If unsure, regenerate advisory artifacts with previous known-good inputs and compare diffs manually."
+      ],
+      "source_action_id": "governance_recovery_action_2363f036c47a4ef782db3bcb0ac05fc8",
+      "source_wave_id": "wave_1",
+      "target_artifacts": [
+        ".config/portfolio/portfolio_registry.json",
+        ".control_plane/portfolio_bootstrap/latest.json",
+        ".control_plane/portfolio_onboarding_recommendations/latest.json",
+        ".control_plane/portfolio/latest.json"
+      ],
+      "target_component": "Portfolio Readiness",
+      "title": "Dossier: Validate and close missing onboarding/readiness repositories",
+      "validation_commands": [
+        "python src/portfolio_onboarding_recommendations/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "codex_prompt": "You are implementing a Governance Recovery Execution Dossier in advisory-only mode.\nStrict constraints:\n- Do not modify platform_engine.py.\n- Do not modify .platform_queue/next_task.json or queue semantics.\n- Do not execute commands automatically without explicit human review and manual trigger.\n- Do not modify external repositories.\n- Use only allowed artifact paths listed below.\n\nTarget component: Onboarding Coverage\nObjective: Address highest-priority onboarding recommendations first.\n\nAllowed artifact paths:\n- .config/portfolio/portfolio_registry.json\n- .control_plane/portfolio_bootstrap/latest.json\n- .control_plane/portfolio_onboarding_recommendations/latest.json\n- .control_plane/portfolio/latest.json\n\nForbidden paths:\n- src/orchestrator/platform_engine.py\n- src/orchastrator/platform_engine.py\n- .platform_queue/next_task.json\n\nRecommended manual commands:\n- python src/portfolio_onboarding_recommendations/cli.py --export --export-jsonl\n\nValidation commands:\n- python src/portfolio_onboarding_recommendations/cli.py --print\n- python src/portfolio_orchestration/cli.py --print\n- python src/portfolio_governance_index/cli.py --print\n\nExpected outputs:\n- Updated advisory artifacts for the target component.\n- No runtime behavior change.\n- Queue contract untouched.\n",
+      "dossier_id": "governance_recovery_dossier_a99193d417fd4f24b2dc8998d7653935",
+      "execution_risk": "high",
+      "metadata": {
+        "advisory_only": true,
+        "expected_score_impact": 12,
+        "priority": "P1"
+      },
+      "objective": "Address highest-priority onboarding recommendations first.",
+      "recommended_commands": [
+        "python src/portfolio_onboarding_recommendations/cli.py --export --export-jsonl"
+      ],
+      "review_checklist": [
+        "Confirm objective scope is limited to action: Resolve P1 onboarding recommendations",
+        "Confirm advisory-only mode (no auto execution, no enforcement).",
+        "Confirm no edits to platform_engine.py and no .platform_queue mutation.",
+        "Confirm target artifacts are inside allowed .control_plane/.config advisory paths.",
+        "Confirm expected artifact updates are human-reviewed before any manual command execution.",
+        "Confirm runtime queue contract remains unchanged after manual run.",
+        "Confirm all target artifacts were reviewed (4 path(s))."
+      ],
+      "rollback_guidance": [
+        "Rollback is artifact-only: restore previous generated advisory reports from history backups.",
+        "Do not attempt runtime rollback through queue or platform engine paths.",
+        "Restore previous state for: .config/portfolio/portfolio_registry.json",
+        "Restore previous state for: .control_plane/portfolio_bootstrap/latest.json",
+        "Restore previous state for: .control_plane/portfolio_onboarding_recommendations/latest.json",
+        "Restore previous state for: .control_plane/portfolio/latest.json",
+        "If unsure, regenerate advisory artifacts with previous known-good inputs and compare diffs manually."
+      ],
+      "source_action_id": "governance_recovery_action_98dff872d93c4c349f0600ea7d4135fe",
+      "source_wave_id": "wave_1",
+      "target_artifacts": [
+        ".config/portfolio/portfolio_registry.json",
+        ".control_plane/portfolio_bootstrap/latest.json",
+        ".control_plane/portfolio_onboarding_recommendations/latest.json",
+        ".control_plane/portfolio/latest.json"
+      ],
+      "target_component": "Onboarding Coverage",
+      "title": "Dossier: Resolve P1 onboarding recommendations",
+      "validation_commands": [
+        "python src/portfolio_onboarding_recommendations/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "codex_prompt": "You are implementing a Governance Recovery Execution Dossier in advisory-only mode.\nStrict constraints:\n- Do not modify platform_engine.py.\n- Do not modify .platform_queue/next_task.json or queue semantics.\n- Do not execute commands automatically without explicit human review and manual trigger.\n- Do not modify external repositories.\n- Use only allowed artifact paths listed below.\n\nTarget component: Portfolio Readiness\nObjective: Increase readiness confidence by generating missing repository intelligence baselines.\n\nAllowed artifact paths:\n- .config/portfolio/portfolio_registry.json\n- .control_plane/portfolio_bootstrap/latest.json\n- .control_plane/portfolio_onboarding_recommendations/latest.json\n- .control_plane/portfolio/latest.json\n\nForbidden paths:\n- src/orchestrator/platform_engine.py\n- src/orchastrator/platform_engine.py\n- .platform_queue/next_task.json\n\nRecommended manual commands:\n- python src/repository_intelligence/cli.py --export --export-jsonl\n\nValidation commands:\n- python src/portfolio_onboarding_recommendations/cli.py --print\n- python src/portfolio_orchestration/cli.py --print\n- python src/portfolio_governance_index/cli.py --print\n\nExpected outputs:\n- Updated advisory artifacts for the target component.\n- No runtime behavior change.\n- Queue contract untouched.\n",
+      "dossier_id": "governance_recovery_dossier_d6105aa0d78c49519b7294cca1ea2c3e",
+      "execution_risk": "high",
+      "metadata": {
+        "advisory_only": true,
+        "expected_score_impact": 10,
+        "priority": "P1"
+      },
+      "objective": "Increase readiness confidence by generating missing repository intelligence baselines.",
+      "recommended_commands": [
+        "python src/repository_intelligence/cli.py --export --export-jsonl"
+      ],
+      "review_checklist": [
+        "Confirm objective scope is limited to action: Generate repository intelligence baselines for low-readiness repos",
+        "Confirm advisory-only mode (no auto execution, no enforcement).",
+        "Confirm no edits to platform_engine.py and no .platform_queue mutation.",
+        "Confirm target artifacts are inside allowed .control_plane/.config advisory paths.",
+        "Confirm expected artifact updates are human-reviewed before any manual command execution.",
+        "Confirm runtime queue contract remains unchanged after manual run.",
+        "Confirm all target artifacts were reviewed (4 path(s))."
+      ],
+      "rollback_guidance": [
+        "Rollback is artifact-only: restore previous generated advisory reports from history backups.",
+        "Do not attempt runtime rollback through queue or platform engine paths.",
+        "Restore previous state for: .config/portfolio/portfolio_registry.json",
+        "Restore previous state for: .control_plane/portfolio_bootstrap/latest.json",
+        "Restore previous state for: .control_plane/portfolio_onboarding_recommendations/latest.json",
+        "Restore previous state for: .control_plane/portfolio/latest.json",
+        "If unsure, regenerate advisory artifacts with previous known-good inputs and compare diffs manually."
+      ],
+      "source_action_id": "governance_recovery_action_fb6672d23ef04d489517e35af43f8ba2",
+      "source_wave_id": "wave_1",
+      "target_artifacts": [
+        ".config/portfolio/portfolio_registry.json",
+        ".control_plane/portfolio_bootstrap/latest.json",
+        ".control_plane/portfolio_onboarding_recommendations/latest.json",
+        ".control_plane/portfolio/latest.json"
+      ],
+      "target_component": "Portfolio Readiness",
+      "title": "Dossier: Generate repository intelligence baselines for low-readiness repos",
+      "validation_commands": [
+        "python src/portfolio_onboarding_recommendations/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "codex_prompt": "You are implementing a Governance Recovery Execution Dossier in advisory-only mode.\nStrict constraints:\n- Do not modify platform_engine.py.\n- Do not modify .platform_queue/next_task.json or queue semantics.\n- Do not execute commands automatically without explicit human review and manual trigger.\n- Do not modify external repositories.\n- Use only allowed artifact paths listed below.\n\nTarget component: Dependency Risk\nObjective: Resolve top dependency blockers and unknown references.\n\nAllowed artifact paths:\n- .config/portfolio/dependencies.json\n- .control_plane/portfolio_dependencies/latest.json\n- .control_plane/portfolio_critical_path/latest.json\n\nForbidden paths:\n- src/orchestrator/platform_engine.py\n- src/orchastrator/platform_engine.py\n- .platform_queue/next_task.json\n\nRecommended manual commands:\n- python src/portfolio_dependencies/cli.py --export --export-jsonl\n- python src/portfolio_critical_path/cli.py --export --export-jsonl\n\nValidation commands:\n- python src/portfolio_dependencies/cli.py --print\n- python src/portfolio_orchestration/cli.py --print\n- python src/portfolio_governance_index/cli.py --print\n\nExpected outputs:\n- Updated advisory artifacts for the target component.\n- No runtime behavior change.\n- Queue contract untouched.\n",
+      "dossier_id": "governance_recovery_dossier_e309da55dea946f79afd04bec39997da",
+      "execution_risk": "medium",
+      "metadata": {
+        "advisory_only": true,
+        "expected_score_impact": 12,
+        "priority": "P2"
+      },
+      "objective": "Resolve top dependency blockers and unknown references.",
+      "recommended_commands": [
+        "python src/portfolio_dependencies/cli.py --export --export-jsonl",
+        "python src/portfolio_critical_path/cli.py --export --export-jsonl"
+      ],
+      "review_checklist": [
+        "Confirm objective scope is limited to action: Reduce high/critical dependency findings",
+        "Confirm advisory-only mode (no auto execution, no enforcement).",
+        "Confirm no edits to platform_engine.py and no .platform_queue mutation.",
+        "Confirm target artifacts are inside allowed .control_plane/.config advisory paths.",
+        "Confirm expected artifact updates are human-reviewed before any manual command execution.",
+        "Confirm runtime queue contract remains unchanged after manual run.",
+        "Confirm all target artifacts were reviewed (3 path(s))."
+      ],
+      "rollback_guidance": [
+        "Rollback is artifact-only: restore previous generated advisory reports from history backups.",
+        "Do not attempt runtime rollback through queue or platform engine paths.",
+        "Restore previous state for: .config/portfolio/dependencies.json",
+        "Restore previous state for: .control_plane/portfolio_dependencies/latest.json",
+        "Restore previous state for: .control_plane/portfolio_critical_path/latest.json",
+        "If unsure, regenerate advisory artifacts with previous known-good inputs and compare diffs manually."
+      ],
+      "source_action_id": "governance_recovery_action_c9a4dbee5e1a4a28be3b73d418ee1c92",
+      "source_wave_id": "wave_2",
+      "target_artifacts": [
+        ".config/portfolio/dependencies.json",
+        ".control_plane/portfolio_dependencies/latest.json",
+        ".control_plane/portfolio_critical_path/latest.json"
+      ],
+      "target_component": "Dependency Risk",
+      "title": "Dossier: Reduce high/critical dependency findings",
+      "validation_commands": [
+        "python src/portfolio_dependencies/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "codex_prompt": "You are implementing a Governance Recovery Execution Dossier in advisory-only mode.\nStrict constraints:\n- Do not modify platform_engine.py.\n- Do not modify .platform_queue/next_task.json or queue semantics.\n- Do not execute commands automatically without explicit human review and manual trigger.\n- Do not modify external repositories.\n- Use only allowed artifact paths listed below.\n\nTarget component: Drift Health\nObjective: Clean cross-artifact drift and stale report chains.\n\nAllowed artifact paths:\n- .config/portfolio/dependencies.json\n- .control_plane/portfolio_dependencies/latest.json\n- .control_plane/portfolio_critical_path/latest.json\n- .control_plane/portfolio_drift/latest.json\n- .control_plane/portfolio_roadmap/latest.json\n- .control_plane/portfolio_progress/latest.json\n\nForbidden paths:\n- src/orchestrator/platform_engine.py\n- src/orchastrator/platform_engine.py\n- .platform_queue/next_task.json\n\nRecommended manual commands:\n- python src/portfolio_drift/cli.py --export --export-jsonl\n- python src/portfolio_roadmap/cli.py --export --export-jsonl\n- python src/portfolio_progress/cli.py --export --export-jsonl\n\nValidation commands:\n- python src/portfolio_drift/cli.py --print\n- python src/portfolio_dependencies/cli.py --print\n- python src/portfolio_orchestration/cli.py --print\n- python src/portfolio_governance_index/cli.py --print\n\nExpected outputs:\n- Updated advisory artifacts for the target component.\n- No runtime behavior change.\n- Queue contract untouched.\n",
+      "dossier_id": "governance_recovery_dossier_21b7604d225b40e8bca68cd43b00d47f",
+      "execution_risk": "medium",
+      "metadata": {
+        "advisory_only": true,
+        "expected_score_impact": 8,
+        "priority": "P2"
+      },
+      "objective": "Clean cross-artifact drift and stale report chains.",
+      "recommended_commands": [
+        "python src/portfolio_drift/cli.py --export --export-jsonl",
+        "python src/portfolio_roadmap/cli.py --export --export-jsonl",
+        "python src/portfolio_progress/cli.py --export --export-jsonl"
+      ],
+      "review_checklist": [
+        "Confirm objective scope is limited to action: Resolve missing dependency references and stale artifacts",
+        "Confirm advisory-only mode (no auto execution, no enforcement).",
+        "Confirm no edits to platform_engine.py and no .platform_queue mutation.",
+        "Confirm target artifacts are inside allowed .control_plane/.config advisory paths.",
+        "Confirm expected artifact updates are human-reviewed before any manual command execution.",
+        "Confirm runtime queue contract remains unchanged after manual run.",
+        "Confirm all target artifacts were reviewed (6 path(s))."
+      ],
+      "rollback_guidance": [
+        "Rollback is artifact-only: restore previous generated advisory reports from history backups.",
+        "Do not attempt runtime rollback through queue or platform engine paths.",
+        "Restore previous state for: .config/portfolio/dependencies.json",
+        "Restore previous state for: .control_plane/portfolio_dependencies/latest.json",
+        "Restore previous state for: .control_plane/portfolio_critical_path/latest.json",
+        "Restore previous state for: .control_plane/portfolio_drift/latest.json",
+        "Restore previous state for: .control_plane/portfolio_roadmap/latest.json",
+        "Restore previous state for: .control_plane/portfolio_progress/latest.json",
+        "If unsure, regenerate advisory artifacts with previous known-good inputs and compare diffs manually."
+      ],
+      "source_action_id": "governance_recovery_action_bb60bd02f8b4482abd49454c89cd2258",
+      "source_wave_id": "wave_2",
+      "target_artifacts": [
+        ".config/portfolio/dependencies.json",
+        ".control_plane/portfolio_dependencies/latest.json",
+        ".control_plane/portfolio_critical_path/latest.json",
+        ".control_plane/portfolio_drift/latest.json",
+        ".control_plane/portfolio_roadmap/latest.json",
+        ".control_plane/portfolio_progress/latest.json"
+      ],
+      "target_component": "Drift Health",
+      "title": "Dossier: Resolve missing dependency references and stale artifacts",
+      "validation_commands": [
+        "python src/portfolio_drift/cli.py --print",
+        "python src/portfolio_dependencies/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "codex_prompt": "You are implementing a Governance Recovery Execution Dossier in advisory-only mode.\nStrict constraints:\n- Do not modify platform_engine.py.\n- Do not modify .platform_queue/next_task.json or queue semantics.\n- Do not execute commands automatically without explicit human review and manual trigger.\n- Do not modify external repositories.\n- Use only allowed artifact paths listed below.\n\nTarget component: Roadmap Completeness\nObjective: Improve roadmap completeness by regenerating from up-to-date critical path analysis.\n\nAllowed artifact paths:\n- .config/portfolio/dependencies.json\n- .control_plane/portfolio_dependencies/latest.json\n- .control_plane/portfolio_critical_path/latest.json\n- .control_plane/portfolio_roadmap/latest.json\n- .control_plane/portfolio_progress/latest.json\n- .control_plane/portfolio_governance_index/latest.json\n\nForbidden paths:\n- src/orchestrator/platform_engine.py\n- src/orchastrator/platform_engine.py\n- .platform_queue/next_task.json\n\nRecommended manual commands:\n- python src/portfolio_critical_path/cli.py --export --export-jsonl\n- python src/portfolio_roadmap/cli.py --export --export-jsonl\n\nValidation commands:\n- python src/portfolio_dependencies/cli.py --print\n- python src/portfolio_orchestration/cli.py --print\n- python src/portfolio_governance_index/cli.py --print\n\nExpected outputs:\n- Updated advisory artifacts for the target component.\n- No runtime behavior change.\n- Queue contract untouched.\n",
+      "dossier_id": "governance_recovery_dossier_a76e943f2bc44bc1be4ff5e34e5d223e",
+      "execution_risk": "medium",
+      "metadata": {
+        "advisory_only": true,
+        "expected_score_impact": 7,
+        "priority": "P2"
+      },
+      "objective": "Improve roadmap completeness by regenerating from up-to-date critical path analysis.",
+      "recommended_commands": [
+        "python src/portfolio_critical_path/cli.py --export --export-jsonl",
+        "python src/portfolio_roadmap/cli.py --export --export-jsonl"
+      ],
+      "review_checklist": [
+        "Confirm objective scope is limited to action: Regenerate strategic roadmap from latest critical path",
+        "Confirm advisory-only mode (no auto execution, no enforcement).",
+        "Confirm no edits to platform_engine.py and no .platform_queue mutation.",
+        "Confirm target artifacts are inside allowed .control_plane/.config advisory paths.",
+        "Confirm expected artifact updates are human-reviewed before any manual command execution.",
+        "Confirm runtime queue contract remains unchanged after manual run.",
+        "Confirm all target artifacts were reviewed (6 path(s))."
+      ],
+      "rollback_guidance": [
+        "Rollback is artifact-only: restore previous generated advisory reports from history backups.",
+        "Do not attempt runtime rollback through queue or platform engine paths.",
+        "Restore previous state for: .config/portfolio/dependencies.json",
+        "Restore previous state for: .control_plane/portfolio_dependencies/latest.json",
+        "Restore previous state for: .control_plane/portfolio_critical_path/latest.json",
+        "Restore previous state for: .control_plane/portfolio_roadmap/latest.json",
+        "Restore previous state for: .control_plane/portfolio_progress/latest.json",
+        "Restore previous state for: .control_plane/portfolio_governance_index/latest.json",
+        "If unsure, regenerate advisory artifacts with previous known-good inputs and compare diffs manually."
+      ],
+      "source_action_id": "governance_recovery_action_ba3b426d34824bf580f381991c35dbd2",
+      "source_wave_id": "wave_2",
+      "target_artifacts": [
+        ".config/portfolio/dependencies.json",
+        ".control_plane/portfolio_dependencies/latest.json",
+        ".control_plane/portfolio_critical_path/latest.json",
+        ".control_plane/portfolio_roadmap/latest.json",
+        ".control_plane/portfolio_progress/latest.json",
+        ".control_plane/portfolio_governance_index/latest.json"
+      ],
+      "target_component": "Roadmap Completeness",
+      "title": "Dossier: Regenerate strategic roadmap from latest critical path",
+      "validation_commands": [
+        "python src/portfolio_dependencies/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "codex_prompt": "You are implementing a Governance Recovery Execution Dossier in advisory-only mode.\nStrict constraints:\n- Do not modify platform_engine.py.\n- Do not modify .platform_queue/next_task.json or queue semantics.\n- Do not execute commands automatically without explicit human review and manual trigger.\n- Do not modify external repositories.\n- Use only allowed artifact paths listed below.\n\nTarget component: Onboarding Coverage\nObjective: Refresh onboarding artifacts to ensure recommendations match latest repository state.\n\nAllowed artifact paths:\n- .config/portfolio/portfolio_registry.json\n- .control_plane/portfolio_bootstrap/latest.json\n- .control_plane/portfolio_onboarding_recommendations/latest.json\n- .control_plane/portfolio/latest.json\n\nForbidden paths:\n- src/orchestrator/platform_engine.py\n- src/orchastrator/platform_engine.py\n- .platform_queue/next_task.json\n\nRecommended manual commands:\n- python src/portfolio_bootstrap/cli.py --export --export-jsonl\n- python src/portfolio_onboarding_recommendations/cli.py --export --export-jsonl\n\nValidation commands:\n- python src/portfolio_onboarding_recommendations/cli.py --print\n- python src/portfolio_orchestration/cli.py --print\n- python src/portfolio_governance_index/cli.py --print\n\nExpected outputs:\n- Updated advisory artifacts for the target component.\n- No runtime behavior change.\n- Queue contract untouched.\n",
+      "dossier_id": "governance_recovery_dossier_2bf8e591bb2d4f529c9c9511ec4c4fb0",
+      "execution_risk": "medium",
+      "metadata": {
+        "advisory_only": true,
+        "expected_score_impact": 5,
+        "priority": "P2"
+      },
+      "objective": "Refresh onboarding artifacts to ensure recommendations match latest repository state.",
+      "recommended_commands": [
+        "python src/portfolio_bootstrap/cli.py --export --export-jsonl",
+        "python src/portfolio_onboarding_recommendations/cli.py --export --export-jsonl"
+      ],
+      "review_checklist": [
+        "Confirm objective scope is limited to action: Re-run bootstrap and onboarding recommendation refresh",
+        "Confirm advisory-only mode (no auto execution, no enforcement).",
+        "Confirm no edits to platform_engine.py and no .platform_queue mutation.",
+        "Confirm target artifacts are inside allowed .control_plane/.config advisory paths.",
+        "Confirm expected artifact updates are human-reviewed before any manual command execution.",
+        "Confirm runtime queue contract remains unchanged after manual run.",
+        "Confirm all target artifacts were reviewed (4 path(s))."
+      ],
+      "rollback_guidance": [
+        "Rollback is artifact-only: restore previous generated advisory reports from history backups.",
+        "Do not attempt runtime rollback through queue or platform engine paths.",
+        "Restore previous state for: .config/portfolio/portfolio_registry.json",
+        "Restore previous state for: .control_plane/portfolio_bootstrap/latest.json",
+        "Restore previous state for: .control_plane/portfolio_onboarding_recommendations/latest.json",
+        "Restore previous state for: .control_plane/portfolio/latest.json",
+        "If unsure, regenerate advisory artifacts with previous known-good inputs and compare diffs manually."
+      ],
+      "source_action_id": "governance_recovery_action_b4289d6db58245439fb6e1124a072fe7",
+      "source_wave_id": "wave_2",
+      "target_artifacts": [
+        ".config/portfolio/portfolio_registry.json",
+        ".control_plane/portfolio_bootstrap/latest.json",
+        ".control_plane/portfolio_onboarding_recommendations/latest.json",
+        ".control_plane/portfolio/latest.json"
+      ],
+      "target_component": "Onboarding Coverage",
+      "title": "Dossier: Re-run bootstrap and onboarding recommendation refresh",
+      "validation_commands": [
+        "python src/portfolio_onboarding_recommendations/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "codex_prompt": "You are implementing a Governance Recovery Execution Dossier in advisory-only mode.\nStrict constraints:\n- Do not modify platform_engine.py.\n- Do not modify .platform_queue/next_task.json or queue semantics.\n- Do not execute commands automatically without explicit human review and manual trigger.\n- Do not modify external repositories.\n- Use only allowed artifact paths listed below.\n\nTarget component: Progress Trend\nObjective: Generate consecutive snapshots to stabilize trend confidence.\n\nAllowed artifact paths:\n- .control_plane/portfolio_roadmap/latest.json\n- .control_plane/portfolio_progress/latest.json\n- .control_plane/portfolio_governance_index/latest.json\n\nForbidden paths:\n- src/orchestrator/platform_engine.py\n- src/orchastrator/platform_engine.py\n- .platform_queue/next_task.json\n\nRecommended manual commands:\n- python src/portfolio_progress/cli.py --export --export-jsonl\n\nValidation commands:\n- python src/portfolio_orchestration/cli.py --print\n- python src/portfolio_governance_index/cli.py --print\n\nExpected outputs:\n- Updated advisory artifacts for the target component.\n- No runtime behavior change.\n- Queue contract untouched.\n",
+      "dossier_id": "governance_recovery_dossier_efb85b732ba5422890b2bf86bdc7b526",
+      "execution_risk": "low",
+      "metadata": {
+        "advisory_only": true,
+        "expected_score_impact": 4,
+        "priority": "P3"
+      },
+      "objective": "Generate consecutive snapshots to stabilize trend confidence.",
+      "recommended_commands": [
+        "python src/portfolio_progress/cli.py --export --export-jsonl"
+      ],
+      "review_checklist": [
+        "Confirm objective scope is limited to action: Build additional progress history snapshots",
+        "Confirm advisory-only mode (no auto execution, no enforcement).",
+        "Confirm no edits to platform_engine.py and no .platform_queue mutation.",
+        "Confirm target artifacts are inside allowed .control_plane/.config advisory paths.",
+        "Confirm expected artifact updates are human-reviewed before any manual command execution.",
+        "Confirm runtime queue contract remains unchanged after manual run.",
+        "Confirm all target artifacts were reviewed (3 path(s))."
+      ],
+      "rollback_guidance": [
+        "Rollback is artifact-only: restore previous generated advisory reports from history backups.",
+        "Do not attempt runtime rollback through queue or platform engine paths.",
+        "Restore previous state for: .control_plane/portfolio_roadmap/latest.json",
+        "Restore previous state for: .control_plane/portfolio_progress/latest.json",
+        "Restore previous state for: .control_plane/portfolio_governance_index/latest.json",
+        "If unsure, regenerate advisory artifacts with previous known-good inputs and compare diffs manually."
+      ],
+      "source_action_id": "governance_recovery_action_48f89b55f3e2490f8a5d51efd423dbc3",
+      "source_wave_id": "wave_3",
+      "target_artifacts": [
+        ".control_plane/portfolio_roadmap/latest.json",
+        ".control_plane/portfolio_progress/latest.json",
+        ".control_plane/portfolio_governance_index/latest.json"
+      ],
+      "target_component": "Progress Trend",
+      "title": "Dossier: Build additional progress history snapshots",
+      "validation_commands": [
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    }
+  ],
+  "generated_utc": "2026-05-31T17:32:31Z",
+  "metadata": {
+    "advisory_only": true,
+    "queue_mutation": false,
+    "runtime_unchanged": true,
+    "source_recovery_report_path": ".control_plane\\governance_recovery\\latest.json"
+  },
+  "report_id": "governance_recovery_dossier_report_badf2722bd1a4c7aabdf0dc4129faac0",
+  "source_recovery_report_id": "governance_recovery_report_604834bba93949fdbba0d2b55b22e5fb",
+  "wave_summary": [
+    {
+      "action_ids": [
+        "governance_recovery_action_2363f036c47a4ef782db3bcb0ac05fc8",
+        "governance_recovery_action_98dff872d93c4c349f0600ea7d4135fe",
+        "governance_recovery_action_fb6672d23ef04d489517e35af43f8ba2"
+      ],
+      "critical_risk_count": 0,
+      "dossier_count": 3,
+      "high_risk_count": 3,
+      "wave_id": "wave_1",
+      "wave_title": "Wave 1: Readiness and Onboarding Recovery"
+    },
+    {
+      "action_ids": [
+        "governance_recovery_action_c9a4dbee5e1a4a28be3b73d418ee1c92",
+        "governance_recovery_action_bb60bd02f8b4482abd49454c89cd2258",
+        "governance_recovery_action_ba3b426d34824bf580f381991c35dbd2",
+        "governance_recovery_action_b4289d6db58245439fb6e1124a072fe7"
+      ],
+      "critical_risk_count": 0,
+      "dossier_count": 4,
+      "high_risk_count": 0,
+      "wave_id": "wave_2",
+      "wave_title": "Wave 2: Dependency and Critical-Path Stabilization"
+    },
+    {
+      "action_ids": [
+        "governance_recovery_action_48f89b55f3e2490f8a5d51efd423dbc3"
+      ],
+      "critical_risk_count": 0,
+      "dossier_count": 1,
+      "high_risk_count": 0,
+      "wave_id": "wave_3",
+      "wave_title": "Wave 3: Drift Cleanup and Trend Hardening"
+    }
+  ]
+}

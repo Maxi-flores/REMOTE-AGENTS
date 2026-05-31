@@ -1,0 +1,449 @@
+{
+  "advisory_only": true,
+  "generated_utc": "2026-05-31T18:06:48Z",
+  "metadata": {
+    "advisory_only": true,
+    "queue_mutation": false,
+    "runtime_unchanged": true,
+    "source_dossier_report_path": ".control_plane\\governance_recovery_dossiers\\latest.json",
+    "source_readiness_report_path": ".control_plane\\governance_approval_readiness\\latest.json"
+  },
+  "packets": [
+    {
+      "advisory_only": true,
+      "approval_status": "needs_review",
+      "human_decision_template": {
+        "allowed_decisions": [
+          "approve_for_manual_execution",
+          "request_changes",
+          "reject",
+          "defer"
+        ],
+        "decision_notes_placeholder": "",
+        "decision_timestamp_placeholder": "",
+        "required_reviewer": "",
+        "safety_acknowledgements": [
+          "I understand this packet does not execute anything.",
+          "I understand runtime paths are forbidden.",
+          "I understand queue mutation is forbidden.",
+          "I reviewed validation commands."
+        ]
+      },
+      "metadata": {
+        "advisory_only": true,
+        "approval_recommendation": "Requires elevated human review due to execution risk before approval.",
+        "required_human_review": true
+      },
+      "packet_id": "governance_approval_packet_d5c5d70c0bfd4fca9f75a80dfa5667c5",
+      "readiness_score": 55,
+      "review_summary": "Human-review approval packet only. This does NOT grant approval and does NOT execute anything. Status: needs_review. Risk: high. No missing requirements detected.",
+      "risk_level": "high",
+      "rollback_guidance": [
+        "Rollback is artifact-only: restore previous generated advisory reports from history backups.",
+        "Do not attempt runtime rollback through queue or platform engine paths.",
+        "Restore previous state for: .config/portfolio/portfolio_registry.json",
+        "Restore previous state for: .control_plane/portfolio_bootstrap/latest.json",
+        "Restore previous state for: .control_plane/portfolio_onboarding_recommendations/latest.json",
+        "Restore previous state for: .control_plane/portfolio/latest.json",
+        "If unsure, regenerate advisory artifacts with previous known-good inputs and compare diffs manually."
+      ],
+      "source_dossier_id": "governance_recovery_dossier_a8b66bbeec55414e817dc62f279884b2",
+      "source_readiness_record_id": "governance_approval_readiness_e5435d886f3a4187a21df17473524d3a",
+      "target_artifacts": [
+        ".config/portfolio/portfolio_registry.json",
+        ".control_plane/portfolio_bootstrap/latest.json",
+        ".control_plane/portfolio_onboarding_recommendations/latest.json",
+        ".control_plane/portfolio/latest.json"
+      ],
+      "title": "Dossier: Validate and close missing onboarding/readiness repositories",
+      "validation_commands": [
+        "python src/portfolio_onboarding_recommendations/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "approval_status": "needs_review",
+      "human_decision_template": {
+        "allowed_decisions": [
+          "approve_for_manual_execution",
+          "request_changes",
+          "reject",
+          "defer"
+        ],
+        "decision_notes_placeholder": "",
+        "decision_timestamp_placeholder": "",
+        "required_reviewer": "",
+        "safety_acknowledgements": [
+          "I understand this packet does not execute anything.",
+          "I understand runtime paths are forbidden.",
+          "I understand queue mutation is forbidden.",
+          "I reviewed validation commands."
+        ]
+      },
+      "metadata": {
+        "advisory_only": true,
+        "approval_recommendation": "Requires elevated human review due to execution risk before approval.",
+        "required_human_review": true
+      },
+      "packet_id": "governance_approval_packet_12d02874e073420a995c279e22ec12b4",
+      "readiness_score": 55,
+      "review_summary": "Human-review approval packet only. This does NOT grant approval and does NOT execute anything. Status: needs_review. Risk: high. No missing requirements detected.",
+      "risk_level": "high",
+      "rollback_guidance": [
+        "Rollback is artifact-only: restore previous generated advisory reports from history backups.",
+        "Do not attempt runtime rollback through queue or platform engine paths.",
+        "Restore previous state for: .config/portfolio/portfolio_registry.json",
+        "Restore previous state for: .control_plane/portfolio_bootstrap/latest.json",
+        "Restore previous state for: .control_plane/portfolio_onboarding_recommendations/latest.json",
+        "Restore previous state for: .control_plane/portfolio/latest.json",
+        "If unsure, regenerate advisory artifacts with previous known-good inputs and compare diffs manually."
+      ],
+      "source_dossier_id": "governance_recovery_dossier_a99193d417fd4f24b2dc8998d7653935",
+      "source_readiness_record_id": "governance_approval_readiness_1726de881f42492d845b55ade3ed5379",
+      "target_artifacts": [
+        ".config/portfolio/portfolio_registry.json",
+        ".control_plane/portfolio_bootstrap/latest.json",
+        ".control_plane/portfolio_onboarding_recommendations/latest.json",
+        ".control_plane/portfolio/latest.json"
+      ],
+      "title": "Dossier: Resolve P1 onboarding recommendations",
+      "validation_commands": [
+        "python src/portfolio_onboarding_recommendations/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "approval_status": "needs_review",
+      "human_decision_template": {
+        "allowed_decisions": [
+          "approve_for_manual_execution",
+          "request_changes",
+          "reject",
+          "defer"
+        ],
+        "decision_notes_placeholder": "",
+        "decision_timestamp_placeholder": "",
+        "required_reviewer": "",
+        "safety_acknowledgements": [
+          "I understand this packet does not execute anything.",
+          "I understand runtime paths are forbidden.",
+          "I understand queue mutation is forbidden.",
+          "I reviewed validation commands."
+        ]
+      },
+      "metadata": {
+        "advisory_only": true,
+        "approval_recommendation": "Requires elevated human review due to execution risk before approval.",
+        "required_human_review": true
+      },
+      "packet_id": "governance_approval_packet_10b272337c7a45e4a64f1d96d739d36a",
+      "readiness_score": 55,
+      "review_summary": "Human-review approval packet only. This does NOT grant approval and does NOT execute anything. Status: needs_review. Risk: high. No missing requirements detected.",
+      "risk_level": "high",
+      "rollback_guidance": [
+        "Rollback is artifact-only: restore previous generated advisory reports from history backups.",
+        "Do not attempt runtime rollback through queue or platform engine paths.",
+        "Restore previous state for: .config/portfolio/portfolio_registry.json",
+        "Restore previous state for: .control_plane/portfolio_bootstrap/latest.json",
+        "Restore previous state for: .control_plane/portfolio_onboarding_recommendations/latest.json",
+        "Restore previous state for: .control_plane/portfolio/latest.json",
+        "If unsure, regenerate advisory artifacts with previous known-good inputs and compare diffs manually."
+      ],
+      "source_dossier_id": "governance_recovery_dossier_d6105aa0d78c49519b7294cca1ea2c3e",
+      "source_readiness_record_id": "governance_approval_readiness_1051929d233a421d80e9975986211294",
+      "target_artifacts": [
+        ".config/portfolio/portfolio_registry.json",
+        ".control_plane/portfolio_bootstrap/latest.json",
+        ".control_plane/portfolio_onboarding_recommendations/latest.json",
+        ".control_plane/portfolio/latest.json"
+      ],
+      "title": "Dossier: Generate repository intelligence baselines for low-readiness repos",
+      "validation_commands": [
+        "python src/portfolio_onboarding_recommendations/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "approval_status": "ready_for_review",
+      "human_decision_template": {
+        "allowed_decisions": [
+          "approve_for_manual_execution",
+          "request_changes",
+          "reject",
+          "defer"
+        ],
+        "decision_notes_placeholder": "",
+        "decision_timestamp_placeholder": "",
+        "required_reviewer": "",
+        "safety_acknowledgements": [
+          "I understand this packet does not execute anything.",
+          "I understand runtime paths are forbidden.",
+          "I understand queue mutation is forbidden.",
+          "I reviewed validation commands."
+        ]
+      },
+      "metadata": {
+        "advisory_only": true,
+        "approval_recommendation": "Proceed to human approval review with standard checklist verification.",
+        "required_human_review": false
+      },
+      "packet_id": "governance_approval_packet_ee80ac6d3589446ba5aff35cabb3c53a",
+      "readiness_score": 90,
+      "review_summary": "Human-review approval packet only. This does NOT grant approval and does NOT execute anything. Status: ready_for_review. Risk: medium. No missing requirements detected.",
+      "risk_level": "medium",
+      "rollback_guidance": [
+        "Rollback is artifact-only: restore previous generated advisory reports from history backups.",
+        "Do not attempt runtime rollback through queue or platform engine paths.",
+        "Restore previous state for: .config/portfolio/dependencies.json",
+        "Restore previous state for: .control_plane/portfolio_dependencies/latest.json",
+        "Restore previous state for: .control_plane/portfolio_critical_path/latest.json",
+        "If unsure, regenerate advisory artifacts with previous known-good inputs and compare diffs manually."
+      ],
+      "source_dossier_id": "governance_recovery_dossier_e309da55dea946f79afd04bec39997da",
+      "source_readiness_record_id": "governance_approval_readiness_a661ce7c18bf45ab98a3a4a4fc305795",
+      "target_artifacts": [
+        ".config/portfolio/dependencies.json",
+        ".control_plane/portfolio_dependencies/latest.json",
+        ".control_plane/portfolio_critical_path/latest.json"
+      ],
+      "title": "Dossier: Reduce high/critical dependency findings",
+      "validation_commands": [
+        "python src/portfolio_dependencies/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "approval_status": "ready_for_review",
+      "human_decision_template": {
+        "allowed_decisions": [
+          "approve_for_manual_execution",
+          "request_changes",
+          "reject",
+          "defer"
+        ],
+        "decision_notes_placeholder": "",
+        "decision_timestamp_placeholder": "",
+        "required_reviewer": "",
+        "safety_acknowledgements": [
+          "I understand this packet does not execute anything.",
+          "I understand runtime paths are forbidden.",
+          "I understand queue mutation is forbidden.",
+          "I reviewed validation commands."
+        ]
+      },
+      "metadata": {
+        "advisory_only": true,
+        "approval_recommendation": "Proceed to human approval review with standard checklist verification.",
+        "required_human_review": false
+      },
+      "packet_id": "governance_approval_packet_c20370f6706c438d86078b6721a5a447",
+      "readiness_score": 90,
+      "review_summary": "Human-review approval packet only. This does NOT grant approval and does NOT execute anything. Status: ready_for_review. Risk: medium. No missing requirements detected.",
+      "risk_level": "medium",
+      "rollback_guidance": [
+        "Rollback is artifact-only: restore previous generated advisory reports from history backups.",
+        "Do not attempt runtime rollback through queue or platform engine paths.",
+        "Restore previous state for: .config/portfolio/dependencies.json",
+        "Restore previous state for: .control_plane/portfolio_dependencies/latest.json",
+        "Restore previous state for: .control_plane/portfolio_critical_path/latest.json",
+        "Restore previous state for: .control_plane/portfolio_drift/latest.json",
+        "Restore previous state for: .control_plane/portfolio_roadmap/latest.json",
+        "Restore previous state for: .control_plane/portfolio_progress/latest.json",
+        "If unsure, regenerate advisory artifacts with previous known-good inputs and compare diffs manually."
+      ],
+      "source_dossier_id": "governance_recovery_dossier_21b7604d225b40e8bca68cd43b00d47f",
+      "source_readiness_record_id": "governance_approval_readiness_87f2e7649b3747d98189d2e173a46ddb",
+      "target_artifacts": [
+        ".config/portfolio/dependencies.json",
+        ".control_plane/portfolio_dependencies/latest.json",
+        ".control_plane/portfolio_critical_path/latest.json",
+        ".control_plane/portfolio_drift/latest.json",
+        ".control_plane/portfolio_roadmap/latest.json",
+        ".control_plane/portfolio_progress/latest.json"
+      ],
+      "title": "Dossier: Resolve missing dependency references and stale artifacts",
+      "validation_commands": [
+        "python src/portfolio_drift/cli.py --print",
+        "python src/portfolio_dependencies/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "approval_status": "ready_for_review",
+      "human_decision_template": {
+        "allowed_decisions": [
+          "approve_for_manual_execution",
+          "request_changes",
+          "reject",
+          "defer"
+        ],
+        "decision_notes_placeholder": "",
+        "decision_timestamp_placeholder": "",
+        "required_reviewer": "",
+        "safety_acknowledgements": [
+          "I understand this packet does not execute anything.",
+          "I understand runtime paths are forbidden.",
+          "I understand queue mutation is forbidden.",
+          "I reviewed validation commands."
+        ]
+      },
+      "metadata": {
+        "advisory_only": true,
+        "approval_recommendation": "Proceed to human approval review with standard checklist verification.",
+        "required_human_review": false
+      },
+      "packet_id": "governance_approval_packet_15c1ab7d9afe4bab9668e3b4603dc086",
+      "readiness_score": 90,
+      "review_summary": "Human-review approval packet only. This does NOT grant approval and does NOT execute anything. Status: ready_for_review. Risk: medium. No missing requirements detected.",
+      "risk_level": "medium",
+      "rollback_guidance": [
+        "Rollback is artifact-only: restore previous generated advisory reports from history backups.",
+        "Do not attempt runtime rollback through queue or platform engine paths.",
+        "Restore previous state for: .config/portfolio/dependencies.json",
+        "Restore previous state for: .control_plane/portfolio_dependencies/latest.json",
+        "Restore previous state for: .control_plane/portfolio_critical_path/latest.json",
+        "Restore previous state for: .control_plane/portfolio_roadmap/latest.json",
+        "Restore previous state for: .control_plane/portfolio_progress/latest.json",
+        "Restore previous state for: .control_plane/portfolio_governance_index/latest.json",
+        "If unsure, regenerate advisory artifacts with previous known-good inputs and compare diffs manually."
+      ],
+      "source_dossier_id": "governance_recovery_dossier_a76e943f2bc44bc1be4ff5e34e5d223e",
+      "source_readiness_record_id": "governance_approval_readiness_2942bbecf664448389e48ed9eb1ac7ae",
+      "target_artifacts": [
+        ".config/portfolio/dependencies.json",
+        ".control_plane/portfolio_dependencies/latest.json",
+        ".control_plane/portfolio_critical_path/latest.json",
+        ".control_plane/portfolio_roadmap/latest.json",
+        ".control_plane/portfolio_progress/latest.json",
+        ".control_plane/portfolio_governance_index/latest.json"
+      ],
+      "title": "Dossier: Regenerate strategic roadmap from latest critical path",
+      "validation_commands": [
+        "python src/portfolio_dependencies/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "approval_status": "ready_for_review",
+      "human_decision_template": {
+        "allowed_decisions": [
+          "approve_for_manual_execution",
+          "request_changes",
+          "reject",
+          "defer"
+        ],
+        "decision_notes_placeholder": "",
+        "decision_timestamp_placeholder": "",
+        "required_reviewer": "",
+        "safety_acknowledgements": [
+          "I understand this packet does not execute anything.",
+          "I understand runtime paths are forbidden.",
+          "I understand queue mutation is forbidden.",
+          "I reviewed validation commands."
+        ]
+      },
+      "metadata": {
+        "advisory_only": true,
+        "approval_recommendation": "Proceed to human approval review with standard checklist verification.",
+        "required_human_review": false
+      },
+      "packet_id": "governance_approval_packet_6e4bdffe32ae4584acd417d9e3b605e0",
+      "readiness_score": 90,
+      "review_summary": "Human-review approval packet only. This does NOT grant approval and does NOT execute anything. Status: ready_for_review. Risk: medium. No missing requirements detected.",
+      "risk_level": "medium",
+      "rollback_guidance": [
+        "Rollback is artifact-only: restore previous generated advisory reports from history backups.",
+        "Do not attempt runtime rollback through queue or platform engine paths.",
+        "Restore previous state for: .config/portfolio/portfolio_registry.json",
+        "Restore previous state for: .control_plane/portfolio_bootstrap/latest.json",
+        "Restore previous state for: .control_plane/portfolio_onboarding_recommendations/latest.json",
+        "Restore previous state for: .control_plane/portfolio/latest.json",
+        "If unsure, regenerate advisory artifacts with previous known-good inputs and compare diffs manually."
+      ],
+      "source_dossier_id": "governance_recovery_dossier_2bf8e591bb2d4f529c9c9511ec4c4fb0",
+      "source_readiness_record_id": "governance_approval_readiness_fe2ee45d8b654724abda49ba799aa4b5",
+      "target_artifacts": [
+        ".config/portfolio/portfolio_registry.json",
+        ".control_plane/portfolio_bootstrap/latest.json",
+        ".control_plane/portfolio_onboarding_recommendations/latest.json",
+        ".control_plane/portfolio/latest.json"
+      ],
+      "title": "Dossier: Re-run bootstrap and onboarding recommendation refresh",
+      "validation_commands": [
+        "python src/portfolio_onboarding_recommendations/cli.py --print",
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    },
+    {
+      "advisory_only": true,
+      "approval_status": "ready_for_review",
+      "human_decision_template": {
+        "allowed_decisions": [
+          "approve_for_manual_execution",
+          "request_changes",
+          "reject",
+          "defer"
+        ],
+        "decision_notes_placeholder": "",
+        "decision_timestamp_placeholder": "",
+        "required_reviewer": "",
+        "safety_acknowledgements": [
+          "I understand this packet does not execute anything.",
+          "I understand runtime paths are forbidden.",
+          "I understand queue mutation is forbidden.",
+          "I reviewed validation commands."
+        ]
+      },
+      "metadata": {
+        "advisory_only": true,
+        "approval_recommendation": "Proceed to human approval review with standard checklist verification.",
+        "required_human_review": false
+      },
+      "packet_id": "governance_approval_packet_0c4139463d0244bd9f2f22e03cf31071",
+      "readiness_score": 90,
+      "review_summary": "Human-review approval packet only. This does NOT grant approval and does NOT execute anything. Status: ready_for_review. Risk: low. No missing requirements detected.",
+      "risk_level": "low",
+      "rollback_guidance": [
+        "Rollback is artifact-only: restore previous generated advisory reports from history backups.",
+        "Do not attempt runtime rollback through queue or platform engine paths.",
+        "Restore previous state for: .control_plane/portfolio_roadmap/latest.json",
+        "Restore previous state for: .control_plane/portfolio_progress/latest.json",
+        "Restore previous state for: .control_plane/portfolio_governance_index/latest.json",
+        "If unsure, regenerate advisory artifacts with previous known-good inputs and compare diffs manually."
+      ],
+      "source_dossier_id": "governance_recovery_dossier_efb85b732ba5422890b2bf86bdc7b526",
+      "source_readiness_record_id": "governance_approval_readiness_d31af3d431dd4e18b140b7db1865a74e",
+      "target_artifacts": [
+        ".control_plane/portfolio_roadmap/latest.json",
+        ".control_plane/portfolio_progress/latest.json",
+        ".control_plane/portfolio_governance_index/latest.json"
+      ],
+      "title": "Dossier: Build additional progress history snapshots",
+      "validation_commands": [
+        "python src/portfolio_orchestration/cli.py --print",
+        "python src/portfolio_governance_index/cli.py --print"
+      ]
+    }
+  ],
+  "report_id": "governance_approval_packet_report_bd02a313393246be930b4d97e94f9929",
+  "source_readiness_report_id": "governance_approval_readiness_report_0033ed40c6774e3abe0658cf3e39b2ac",
+  "summary": {
+    "needs_review_packets": 3,
+    "packets_generated": 8,
+    "ready_for_review_packets": 5,
+    "skipped_blocked_or_rejected": 0
+  }
+}

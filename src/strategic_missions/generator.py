@@ -25,6 +25,11 @@ def generate_strategic_mission_report(
     briefing_path: str | Path | None = None,
     base_dir: str | Path = ".",
     limit: int | None = None,
+    governance_recovery_dossier_report: Dict[str, Any] | None = None,
+    governance_approval_readiness_report: Dict[str, Any] | None = None,
+    governance_approval_packet_report: Dict[str, Any] | None = None,
+    governance_decision_report: Dict[str, Any] | None = None,
+    manual_execution_queue_report: Dict[str, Any] | None = None,
 ) -> Dict[str, Any]:
     root = Path(base_dir)
     repo_intel = load_executive_briefing(root / ".control_plane" / "repository_intelligence" / "repository_intelligence_report.json")
@@ -41,6 +46,31 @@ def generate_strategic_mission_report(
     portfolio_roadmap = load_executive_briefing(root / ".control_plane" / "portfolio_roadmap" / "latest.json")
     portfolio_progress = load_executive_briefing(root / ".control_plane" / "portfolio_progress" / "latest.json")
     portfolio_drift = load_executive_briefing(root / ".control_plane" / "portfolio_drift" / "latest.json")
+    portfolio_governance_index = load_executive_briefing(root / ".control_plane" / "portfolio_governance_index" / "latest.json")
+    governance_recovery = load_executive_briefing(root / ".control_plane" / "governance_recovery" / "latest.json")
+    governance_approval_packets = load_executive_briefing(root / ".control_plane" / "governance_approval_packets" / "latest.json")
+    governance_decisions = load_executive_briefing(root / ".control_plane" / "governance_decisions" / "latest.json")
+    manual_execution_queue = load_executive_briefing(root / ".control_plane" / "manual_execution_queue" / "latest.json")
+    if governance_approval_readiness_report is None:
+        governance_approval_readiness = load_executive_briefing(root / ".control_plane" / "governance_approval_readiness" / "latest.json")
+    else:
+        governance_approval_readiness = governance_approval_readiness_report
+    if governance_recovery_dossier_report is None:
+        governance_recovery_dossiers = load_executive_briefing(root / ".control_plane" / "governance_recovery_dossiers" / "latest.json")
+    else:
+        governance_recovery_dossiers = governance_recovery_dossier_report
+    if governance_approval_packet_report is None:
+        governance_approval_packets_local = governance_approval_packets
+    else:
+        governance_approval_packets_local = governance_approval_packet_report
+    if governance_decision_report is None:
+        governance_decisions_local = governance_decisions
+    else:
+        governance_decisions_local = governance_decision_report
+    if manual_execution_queue_report is None:
+        manual_execution_queue_local = manual_execution_queue
+    else:
+        manual_execution_queue_local = manual_execution_queue_report
     if briefing is None:
         source_path = Path(briefing_path) if briefing_path else (root / ".control_plane" / "executive" / "executive_briefing.json")
         briefing = load_executive_briefing(source_path)
@@ -63,6 +93,13 @@ def generate_strategic_mission_report(
         portfolio_roadmap_report=portfolio_roadmap,
         portfolio_progress_report=portfolio_progress,
         portfolio_drift_report=portfolio_drift,
+        portfolio_governance_index_report=portfolio_governance_index,
+        governance_recovery_report=governance_recovery,
+        governance_recovery_dossier_report=governance_recovery_dossiers,
+        governance_approval_readiness_report=governance_approval_readiness,
+        governance_approval_packet_report=governance_approval_packets_local,
+        governance_decision_report=governance_decisions_local,
+        manual_execution_queue_report=manual_execution_queue_local,
     )
     if limit is not None and isinstance(limit, int) and limit > 0:
         candidates = candidates[:limit]
@@ -124,6 +161,13 @@ def _candidates_from_briefing(
     portfolio_roadmap_report: Dict[str, Any] | None = None,
     portfolio_progress_report: Dict[str, Any] | None = None,
     portfolio_drift_report: Dict[str, Any] | None = None,
+    portfolio_governance_index_report: Dict[str, Any] | None = None,
+    governance_recovery_report: Dict[str, Any] | None = None,
+    governance_recovery_dossier_report: Dict[str, Any] | None = None,
+    governance_approval_readiness_report: Dict[str, Any] | None = None,
+    governance_approval_packet_report: Dict[str, Any] | None = None,
+    governance_decision_report: Dict[str, Any] | None = None,
+    manual_execution_queue_report: Dict[str, Any] | None = None,
 ) -> List[Dict[str, Any]]:
     if not isinstance(briefing, dict):
         return _maintenance_candidates()
@@ -141,13 +185,20 @@ def _candidates_from_briefing(
     roadmap_candidates = _candidates_from_portfolio_roadmap(portfolio_roadmap_report or {})
     progress_candidates = _candidates_from_portfolio_progress(portfolio_progress_report or {})
     drift_candidates = _candidates_from_portfolio_drift(portfolio_drift_report or {})
+    governance_index_candidates = _candidates_from_portfolio_governance_index(portfolio_governance_index_report or {})
+    governance_recovery_candidates = _candidates_from_governance_recovery(governance_recovery_report or {})
+    governance_recovery_dossier_candidates = _candidates_from_governance_recovery_dossiers(governance_recovery_dossier_report or {})
+    governance_approval_candidates = _candidates_from_governance_approval_readiness(governance_approval_readiness_report or {})
+    governance_approval_packet_candidates = _candidates_from_governance_approval_packets(governance_approval_packet_report or {})
+    governance_decision_candidates = _candidates_from_governance_decisions(governance_decision_report or {})
+    manual_execution_queue_candidates = _candidates_from_manual_execution_queue(manual_execution_queue_report or {})
     refinement_candidates = _candidates_from_refinements(handoff_refinement_report or {})
     handoff_candidates = refinement_candidates if refinement_candidates else _candidates_from_handoffs(remediation_handoff_report or {})
     if isinstance(findings, list) and findings:
         base = [_candidate_from_finding(f, actions) for f in findings if isinstance(f, dict)]
-        return _rank_candidates(base + dossier_candidates + queue_candidates + repo_candidates + remediation_candidates + handoff_candidates + portfolio_candidates + bootstrap_candidates + onboarding_recommendation_candidates + dependency_candidates + critical_path_candidates + roadmap_candidates + progress_candidates + drift_candidates)
+        return _rank_candidates(base + dossier_candidates + queue_candidates + repo_candidates + remediation_candidates + handoff_candidates + portfolio_candidates + bootstrap_candidates + onboarding_recommendation_candidates + dependency_candidates + critical_path_candidates + roadmap_candidates + progress_candidates + drift_candidates + governance_index_candidates + governance_recovery_candidates + governance_recovery_dossier_candidates + governance_approval_candidates + governance_approval_packet_candidates + governance_decision_candidates + manual_execution_queue_candidates)
     # healthy/no-risks => maintenance continuity recommendations
-    return _rank_candidates(_maintenance_candidates() + dossier_candidates + queue_candidates + repo_candidates + remediation_candidates + handoff_candidates + portfolio_candidates + bootstrap_candidates + onboarding_recommendation_candidates + dependency_candidates + critical_path_candidates + roadmap_candidates + progress_candidates + drift_candidates)
+    return _rank_candidates(_maintenance_candidates() + dossier_candidates + queue_candidates + repo_candidates + remediation_candidates + handoff_candidates + portfolio_candidates + bootstrap_candidates + onboarding_recommendation_candidates + dependency_candidates + critical_path_candidates + roadmap_candidates + progress_candidates + drift_candidates + governance_index_candidates + governance_recovery_candidates + governance_recovery_dossier_candidates + governance_approval_candidates + governance_approval_packet_candidates + governance_decision_candidates + manual_execution_queue_candidates)
 
 
 def _candidate_from_finding(finding: Dict[str, Any], actions: Any) -> Dict[str, Any]:
@@ -685,6 +736,313 @@ def _candidates_from_portfolio_drift(report: Dict[str, Any]) -> List[Dict[str, A
                 suggested_instruction=str(finding.get("recommended_action") or "Resolve portfolio drift finding."),
                 advisory_only=True,
                 metadata={"source": "portfolio_drift", "severity": sev},
+            ).to_dict()
+        )
+    return out
+
+
+def _candidates_from_portfolio_governance_index(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    score = int(report.get("governance_score") or 0)
+    status = str(report.get("governance_status") or "unknown")
+    if status in {"healthy", "unknown"} and score >= 85:
+        return []
+    priority = "P1" if status in {"critical", "degraded"} else "P2"
+    return [
+        StrategicMissionCandidate(
+            candidate_id=new_id("strategic_mission"),
+            title="Governance index improvement mission",
+            description=f"Governance index status is {status} with score {score}.",
+            source_finding_ids=[str(report.get("report_id") or new_id("governance_index_ref"))],
+            category="system",
+            priority=priority,
+            risk_reduction_score=80 if priority == "P1" else 65,
+            effort_score=40,
+            confidence_score=92,
+            recommended_repository="portfolio",
+            suggested_instruction="Address top governance index reasons and execute highest-impact recommendations first.",
+            advisory_only=True,
+            metadata={"source": "portfolio_governance_index", "governance_status": status, "governance_score": score},
+        ).to_dict()
+    ]
+
+
+def _candidates_from_governance_recovery(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    actions = report.get("actions")
+    if not isinstance(actions, list):
+        return []
+    out: List[Dict[str, Any]] = []
+    for action in actions[:5]:
+        if not isinstance(action, dict):
+            continue
+        out.append(
+            StrategicMissionCandidate(
+                candidate_id=new_id("strategic_mission"),
+                title=f"Recovery action: {str(action.get('title') or 'Governance recovery')}",
+                description=str(action.get("description") or "Governance recovery action"),
+                source_finding_ids=[str(action.get("action_id") or new_id("recovery_action_ref"))],
+                category="system",
+                priority=str(action.get("priority") or "P2"),
+                risk_reduction_score=min(95, int(action.get("expected_score_impact") or 5) * 5),
+                effort_score=35,
+                confidence_score=92,
+                recommended_repository="portfolio",
+                suggested_instruction=str(action.get("description") or "Execute governance recovery action manually."),
+                advisory_only=True,
+                metadata={"source": "governance_recovery", "target_component": str(action.get("target_component") or "")},
+            ).to_dict()
+        )
+    return out
+
+
+def _candidates_from_governance_recovery_dossiers(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    dossiers = report.get("dossiers")
+    if not isinstance(dossiers, list):
+        return []
+    out: List[Dict[str, Any]] = []
+    for dossier in dossiers[:5]:
+        if not isinstance(dossier, dict):
+            continue
+        risk = str(dossier.get("execution_risk") or "low")
+        priority = "P1" if risk in {"high", "critical"} else "P2"
+        out.append(
+            StrategicMissionCandidate(
+                candidate_id=new_id("strategic_mission"),
+                title=f"Execute recovery dossier: {str(dossier.get('title') or 'Governance recovery dossier')}",
+                description=str(dossier.get("objective") or "Governance recovery execution dossier."),
+                source_finding_ids=[str(dossier.get("source_action_id") or new_id("dossier_action_ref"))],
+                category="system",
+                priority=priority,
+                risk_reduction_score=80 if priority == "P1" else 65,
+                effort_score=35,
+                confidence_score=92,
+                recommended_repository="portfolio",
+                suggested_instruction=f"Review and manually execute governance recovery dossier '{str(dossier.get('title') or '')}'.",
+                advisory_only=True,
+                metadata={"source": "governance_recovery_dossiers", "execution_risk": risk},
+            ).to_dict()
+        )
+    return out
+
+
+def _candidates_from_governance_approval_readiness(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    records = report.get("records")
+    if not isinstance(records, list):
+        return []
+    out: List[Dict[str, Any]] = []
+    for record in records[:5]:
+        if not isinstance(record, dict):
+            continue
+        status = str(record.get("approval_status") or "unknown")
+        if status not in {"blocked", "needs_review", "rejected_advisory"}:
+            continue
+        priority = "P1" if status in {"blocked", "rejected_advisory"} else "P2"
+        out.append(
+            StrategicMissionCandidate(
+                candidate_id=new_id("strategic_mission"),
+                title=f"Clear approval readiness issue: {str(record.get('title') or 'Governance dossier')}",
+                description=str(record.get("approval_recommendation") or "Resolve governance approval readiness gaps."),
+                source_finding_ids=[str(record.get("record_id") or new_id("approval_readiness_ref"))],
+                category="governance",
+                priority=priority,
+                risk_reduction_score=80 if priority == "P1" else 65,
+                effort_score=30,
+                confidence_score=92,
+                recommended_repository="portfolio",
+                suggested_instruction=str(record.get("approval_recommendation") or "Resolve advisory approval readiness issue."),
+                advisory_only=True,
+                metadata={"source": "governance_approval_readiness", "approval_status": status},
+            ).to_dict()
+        )
+    return out
+
+
+def _candidates_from_governance_approval_packets(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    packets = report.get("packets")
+    if not isinstance(packets, list):
+        return []
+    out: List[Dict[str, Any]] = []
+    for packet in packets[:5]:
+        if not isinstance(packet, dict):
+            continue
+        status = str(packet.get("approval_status") or "unknown")
+        if status not in {"ready_for_review", "needs_review"}:
+            continue
+        priority = "P2" if status == "needs_review" else "P3"
+        out.append(
+            StrategicMissionCandidate(
+                candidate_id=new_id("strategic_mission"),
+                title=f"Review governance approval packet: {str(packet.get('title') or 'Governance packet')}",
+                description=str(packet.get("review_summary") or "Perform human review of governance approval packet."),
+                source_finding_ids=[str(packet.get("packet_id") or new_id("approval_packet_ref"))],
+                category="governance",
+                priority=priority,
+                risk_reduction_score=60 if status == "needs_review" else 45,
+                effort_score=20,
+                confidence_score=95,
+                recommended_repository="portfolio",
+                suggested_instruction="Complete human decision template and record manual review outcome.",
+                advisory_only=True,
+                metadata={"source": "governance_approval_packets", "approval_status": status},
+            ).to_dict()
+        )
+    return out
+
+
+def _candidates_from_governance_decisions(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    out: List[Dict[str, Any]] = []
+    summary = report.get("summary") if isinstance(report.get("summary"), dict) else {}
+    pending = int(summary.get("pending", 0) or 0)
+    req_changes = int(summary.get("request_changes", 0) or 0)
+    approved = int(summary.get("approved", 0) or 0)
+    if pending > 0:
+        out.append(
+            StrategicMissionCandidate(
+                candidate_id=new_id("strategic_mission"),
+                title="Review pending governance decision packets",
+                description=f"{pending} approval packet(s) are still pending human decision.",
+                source_finding_ids=[str(report.get("report_id") or new_id("governance_decision_report_ref"))],
+                category="governance",
+                priority="P2",
+                risk_reduction_score=65,
+                effort_score=25,
+                confidence_score=95,
+                recommended_repository="portfolio",
+                suggested_instruction="Complete pending governance packet decisions before manual execution planning.",
+                advisory_only=True,
+                metadata={"source": "governance_decisions", "decision_state": "pending"},
+            ).to_dict()
+        )
+    if req_changes > 0:
+        out.append(
+            StrategicMissionCandidate(
+                candidate_id=new_id("strategic_mission"),
+                title="Address governance packets marked request_changes",
+                description=f"{req_changes} packet(s) are marked request_changes.",
+                source_finding_ids=[str(report.get("report_id") or new_id("governance_decision_report_ref"))],
+                category="governance",
+                priority="P1",
+                risk_reduction_score=75,
+                effort_score=30,
+                confidence_score=95,
+                recommended_repository="portfolio",
+                suggested_instruction="Resolve requested packet changes and re-submit for human governance review.",
+                advisory_only=True,
+                metadata={"source": "governance_decisions", "decision_state": "request_changes"},
+            ).to_dict()
+        )
+    if approved > 0:
+        out.append(
+            StrategicMissionCandidate(
+                candidate_id=new_id("strategic_mission"),
+                title="Plan manual execution for approved governance packets",
+                description=f"{approved} packet(s) are approved for manual execution planning.",
+                source_finding_ids=[str(report.get("report_id") or new_id("governance_decision_report_ref"))],
+                category="governance",
+                priority="P3",
+                risk_reduction_score=50,
+                effort_score=20,
+                confidence_score=95,
+                recommended_repository="portfolio",
+                suggested_instruction="Prepare manual execution plans for approved packets without automation.",
+                advisory_only=True,
+                metadata={"source": "governance_decisions", "decision_state": "approved"},
+            ).to_dict()
+        )
+    return out
+
+
+def _candidates_from_manual_execution_queue(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if not isinstance(report, dict) or not report:
+        return []
+    summary = report.get("summary") if isinstance(report.get("summary"), dict) else {}
+    out: List[Dict[str, Any]] = []
+    pending = int(summary.get("pending_review", 0) or 0)
+    deferred = int(summary.get("deferred", 0) or 0)
+    needs_changes = int(summary.get("needs_changes", 0) or 0)
+    approved = int(summary.get("approved_manual", 0) or 0)
+    report_id = str(report.get("report_id") or new_id("manual_execution_queue_report_ref"))
+    if pending > 0:
+        out.append(
+            StrategicMissionCandidate(
+                candidate_id=new_id("strategic_mission"),
+                title="Review pending manual execution handoff queue items",
+                description=f"{pending} queue item(s) are pending governance review.",
+                source_finding_ids=[report_id],
+                category="governance",
+                priority="P2",
+                risk_reduction_score=65,
+                effort_score=25,
+                confidence_score=95,
+                recommended_repository="portfolio",
+                suggested_instruction="Review pending manual handoff queue items and record governance decisions.",
+                advisory_only=True,
+                metadata={"source": "manual_execution_queue"},
+            ).to_dict()
+        )
+    if needs_changes > 0:
+        out.append(
+            StrategicMissionCandidate(
+                candidate_id=new_id("strategic_mission"),
+                title="Resolve manual execution queue items needing changes",
+                description=f"{needs_changes} queue item(s) need packet/dossier updates before manual handoff.",
+                source_finding_ids=[report_id],
+                category="governance",
+                priority="P1",
+                risk_reduction_score=75,
+                effort_score=30,
+                confidence_score=95,
+                recommended_repository="portfolio",
+                suggested_instruction="Revise packet/dossier content for items flagged as needs_changes.",
+                advisory_only=True,
+                metadata={"source": "manual_execution_queue"},
+            ).to_dict()
+        )
+    if deferred > 0:
+        out.append(
+            StrategicMissionCandidate(
+                candidate_id=new_id("strategic_mission"),
+                title="Revisit deferred manual execution queue items",
+                description=f"{deferred} queue item(s) are deferred awaiting conditions.",
+                source_finding_ids=[report_id],
+                category="governance",
+                priority="P3",
+                risk_reduction_score=45,
+                effort_score=20,
+                confidence_score=95,
+                recommended_repository="portfolio",
+                suggested_instruction="Track deferred conditions and revisit when blockers are resolved.",
+                advisory_only=True,
+                metadata={"source": "manual_execution_queue"},
+            ).to_dict()
+        )
+    if approved > 0:
+        out.append(
+            StrategicMissionCandidate(
+                candidate_id=new_id("strategic_mission"),
+                title="Prepare approved manual execution handoff packages",
+                description=f"{approved} queue item(s) are approved for manual handoff preparation.",
+                source_finding_ids=[report_id],
+                category="governance",
+                priority="P2",
+                risk_reduction_score=55,
+                effort_score=20,
+                confidence_score=95,
+                recommended_repository="portfolio",
+                suggested_instruction="Prepare operator-facing manual execution handoff instructions for approved items.",
+                advisory_only=True,
+                metadata={"source": "manual_execution_queue"},
             ).to_dict()
         )
     return out

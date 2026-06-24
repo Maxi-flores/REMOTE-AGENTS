@@ -9,6 +9,23 @@ from repository_governance.contracts import RepositoryGovernanceProfile, create_
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_REPOSITORIES_REGISTRY = REPO_ROOT / "config" / "registries" / "repositories.json"
+DEFAULT_EXECUTION_CONSTRAINTS = {
+    "num_thread": 4,
+    "quantization_preference": "Q5_K_M",
+    "max_context_chars": 12000,
+}
+DEFAULT_COMPILER_RUNTIME_CONTRACT = {
+    "raw_source_only": True,
+    "forbid_markdown_wrappers": True,
+    "forbid_conversational_text": True,
+    "skills_guardrail_file": "skills.md",
+    "enforce_skills_visual_tokens": True,
+    "forbid_inline_style_overrides": True,
+    "forbid_hardcoded_style_tokens": True,
+    "isolate_component_boundaries_before_repair": True,
+    "preserve_responsive_fluid_scaling": True,
+    "emit_single_refactored_source_artifact": True,
+}
 
 
 def profile_from_repository_registry_record(record: Dict[str, Any]) -> RepositoryGovernanceProfile:
@@ -18,6 +35,8 @@ def profile_from_repository_registry_record(record: Dict[str, Any]) -> Repositor
     source_status = str(record.get("status") or "unknown")
     health_indicators = _str_list(record.get("structural_health_indicators"))
     risk_tier = _infer_risk_tier(health_indicators)
+    execution_constraints = _infer_execution_constraints(record)
+    compiler_runtime_contract = _infer_compiler_runtime_contract(record)
     profile = create_governance_profile(
         repository_name=name,
         repository_group=group,
@@ -54,6 +73,8 @@ def profile_from_repository_registry_record(record: Dict[str, Any]) -> Repositor
             "detected_class": record.get("detected_class"),
             "core_objective": record.get("core_objective"),
             "structural_health_indicators": health_indicators,
+            "execution_constraints": execution_constraints,
+            "compiler_runtime_contract": compiler_runtime_contract,
         },
     )
     return profile
@@ -135,3 +156,31 @@ def _str_list(value: Any) -> List[str]:
     if not isinstance(value, list):
         return []
     return [str(item) for item in value if isinstance(item, str)]
+
+
+def _infer_execution_constraints(record: Dict[str, Any]) -> Dict[str, Any]:
+    raw = record.get("execution_constraints")
+    if isinstance(raw, dict):
+        return {
+            "num_thread": int(raw.get("num_thread") or DEFAULT_EXECUTION_CONSTRAINTS["num_thread"]),
+            "quantization_preference": str(
+                raw.get("quantization_preference") or DEFAULT_EXECUTION_CONSTRAINTS["quantization_preference"]
+            ),
+            "max_context_chars": int(raw.get("max_context_chars") or DEFAULT_EXECUTION_CONSTRAINTS["max_context_chars"]),
+        }
+
+    inferred = dict(DEFAULT_EXECUTION_CONSTRAINTS)
+    name = str(record.get("name") or "")
+    primary = str(record.get("primary_agent_class") or "")
+    if name == "Mucho3D" or primary == "3DSceneOrchestratorAgent":
+        inferred["max_context_chars"] = 16000
+    return inferred
+
+
+def _infer_compiler_runtime_contract(record: Dict[str, Any]) -> Dict[str, Any]:
+    raw = record.get("compiler_runtime_contract")
+    if isinstance(raw, dict):
+        out = dict(DEFAULT_COMPILER_RUNTIME_CONTRACT)
+        out.update(raw)
+        return out
+    return dict(DEFAULT_COMPILER_RUNTIME_CONTRACT)

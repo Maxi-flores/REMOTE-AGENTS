@@ -1,0 +1,47 @@
+codex needs to keep codex runningTo keep OpenAI Codex running indefinitely as an autonomous background
+twin for your Powerframe.online development, you need to configure persistent daemon workers. Because 
+your Core i9 NUC runs Windows, Codex relies on foreground execution for UI scraping, meaning you must 
+isolate it so it doesn't take over your mouse while you are working.The optimal infrastructure 
+configuration involves setting up a dedicated local daemon structure using the Codex Background 
+Automations engine.1. Isolate Codex into an Independent WorktreeTo prevent Codex from conflicting
+with files you are actively modifying, initialize a dedicated Git worktree for the automation loop. 
+Run this command in your terminal inside your local repository:bashgit worktree add .codex/automation-
+worker main
+Use o código com cuidado.This spawns a clean, isolated branch directory specifically for the Codex
+background system to read and write without disrupting your local frontend code.2. Configure the 
+Persistent Heartbeat (config.toml)To prevent the Codex app from going to sleep or killing its own
+loops due to standard idle timeouts, you must define explicit persistence behavior in your configuration.
+Create or modify your local project configuration file at .codex/config.toml:toml[project]
+name = "powerframe-fit-tracker"
+watch_local_changes = true
+
+[automations.fit_tracker_loop]
+trigger = "interval"
+interval = "30s"          # Triggers the reasoning loop every 30 seconds
+keep_alive = true        # Overrides standard process killing timeouts
+execution_mode = "worktree" # Runs background jobs inside the isolated worktree
+keep_pc_awake = true     # Keeps your Intel NUC awake for continuous compute
+
+[computer_use]
+allow_background_execution = true
+target_window_match = "http://localhost:5173" # Matches your local Vite dev server
+Use o código com cuidado.3. Establish the Background Loop LogicUse the built-in @Computer or @Chrome
+skills inside the Codex interface to lock the twin into a continuous pipeline:textInitialize a permanent 
+background automation task on my active worktree. 
+Every 30 seconds, read the global window containing 'http://localhost:5173'.
+
+Your Task Loop:
+1. Parse the DOM structure or visual layout of the Fit Tracker 'MainCanvas'.
+2. If any layout metrics or theme properties mismatch the expected design tokens in tailwind.config.js,
+execute a repair routine on the repository files.
+3. Keep this task running permanently. If an unhandled exception or process termination occurs, 
+automatically restart the daemon session.
+Use o código com cuidado.4. Enable Mobile Remote SupervisionIf Codex encounters a state-altering
+permission block or critical error while running in the background, it can halt. To keep it working
+without forcing you to switch windows:Type /pet inside the Codex chat window to initialize the passive
+global notifier icon on your screen.Alternatively, scan the on-screen connection QR code using the 
+Codex Mobile App. This pipes all active background process re-authentications and status updates 
+directly to your phone, ensuring the NUC keeps processing scripts completely uninterrupted.
+
+Would you like help setting up an automated GitHub Action that handles the synchronization between 
+your private Codex worktree and your main remote repository branch?

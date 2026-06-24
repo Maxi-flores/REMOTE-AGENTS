@@ -37,6 +37,22 @@ class TestRepositoryGovernanceRegistryImport(unittest.TestCase):
         self.assertEqual(profile.status, "active")
         self.assertEqual(profile.risk_tier, "high")
         self.assertEqual(profile.primary_agent_class, "ViteReactPrimaryAgent")
+        self.assertEqual(profile.metadata["execution_constraints"]["max_context_chars"], 12000)
+        self.assertTrue(profile.metadata["compiler_runtime_contract"]["raw_source_only"])
+
+    def test_profile_infers_3d_context_window(self) -> None:
+        profile = profile_from_repository_registry_record(
+            {
+                "name": "Mucho3D",
+                "group": "three_d_and_game_tools",
+                "category": "3D",
+                "status": "Pending Implementation",
+                "primary_agent_class": "3DSceneOrchestratorAgent",
+                "twin_agent_class": "WebGLComplianceAuditor",
+            }
+        )
+        self.assertEqual(profile.metadata["execution_constraints"]["max_context_chars"], 16000)
+        self.assertTrue(profile.metadata["compiler_runtime_contract"]["forbid_markdown_wrappers"])
 
     def test_import_helper_creates_profiles_from_repository_registry(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

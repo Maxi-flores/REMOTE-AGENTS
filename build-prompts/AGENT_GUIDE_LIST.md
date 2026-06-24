@@ -114,10 +114,10 @@
 * **Status:** Ready for Training
 * **Core Objective:** Govern Trade-Agent-V1 by executing Node.js/Express Event-Driven Workflow Orchestrator (SQLite Persistent) tasks with React/Vite Dashboard Frontend Engineer & Autonomy Compliance Twin validation to prevent regressions and secret leaks.
 
-missing webprojects:
+missing webprojects/functions:
 - bis.powerframe.online
 - finance.powerframe.online
-- 
+- AI_guide_plane > sentientOS = sentient.powerframe.online
 
 ## 3. Training & Implementation Matrix
 

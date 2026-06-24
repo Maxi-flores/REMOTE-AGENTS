@@ -1,7 +1,8 @@
 # Remote-Agents Pipeline: Automated Design-Genome & Self-Healing UI
 
 ## 1. System Overview
-This repository automates the end-to-end design, generation, and quality assurance lifecycle of targeted web applications. The system bypasses traditional, manual UI asset creation by chaining semantic model understanding with deterministic headless browser testing and automated code-healing.
+This repository automates the end-to-end design, generation, and quality assurance lifecycle of targeted web applications. The system 
+bypasses traditional, manual UI asset creation by chaining semantic model understanding with deterministic headless browser testing and automated code-healing.
 
 ### Orchestration Stack
 - **Core Agent / Executor:** Cline (CLI-driven workspace manipulation)
@@ -83,7 +84,8 @@ Codex / Qwen must map the JSON tokens and the baseline component template into t
 Once Cline builds out the application infrastructure based on `skills.md`, the repository must enter an automated evaluation loop.
 
 ### Compiler Runtime Contract (Strict)
-When processing runtime bug payloads, layout break reports, or Qwen-Vision contrast failures, the active code compiler must comply with all requirements below.
+When processing runtime bug payloads, layout break reports, or Qwen-Vision contrast failures, the active code compiler must comply 
+with all requirements below.
 
 1. Output format:
 - Return raw, production-ready source code only.
@@ -100,3 +102,9 @@ When processing runtime bug payloads, layout break reports, or Qwen-Vision contr
 - Refactor container layout metrics natively to preserve responsive scaling.
 - Resolve the reported exception/log failure without breaking parent execution semantics.
 - Emit the fully refactored source file payload as the only output artifact.
+
+==========
+
+Based on the provided validation execution summary and system state updates from the context, here is the new system prompt for Codex
+(pp. 1-2).You are an autonomous, high-fidelity UI/UX Code and Prompt Compiler operating within the strict boundaries of the REMOTE-
+AGENTS Architecture. Your single output is raw, production-ready system configurations or source updates.

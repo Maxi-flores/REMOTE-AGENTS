@@ -1,0 +1,56 @@
+When transitioning this GitOps pipeline to an SLM (Small Language Model) server running locally 
+on your hardware (using engines like vLLM, Ollama, Llama.cpp, or LM Studio), the system shifts 
+from relying on external APIs to running inside a closed-loop network topology.Here is exactly how
+the architecture executes this contract end-to-end:1. Endpoint Interception & SDK CompatibilityYour
+existing Python gateway script (call_codex.py) does not need to be rewritten or abandoned. Because
+local SLM execution engines export an OpenAI-compatible REST API structure, the script simply 
+diverts its transmission path to your local engine.python# The local SLM server redirection inside
+call_codex.py
+client = OpenAI(
+    base_url="http://localhost:11434/v1",  # Local Ollama/vLLM instance port
+    api_key="local-slm-token"              # Mock string for SDK validation
+)
+
+# Target your loaded code-specialized Small Language Model
+model="qwen2.5-coder:7b-instruct-q5_K_M" 
+Use o código com cuidado.2. Strict Token & Multi-Repo Profile RoutingWhen your Sync Agent 
+detects a remote prompt change from Chromium and pulls it down, it queries config/agent_registry.json.
+The local SLM context is shaped deterministically on the fly:Quantization Matching: The loader honors 
+the "quantization_preference": "Q5_K_M" parameter specified in your registry profile. This guarantees
+the model uses a highly optimized 5-bit weight layout, keeping the VRAM footprint predictable on your
+server.Dynamic Context Allocation: For standard frontends, it limits the window memory limit to 12000
+characters. If it detects a 3D target app like Mucho3D, it automatically triggers an extended frame 
+buffer window of 16000 characters to process intensive WebGL files.3. The Self-Healing Loop Under SLM 
+LimitationsWhile modern 7B to 14B code SLMs (like Qwen2.5-Coder) are highly efficient, they run a higher
+risk of failing structural code-only instructions compared to trillion-parameter commercial clouds.
+They may occasionally leak conversational intro text or markdown fences despite strict prompting.Your
+self-healing-loop.md logic handles this vulnerability in a 3-step loop:
+
+[SLM Generates Raw Output] ➔ [JS Action Agent Strips Backticks via Sed] ➔ [Playwright Test Build Runs]
+
+                                                                                   │
+         ┌─────────────────── (If Build Fails / Exit Code != 0) ───────────────────┘
+         ▼
+[Pipes Errors Back to Local SLM] ➔ [Model Retries Layout Fix (Max 5 Loops)]
+Sanitization: The run-action-agent.js script aggressively post-processes the output stream using its
+substitution arrays, instantly stripping any unwanted markdown structures before saving the payload 
+to disk.Deterministic Evaluation: The system launches the local target server on an isolated port 
+(PORT=3099) and runs npm run build or Playwright. The SLM's performance is judged strictly by execution
+Exit Codes.Iterative Refinement: If the local build script reports errors, the stack trace is fed back
+into the local SLM. Because local generation latency is low (running on-premise), the 5-retry healing
+cycle loops rapidly until the app hits a zero-error state.4. VRAM & Compute Resource MultiplexingRunning
+a local development server, a headless browser suite, a visual audit model (Qwen-Vision), and a code 
+compiler model on the same physical server can cause memory out-of-memory (OOM) failures if handled 
+in parallel.To prevent this, the orchestrator acts as a strict sequence gate:Phase A (Generation): 
+The server loads the code SLM, executes the compilation script, pipes the raw JSON or code payload 
+to file, and promptly puts the model thread to sleep.Phase B (Local Test Runtime): The app compilation
+and Playwright automation suites are executed while the model engine rests in standby, avoiding 
+CPU/GPU resource contention.Phase C (Visual Audit): The vision-capable model is invoked to evaluate 
+the static screenshots captured during Phase B, checking for design genome compliance without 
+overlapping with active browser rendering threads.Once all local checks pass, the local code 
+modifications are securely committed and pushed back up to your GitHub repository for you to evaluate
+through Chromium.Proposing Specific Ways to Proceed:To ensure your local SLM configuration aligns 
+with this system structure, let me know:Which specific local inference engine (e.g., Ollama, vLLM, 
+Llama.cpp) are you currently hosting on your development server?Do you want the exact bash setup 
+command to launch your local engine with the specified 12,000 to 16,000 context character allocation
+window active?

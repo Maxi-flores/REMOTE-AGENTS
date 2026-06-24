@@ -1,0 +1,127 @@
+ i need first imput to make sync agent from cline, and a action agent 
+to run python to codex?
+
+Exactly. You have nailed the exact architecture 
+needed for this minimal, headless GitOps setup.To make this work seamlessly 
+from a remote Chromium browser, you split the automation into two separate,
+specialized local agent scripts running on your server.Here is the exact code 
+and configuration for your Sync Agent (Input) and your Action Agent (Codex 
+Python Router).Agent 1: The Sync Agent (Input / Trigger)This agent runs as 
+a continuous background daemon on your local server. Its only job is to watch
+your GitHub repository for updates you make via Chromium, pull them down, and 
+activate the Action Agent.Create a file named sync-agent.sh on your 
+server:bash#!/bin/bash
+# sync-agent.sh - The Input Daemon
+
+echo "🚀 Sync Agent active. Monitoring GitHub for remote prompts..."
+
+while true; do
+  # Fetch latest changes from GitHub without merging yet
+  git fetch origin main &> /dev/null
+  
+  LOCAL=$(git rev-parse HEAD)
+  REMOTE=$(git rev-parse @{u})
+  
+  if [ "$LOCAL" != "$REMOTE" ]; then
+    echo "📥 New remote prompt detected! Syncing workspace..."
+    git pull origin main
+    
+    # Check if a prompt.md file exists and has instructions
+    if [ -f "prompt.md" ]; then
+      echo "🔥 Triggering Action Agent..."
+      # Execute Cline CLI or your master orchestrator script
+      # This hands off the workspace to the Action Agent loop
+      node run-action-agent.js
+    fi
+  fi
+  
+  # Wait 30 seconds before polling GitHub again to avoid rate limits
+  sleep 30
+done
+Use o código com cuidado.Agent 2: The Action Agent (Python to Codex Router)
+When triggered, this agent parses your prompt.md instructions, uses a Python 
+wrapper to send commands to Codex, applies the generated code to your local repos,
+tests it, and pushes the working code back to GitHub.Part A: The Python Codex 
+Gateway (call_codex.py)This script acts as the direct pipeline to the Codex/OpenAI 
+engine.python# call_codex.py
+import os
+import sys
+from openai import OpenAI
+
+# Ensure your local server has the environment variable set: export OPENAI_API_KEY="your-key"
+api_key = os.environ.get("OPENAI_API_KEY")
+if not api_key:
+    print("Error: OPENAI_API_KEY environment variable not found.", file=sys.stderr)
+    sys.exit(1)
+
+client = OpenAI(api_key=api_key)
+
+def send_to_codex(prompt_payload):
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o", # The active production successor to Codex
+            messages=[
+                {"role": "system", "content": "You are a precise UI/UX Code Compiler.Output raw code or tokens only. No markdown formatting wraps, no conversational explanations."},
+                {"role": "user", "content": prompt_payload}
+            ],
+            temperature=0.1
+        )
+        return response.choices.message.content.strip()
+    except Exception as e:
+        print(f"API Error: {str(e)}", file=sys.stderr)
+        sys.exit(1)
+
+if __name__ == "__main__":
+    # Read the combined prompt and repo file context sent by Cline from stdin
+    input_data = sys.stdin.read()
+    if not input_data:
+        print("Error: No input data provided via stdin.", file=sys.stderr)
+        sys.exit(1)
+        
+    result_code = send_to_codex(input_data)
+    print(result_code)
+Use o código com cuidado.Part B: The Orchestration Hook (run-action-agent.js)This is the
+JavaScript script running inside your server environment that wraps Cline's CLI functionality,
+telling Cline to execute instructions using your python-to-codex bridge.javascript// 
+run-action-agent.js
+const { execSync } = require('child_process');
+const fs = require('fs');
+
+try {
+  console.log("🤖 Action Agent: Parsing prompt.md...");
+  const userPrompt = fs.readFileSync('prompt.md', 'utf8');
+
+  // Trigger Cline CLI to handle the file modifications and run the self-healing loop
+  // Cline will call 'python3 call_codex.py' internally in the terminal when it needs Codex output
+  console.log("💻 Invoking Cline Engine...");
+  execSync(`cline --instruction "Process the following remote task: ${userPrompt}. Use 
+'python3 call_codex.py' to generate code assets. When complete, run local web verification."`, 
+{ stdio: 'inherit' });
+
+  // Once Cline finishes without errors, push the finalized code back to your GitHub
+  console.log("📤 Self-healing complete. Pushing fixes back to GitHub...");
+  execSync('git add .');
+  execSync('git commit -m "🤖 Auto-Heal: Resolved all UI/UX issues via remote agent loop"');
+  execSync('git push origin main');
+  
+  // Clear the prompt file so it doesn't trigger repeatedly on the next cycle
+  fs.writeFileSync('prompt.md', '# Waiting for next remote instruction...');
+  execSync('git add prompt.md && git commit -m "🔄 Reset prompt trigger" && git push origin main');
+  console.log("✅ Cycle finished. Sync Agent is listening again.");
+
+} catch (error) {
+  console.error("❌ Action Agent Loop Failed:", error.message);
+  // Optional: Push the crash logs back to GitHub so you can read them via Chromium
+  fs.writeFileSync('crash_log.txt', error.stack);
+  execSync('git add crash_log.txt && git commit -m "🚨 Agent Crash Log" && git push origin main');
+}
+Use o código com cuidado.How to use this from your remote Chromium BrowserOpen Google Gemini in one
+tab to draft your UI component modifications or your new skills.md theme rules.Open GitHub in a second
+tab. Click edit on prompt.md, paste your Gemini-optimized text, and commit the file.Your local Sync 
+Agent picks it up within 30 seconds, runs the Action Agent, routes requests to Codex, updates your 
+code locally, runs your verification suite, and commits the clean, working application files right 
+back to your GitHub repository for you to review.To move forward with deploying this to your server,
+let me know:Should we draft a self-healing-loop.md file that defines the precise fallback strategy for
+the Action Agent if Codex returns a faulty code format?Do you need help formatting the background 
+process configuration (like a systemd service or PM2 wrapper) to keep the Sync Agent running 
+permanently on your local server?

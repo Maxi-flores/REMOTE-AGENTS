@@ -82,3 +82,21 @@ Codex / Qwen must map the JSON tokens and the baseline component template into t
 
 Once Cline builds out the application infrastructure based on `skills.md`, the repository must enter an automated evaluation loop.
 
+### Compiler Runtime Contract (Strict)
+When processing runtime bug payloads, layout break reports, or Qwen-Vision contrast failures, the active code compiler must comply with all requirements below.
+
+1. Output format:
+- Return raw, production-ready source code only.
+- Do not emit markdown wrappers, code fences, explanations, greetings, or non-code characters.
+- Ensure imports, brackets, tags, and syntax are fully closed.
+
+2. Design-genome enforcement:
+- Every generated line must inherit active `skills.md` visual tokens and typography variables.
+- Do not introduce arbitrary inline style overrides or hardcoded attributes that deviate from the genome map.
+- Preserve repository-native contrast matrices, opacity modifiers, and canvas/background token usage.
+
+3. Failure isolation and repair:
+- Isolate failing component boundaries before editing.
+- Refactor container layout metrics natively to preserve responsive scaling.
+- Resolve the reported exception/log failure without breaking parent execution semantics.
+- Emit the fully refactored source file payload as the only output artifact.

@@ -64,6 +64,18 @@
         "num_thread": 4,
         "quantization_preference": "Q5_K_M",
         "max_context_chars": 12000
+      },
+      "compiler_runtime_contract": {
+        "raw_source_only": true,
+        "forbid_markdown_wrappers": true,
+        "forbid_conversational_text": true,
+        "skills_guardrail_file": "skills.md",
+        "enforce_skills_visual_tokens": true,
+        "forbid_inline_style_overrides": true,
+        "forbid_hardcoded_style_tokens": true,
+        "isolate_component_boundaries_before_repair": true,
+        "preserve_responsive_fluid_scaling": true,
+        "emit_single_refactored_source_artifact": true
       }
     },
     "Powerframe-CRM": {
@@ -73,6 +85,18 @@
         "num_thread": 4,
         "quantization_preference": "Q5_K_M",
         "max_context_chars": 12000
+      },
+      "compiler_runtime_contract": {
+        "raw_source_only": true,
+        "forbid_markdown_wrappers": true,
+        "forbid_conversational_text": true,
+        "skills_guardrail_file": "skills.md",
+        "enforce_skills_visual_tokens": true,
+        "forbid_inline_style_overrides": true,
+        "forbid_hardcoded_style_tokens": true,
+        "isolate_component_boundaries_before_repair": true,
+        "preserve_responsive_fluid_scaling": true,
+        "emit_single_refactored_source_artifact": true
       }
     },
     "TheRocketTree-Web": {
@@ -82,6 +106,18 @@
         "num_thread": 4,
         "quantization_preference": "Q5_K_M",
         "max_context_chars": 12000
+      },
+      "compiler_runtime_contract": {
+        "raw_source_only": true,
+        "forbid_markdown_wrappers": true,
+        "forbid_conversational_text": true,
+        "skills_guardrail_file": "skills.md",
+        "enforce_skills_visual_tokens": true,
+        "forbid_inline_style_overrides": true,
+        "forbid_hardcoded_style_tokens": true,
+        "isolate_component_boundaries_before_repair": true,
+        "preserve_responsive_fluid_scaling": true,
+        "emit_single_refactored_source_artifact": true
       }
     },
     "Dealinstinct Frontend": {
@@ -91,6 +127,18 @@
         "num_thread": 4,
         "quantization_preference": "Q5_K_M",
         "max_context_chars": 12000
+      },
+      "compiler_runtime_contract": {
+        "raw_source_only": true,
+        "forbid_markdown_wrappers": true,
+        "forbid_conversational_text": true,
+        "skills_guardrail_file": "skills.md",
+        "enforce_skills_visual_tokens": true,
+        "forbid_inline_style_overrides": true,
+        "forbid_hardcoded_style_tokens": true,
+        "isolate_component_boundaries_before_repair": true,
+        "preserve_responsive_fluid_scaling": true,
+        "emit_single_refactored_source_artifact": true
       }
     },
     "Dealinstinct V2": {
@@ -100,6 +148,18 @@
         "num_thread": 4,
         "quantization_preference": "Q5_K_M",
         "max_context_chars": 12000
+      },
+      "compiler_runtime_contract": {
+        "raw_source_only": true,
+        "forbid_markdown_wrappers": true,
+        "forbid_conversational_text": true,
+        "skills_guardrail_file": "skills.md",
+        "enforce_skills_visual_tokens": true,
+        "forbid_inline_style_overrides": true,
+        "forbid_hardcoded_style_tokens": true,
+        "isolate_component_boundaries_before_repair": true,
+        "preserve_responsive_fluid_scaling": true,
+        "emit_single_refactored_source_artifact": true
       }
     },
     "Bikerinstinct": {
@@ -109,6 +169,18 @@
         "num_thread": 4,
         "quantization_preference": "Q5_K_M",
         "max_context_chars": 12000
+      },
+      "compiler_runtime_contract": {
+        "raw_source_only": true,
+        "forbid_markdown_wrappers": true,
+        "forbid_conversational_text": true,
+        "skills_guardrail_file": "skills.md",
+        "enforce_skills_visual_tokens": true,
+        "forbid_inline_style_overrides": true,
+        "forbid_hardcoded_style_tokens": true,
+        "isolate_component_boundaries_before_repair": true,
+        "preserve_responsive_fluid_scaling": true,
+        "emit_single_refactored_source_artifact": true
       }
     },
     "WOMmedia": {
@@ -118,6 +190,18 @@
         "num_thread": 4,
         "quantization_preference": "Q5_K_M",
         "max_context_chars": 12000
+      },
+      "compiler_runtime_contract": {
+        "raw_source_only": true,
+        "forbid_markdown_wrappers": true,
+        "forbid_conversational_text": true,
+        "skills_guardrail_file": "skills.md",
+        "enforce_skills_visual_tokens": true,
+        "forbid_inline_style_overrides": true,
+        "forbid_hardcoded_style_tokens": true,
+        "isolate_component_boundaries_before_repair": true,
+        "preserve_responsive_fluid_scaling": true,
+        "emit_single_refactored_source_artifact": true
       }
     },
     "Powerframe": {
@@ -127,6 +211,18 @@
         "num_thread": 4,
         "quantization_preference": "Q5_K_M",
         "max_context_chars": 12000
+      },
+      "compiler_runtime_contract": {
+        "raw_source_only": true,
+        "forbid_markdown_wrappers": true,
+        "forbid_conversational_text": true,
+        "skills_guardrail_file": "skills.md",
+        "enforce_skills_visual_tokens": true,
+        "forbid_inline_style_overrides": true,
+        "forbid_hardcoded_style_tokens": true,
+        "isolate_component_boundaries_before_repair": true,
+        "preserve_responsive_fluid_scaling": true,
+        "emit_single_refactored_source_artifact": true
       }
     },
     "PowerStarter": {
@@ -136,6 +232,18 @@
         "num_thread": 4,
         "quantization_preference": "Q5_K_M",
         "max_context_chars": 12000
+      },
+      "compiler_runtime_contract": {
+        "raw_source_only": true,
+        "forbid_markdown_wrappers": true,
+        "forbid_conversational_text": true,
+        "skills_guardrail_file": "skills.md",
+        "enforce_skills_visual_tokens": true,
+        "forbid_inline_style_overrides": true,
+        "forbid_hardcoded_style_tokens": true,
+        "isolate_component_boundaries_before_repair": true,
+        "preserve_responsive_fluid_scaling": true,
+        "emit_single_refactored_source_artifact": true
       }
     },
     "TheRocketTree-App": {
@@ -145,6 +253,18 @@
         "num_thread": 4,
         "quantization_preference": "Q5_K_M",
         "max_context_chars": 12000
+      },
+      "compiler_runtime_contract": {
+        "raw_source_only": true,
+        "forbid_markdown_wrappers": true,
+        "forbid_conversational_text": true,
+        "skills_guardrail_file": "skills.md",
+        "enforce_skills_visual_tokens": true,
+        "forbid_inline_style_overrides": true,
+        "forbid_hardcoded_style_tokens": true,
+        "isolate_component_boundaries_before_repair": true,
+        "preserve_responsive_fluid_scaling": true,
+        "emit_single_refactored_source_artifact": true
       }
     },
     "Powerframe-GMS": {
@@ -154,6 +274,18 @@
         "num_thread": 4,
         "quantization_preference": "Q5_K_M",
         "max_context_chars": 12000
+      },
+      "compiler_runtime_contract": {
+        "raw_source_only": true,
+        "forbid_markdown_wrappers": true,
+        "forbid_conversational_text": true,
+        "skills_guardrail_file": "skills.md",
+        "enforce_skills_visual_tokens": true,
+        "forbid_inline_style_overrides": true,
+        "forbid_hardcoded_style_tokens": true,
+        "isolate_component_boundaries_before_repair": true,
+        "preserve_responsive_fluid_scaling": true,
+        "emit_single_refactored_source_artifact": true
       }
     },
     "Powerframe-TPR": {
@@ -163,6 +295,18 @@
         "num_thread": 4,
         "quantization_preference": "Q5_K_M",
         "max_context_chars": 12000
+      },
+      "compiler_runtime_contract": {
+        "raw_source_only": true,
+        "forbid_markdown_wrappers": true,
+        "forbid_conversational_text": true,
+        "skills_guardrail_file": "skills.md",
+        "enforce_skills_visual_tokens": true,
+        "forbid_inline_style_overrides": true,
+        "forbid_hardcoded_style_tokens": true,
+        "isolate_component_boundaries_before_repair": true,
+        "preserve_responsive_fluid_scaling": true,
+        "emit_single_refactored_source_artifact": true
       }
     },
     "Powerframe-WMS": {
@@ -172,6 +316,18 @@
         "num_thread": 4,
         "quantization_preference": "Q5_K_M",
         "max_context_chars": 12000
+      },
+      "compiler_runtime_contract": {
+        "raw_source_only": true,
+        "forbid_markdown_wrappers": true,
+        "forbid_conversational_text": true,
+        "skills_guardrail_file": "skills.md",
+        "enforce_skills_visual_tokens": true,
+        "forbid_inline_style_overrides": true,
+        "forbid_hardcoded_style_tokens": true,
+        "isolate_component_boundaries_before_repair": true,
+        "preserve_responsive_fluid_scaling": true,
+        "emit_single_refactored_source_artifact": true
       }
     },
     "Trade Agent – V1": {
@@ -181,6 +337,18 @@
         "num_thread": 4,
         "quantization_preference": "Q5_K_M",
         "max_context_chars": 12000
+      },
+      "compiler_runtime_contract": {
+        "raw_source_only": true,
+        "forbid_markdown_wrappers": true,
+        "forbid_conversational_text": true,
+        "skills_guardrail_file": "skills.md",
+        "enforce_skills_visual_tokens": true,
+        "forbid_inline_style_overrides": true,
+        "forbid_hardcoded_style_tokens": true,
+        "isolate_component_boundaries_before_repair": true,
+        "preserve_responsive_fluid_scaling": true,
+        "emit_single_refactored_source_artifact": true
       }
     },
     "Sapient KB": {
@@ -190,6 +358,18 @@
         "num_thread": 4,
         "quantization_preference": "Q5_K_M",
         "max_context_chars": 12000
+      },
+      "compiler_runtime_contract": {
+        "raw_source_only": true,
+        "forbid_markdown_wrappers": true,
+        "forbid_conversational_text": true,
+        "skills_guardrail_file": "skills.md",
+        "enforce_skills_visual_tokens": true,
+        "forbid_inline_style_overrides": true,
+        "forbid_hardcoded_style_tokens": true,
+        "isolate_component_boundaries_before_repair": true,
+        "preserve_responsive_fluid_scaling": true,
+        "emit_single_refactored_source_artifact": true
       }
     },
     "TheRocketTreeUnity": {
@@ -199,6 +379,18 @@
         "num_thread": 4,
         "quantization_preference": "Q5_K_M",
         "max_context_chars": 12000
+      },
+      "compiler_runtime_contract": {
+        "raw_source_only": true,
+        "forbid_markdown_wrappers": true,
+        "forbid_conversational_text": true,
+        "skills_guardrail_file": "skills.md",
+        "enforce_skills_visual_tokens": true,
+        "forbid_inline_style_overrides": true,
+        "forbid_hardcoded_style_tokens": true,
+        "isolate_component_boundaries_before_repair": true,
+        "preserve_responsive_fluid_scaling": true,
+        "emit_single_refactored_source_artifact": true
       }
     },
     "Mucho3D": {
@@ -208,6 +400,18 @@
         "num_thread": 4,
         "quantization_preference": "Q5_K_M",
         "max_context_chars": 16000
+      },
+      "compiler_runtime_contract": {
+        "raw_source_only": true,
+        "forbid_markdown_wrappers": true,
+        "forbid_conversational_text": true,
+        "skills_guardrail_file": "skills.md",
+        "enforce_skills_visual_tokens": true,
+        "forbid_inline_style_overrides": true,
+        "forbid_hardcoded_style_tokens": true,
+        "isolate_component_boundaries_before_repair": true,
+        "preserve_responsive_fluid_scaling": true,
+        "emit_single_refactored_source_artifact": true
       }
     },
     "PF-WAI": {
@@ -221,6 +425,18 @@
         "allowed_write_path_prefixes": [
           ".pfwai_output"
         ]
+      },
+      "compiler_runtime_contract": {
+        "raw_source_only": true,
+        "forbid_markdown_wrappers": true,
+        "forbid_conversational_text": true,
+        "skills_guardrail_file": "skills.md",
+        "enforce_skills_visual_tokens": true,
+        "forbid_inline_style_overrides": true,
+        "forbid_hardcoded_style_tokens": true,
+        "isolate_component_boundaries_before_repair": true,
+        "preserve_responsive_fluid_scaling": true,
+        "emit_single_refactored_source_artifact": true
       }
     }
   }

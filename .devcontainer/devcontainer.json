@@ -1,0 +1,10 @@
+{
+  "features": {
+    "ghcr.io/tailscale/codespace/tailscale": {},
+    "ghcr.io/devcontainers/features/desktop-lite:1": {}
+  },
+  "runArgs": [
+    "--device=/dev/net/tun"
+  ],
+  "overrideCommand": false
+}

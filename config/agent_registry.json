@@ -8,6 +8,18 @@
       "num_thread": 4,
       "quantization_preference": "Q5_K_M",
       "max_context_chars": 12000
+    },
+    "compiler_runtime_contract": {
+      "raw_source_only": true,
+      "forbid_markdown_wrappers": true,
+      "forbid_conversational_text": true,
+      "skills_guardrail_file": "skills.md",
+      "enforce_skills_visual_tokens": true,
+      "forbid_inline_style_overrides": true,
+      "forbid_hardcoded_style_tokens": true,
+      "isolate_component_boundaries_before_repair": true,
+      "preserve_responsive_fluid_scaling": true,
+      "emit_single_refactored_source_artifact": true
     }
   },
   "groups": {

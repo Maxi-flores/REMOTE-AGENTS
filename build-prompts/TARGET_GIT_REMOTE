@@ -1,0 +1,128 @@
+Here is the technical implementation to connect your automatic upload and directory
+creation function directly to your target repository at git@github.com:Maxi-flores/
+Design-Genome.git using an automated Python execution pass.Following the core 
+architecture constraints of your runtime, this script acts as an advisory artifact
+engine. It captures the incoming image, generates the programmatic document 
+directories, and executes an authoritative Git subprocess sequence to immediately
+push the new assets back to your GitHub repo without destabilizing the local engine
+queue.Expanded Ingestion & Remote Sync Script (src/orchestrator/upload_and_push.py)
+Save this file into your orchestrator path. This version automatically initializes
+the directory, links the .png profile asset, clears the current execution token, 
+and safely executes an SSH-authenticated upstream sync.pythonimport os
+import json
+import shutil
+import subprocess
+from pathlib import Path
+
+TARGET_GIT_REMOTE = "git@github.com:Maxi-flores/Design-Genome.git"
+
+def execute_git_sync(repo_directory, theme_name):
+    """
+    Executes a structured, isolated git push directly into the 
+    Design-Genome remote repository using local system keys.
+    """
+    try:
+        print(f"[+] Starting remote push sequence for target repo...")
+        
+        # Ensure we are operating from the target workspace directory
+        os.chdir(repo_directory)
+        
+        # Safe staging check
+        subprocess.run(["git", "add", "."], check=True)
+        
+        # Commit payload containing automated design metadata
+        commit_message = f"🤖 remote-agent: automatically uploaded assets and generated documentation for [{theme_name}]"
+        subprocess.run(["git", "commit", "-m", commit_message], check=True)
+        
+        # Authoritative upstream push to default main branch
+        subprocess.run(["git", "push", "origin", "main"], check=True)
+        print("[+] Synchronization to git@github.com:Maxi-flores/Design-Genome.git complete.")
+        return True
+    except subprocess.CalledProcessError as git_err:
+        print(f"[!] Critical Subprocess Failure during Git Execution: {git_err}")
+        return False
+    except Exception as e:
+        print(f"[!] System Error during push mapping: {str(e)}")
+        return False
+
+def automatic_upload_dir_generation(task_file_path=".platform_queue/next_task.json"):
+    # 1. Architectural Contract Validation
+    if not os.path.exists(task_file_path):
+        print("[-] Execution halted: No pending payload found inside .platform_queue/")
+        return
+
+    with open(task_file_path, 'r') as f:
+        task_data = json.load(f)
+
+    if task_data.get("action") != "AUTOMATIC_UPLOAD_DIR_GENERATION":
+        return
+
+    payload = task_data["payload"]
+    source_img = payload["source_image"]
+    output_root = payload["target_output_root"]
+    theme_context = payload["theme_context"]
+    theme_slug = theme_context.lower().replace(" ", "_").replace("-", "")
+
+    # Save the base runtime execution context to jump back to safely later
+    runtime_root = os.getcwd()
+    theme_folder_path = os.path.join(runtime_root, output_root, theme_slug)
+    subfolders = ["assets/images", "components", "documentation", "logs"]
+
+    print(f"[+] Instantiating file structure layout for theme: {theme_context}")
+
+    # 2. Sequential Folder Ingestion
+    for folder in subfolders:
+        target_path = os.path.join(theme_folder_path, folder)
+        Path(target_path).mkdir(parents=True, exist_ok=True)
+
+    # 3. Reference Asset Relocation
+    absolute_source = os.path.join(runtime_root, source_img)
+    if os.path.exists(absolute_source):
+        destination_img_path = os.path.join(theme_folder_path, "assets/images", "theme_profile.png")
+        shutil.copy(absolute_source, destination_img_path)
+        print(f"[+] Reference render target successfully mirrored to: {destination_img_path}")
+    else:
+        print(f"[!] Source target layout broken: {absolute_source} not accessible.")
+        shutil.move(task_file_path, f".platform_queue/failed/failed_{task_data['task_id']}.json")
+        return
+
+    # 4. Compiling Diagnostic Manifest Metadata
+    manifest_data = {
+        "generated_theme": theme_context,
+        "repo_origin": TARGET_GIT_REMOTE,
+        "sync_status": "PENDING_UPSTREAM"
+    }
+    with open(os.path.join(theme_folder_path, "documentation/manifest.json"), "w") as manifest_file:
+        json.dump(manifest_data, manifest_file, indent=2)
+
+    # 5. Remote Sync Invocator Pass
+    sync_success = execute_git_sync(runtime_root, theme_context)
+
+    # 6. Post-Flight State Cleanup and Lock Release
+    os.chdir(runtime_root)
+    if sync_success:
+        if os.path.exists(task_file_path):
+            os.remove(task_file_path)
+        print("[+] Task cleanly flushed from the active .platform_queue/ layer.")
+    else:
+        print("[!] Execution failed during remote deployment phase. Archiving task file details.")
+        shutil.move(task_file_path, f".platform_queue/failed/failed_{task_data['task_id']}.json")
+
+if __name__ == "__main__":
+    automatic_upload_dir_generation()
+Use o código com cuidado.How this functions natively inside your workspace
+loopRemote Commit Initiation: You modify your root prompt.md via your Chromium 
+workspace page or drop a new .png mock-up.Local Sync Trigger: The local daemon 
+spots the update, issues an external pull command, and generates a 
+.platform_queue/next_task.json payload on your server.Automated Structural 
+Assembly: The upload_and_push.py module triggers, maps out the entire dynamic 
+directory configuration structure, copies the generated visual asset file, and
+writes a clean JSON manifest document layout.Git Pipeline Execution: Python 
+opens a sub-shell pipeline targeting git@github.com:Maxi-flores/Design-Genome.git,
+securely locks down your change parameters with an autonomous commit message, pushes
+it back upstream, and drops the processing lock cleanly.Proposing Specific Ways to 
+Proceed:To keep expanding this workflow block, let me know:Do you want me to write
+the automated Node.js router listener code that translates incoming files directly
+into this backend Python execution routine?Do you need help formatting a GitHub 
+Actions workflow pipeline file to verify if the newly pushed folders match your 
+required project schema rules?

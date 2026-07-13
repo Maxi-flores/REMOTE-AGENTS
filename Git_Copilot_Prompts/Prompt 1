@@ -1,0 +1,25 @@
+@workspace /explain 
+
+Analyze the #file:architecture.md file for our new AI project management system. I need to understand our frontend constraints before I start coding.
+
+Please scan the document and extract any specific rule sets regarding:
+1. DESIGN TOKENS: Colors, spacing scales, typography rules, or theme variables.
+2. UI GUARDRAILS: Constraints on accessibility (WCAG), responsive breakpoints, or component behaviors.
+3. PAGE DESIGN SKILLS: Rules or templates for layout structure, dashboard grids, or sidebar behavior.
+
+Format your response as a clean, actionable markdown checklist. If any of these three areas are missing from the architecture file, explicitly state "Not defined in architecture.md" so I know what we need to establish next.
+
+----
+
+@workspace 
+
+Based on the rules found in #file:architecture.md, help me implement the core Layout Manager for our AI project management system inside the open file.
+
+Requirements:
+1. DESIGN TOKENS: Consume the allowed color variables, spacing scales, and theme modes defined in the architecture.
+2. GUARDRAILS: Enforce responsive breakpoints (desktop/mobile layout shifting) and include basic ARIA roles for accessibility.
+3. PAGE DESIGN SKILLS: Implement a flexible page design layout structure (e.g., a sticky Sidebar, a global Header, and a dynamic main content Grid Canvas).
+
+Export a main `LayoutManager` wrapper component and ensure it is highly extensible, as AI skills will dynamically inject custom dashboard widgets into the main canvas later. 
+
+Generate clean, strongly-typed TypeScript code matching our project's UI framework.

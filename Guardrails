@@ -1,0 +1,258 @@
+Agent World — Remote Coding Agent
+
+Status: Architecture Locked
+Surface: https://sentient.powerframe.online/agent-world
+System: Sentient OS / Remote Agents
+
+Purpose
+
+Agent World will become the browser-accessible control plane for governed remote coding agents.
+
+The objective is to allow an authenticated operator to inspect repositories, issue development tasks, observe agent execution, review changes, run validation and approve Git operations entirely through the Agent World web interface.
+
+The client machine requires only a supported web browser.
+
+No repository checkout, terminal, coding CLI, GitHub credential, model API key or execution runtime is required on the client machine.
+
+Architectural Decision
+
+DO NOT create a separate agent.powerframe.online coding product.
+
+The existing:
+
+sentient.powerframe.online/agent-world
+
+is the canonical operator surface.
+
+Coding capability must be integrated into Agent World as a governed Remote Agents capability.
+
+System Boundary
+
+Browser
+   |
+   v
+Sentient OS / Agent World
+   |
+   v
+Remote Agents API / Orchestrator
+   |
+   +---- GitHub
+   |
+   +---- Coding Worker
+   |       |
+   |       +-- repository workspace
+   |       +-- controlled commands
+   |       +-- tests
+   |       +-- builds
+   |       +-- git operations
+   |
+   +---- Model Adapter
+           |
+           +-- OpenRouter
+           +-- OpenAI
+           +-- local models / Ollama
+           +-- future providers
+
+Agent World is the control plane.
+
+Remote Agents owns orchestration and governance.
+
+The Coding Worker owns execution.
+
+Model providers supply inference only.
+
+GitHub remains the repository source of truth.
+
+Core Principle
+
+Models are not agents.
+
+OpenRouter, OpenAI, Anthropic-compatible models, Gemini-compatible models and local models are interchangeable inference providers.
+
+Remote Agents remains responsible for:
+
+* agent identity
+* sessions
+* task state
+* tool permissions
+* execution routing
+* approval gates
+* evidence
+* audit history
+* repository context
+* runtime state
+
+Coding Session
+
+A coding session should eventually contain:
+
+* agent identity
+* repository
+* base branch
+* working branch
+* operator task
+* selected model/provider
+* assigned worker
+* execution state
+* tool activity
+* changed files
+* test results
+* build results
+* git diff
+* approvals
+* commit/PR state
+
+Initial Tool Boundary
+
+Prefer bounded tools instead of unrestricted shell access.
+
+Initial conceptual tool surface:
+
+repo.list
+repo.read
+repo.search
+workspace.write
+workspace.patch
+tests.run
+build.run
+git.status
+git.diff
+git.commit
+github.create_branch
+github.create_pr
+
+Shell execution, when required, must occur through an explicitly governed worker interface.
+
+Do not expose arbitrary host/root execution directly to a model.
+
+Browser Security Boundary
+
+The browser must never require possession of:
+
+* OpenRouter API keys
+* OpenAI API keys
+* GitHub private credentials
+* SSH private keys
+* worker credentials
+* infrastructure secrets
+
+Secrets remain server-side.
+
+The browser receives only the authentication/session authority necessary to operate Agent World.
+
+Approval Model
+
+Repository mutation must remain observable.
+
+The intended flow is:
+
+TASK
+  ↓
+INSPECT
+  ↓
+PLAN
+  ↓
+EDIT
+  ↓
+TEST
+  ↓
+BUILD
+  ↓
+DIFF
+  ↓
+OPERATOR APPROVAL
+  ↓
+COMMIT / PR
+
+High-impact mutations should fail closed when required identity, authority, routing or approval information is unresolved.
+
+Initial Product Scope
+
+Phase 1 — Repository Intelligence
+
+* select repository
+* inspect repository tree
+* read/search files
+* ask repository-aware questions
+* stream agent activity
+* model inference through adapter
+
+No autonomous mutation required.
+
+Phase 2 — Governed Editing
+
+* isolated working copy
+* patch generation
+* changed-file tracking
+* diff viewer
+* explicit approval
+* controlled commit
+
+Phase 3 — Coding Runtime
+
+* bounded tool loop
+* test execution
+* build execution
+* retry/fix cycles
+* branches
+* pull requests
+* persistent session history
+
+Phase 4 — Distributed Remote Agents
+
+* multiple execution workers
+* Windows worker
+* Linux/container worker
+* optional GPU/local-model worker
+* capability-aware routing
+* model-provider selection
+* deeper Sentient OS governance
+
+UI Direction
+
+Do not recreate a full IDE.
+
+Agent World remains an operational control plane.
+
+The dominant interaction should be:
+
+1. select agent
+2. select repository/context
+3. issue task
+4. observe plan and execution
+5. inspect evidence and changes
+6. approve or reject mutations
+
+File viewing and diff inspection support this workflow but should not turn Agent World into a VS Code clone.
+
+Compatibility
+
+The architecture must remain compatible with:
+
+* existing Agent World read models
+* Remote Agents
+* Sentient OS governance
+* GitHub
+* OpenRouter
+* direct model APIs
+* Ollama/local inference
+* Windows workers
+* Linux workers
+* future isolated/container runtimes
+
+Definition of Success
+
+From a browser, an authorized operator can eventually:
+
+1. open Agent World;
+2. select a coding agent;
+3. select an authorized GitHub repository;
+4. issue a development task;
+5. observe repository inspection and execution;
+6. inspect resulting changes and validation evidence;
+7. approve the mutation;
+8. create a controlled commit or pull request;
+
+without requiring a development environment on the browser client.
+
+This document defines the intended architecture unless explicitly superseded by a later approved architecture decision.
